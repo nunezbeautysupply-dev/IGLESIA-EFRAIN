@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260723a-EFD-ADMIN-V1.0">
+<meta name="app-version" content="20260723c-EFD-ADMIN-V2.0">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -137,10 +137,100 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
 .mini{font-size:13.5px;color:var(--lavanda);line-height:1.5}
 .progreso{height:5px;background:rgba(169,166,216,.16);border-radius:3px;overflow:hidden;margin:14px 0}
 .progreso i{display:block;height:100%;background:linear-gradient(90deg,var(--oro),var(--oro-suave));width:0;transition:width .25s}
+
+/* ── reproductor ─────────────────────────────────── */
+.repro{background:var(--indigo);border:1px solid var(--linea);border-radius:18px;padding:18px 16px 16px;margin-bottom:14px}
+.ctrl{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:6px}
+.bsec{flex:0 0 auto;width:46px;height:46px;min-width:46px;border-radius:50%;
+  background:transparent;border:1px solid rgba(169,166,216,.32);color:var(--lavanda);
+  font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.bsec:active{background:var(--indigo2)}
+.bsalto{flex:0 0 auto;width:54px;height:50px;min-width:54px;border-radius:14px;
+  background:transparent;border:1px solid rgba(169,166,216,.32);color:var(--lavanda);
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0}
+.bsalto:active{background:var(--indigo2)}
+.bsalto .fl{font-size:20px;line-height:1}
+.bsalto .nu{font-size:11.5px;line-height:1.1;font-weight:700}
+.bplay{flex:0 0 auto;width:78px;height:78px;min-width:78px;border-radius:50%;border:none;
+  background:linear-gradient(180deg,var(--oro-suave),var(--oro));color:#2A1F04;
+  font-size:31px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;
+  box-shadow:0 0 26px rgba(212,175,55,.32)}
+.bplay:active{filter:brightness(.92)}
+.linea-t{display:flex;justify-content:space-between;font-size:12.5px;color:var(--lavanda);margin-top:2px}
+input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:transparent}
+.vels{display:flex;gap:8px;margin-top:12px}
+.vel{flex:1;padding:11px 0;border-radius:11px;background:transparent;
+  border:1px solid rgba(169,166,216,.28);color:var(--lavanda);font-size:14.5px;font-weight:700;cursor:pointer}
+.vel.on{background:rgba(212,175,55,.16);border-color:var(--oro);color:var(--oro-suave)}
+.dice{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--perg);
+  background:rgba(169,166,216,.07);border-radius:12px;padding:13px 15px;margin-bottom:14px;min-height:76px}
+.voznota{font-size:13px;color:var(--lavanda);text-align:center;margin-top:10px;line-height:1.5}
+@media (max-width:400px){
+  .ctrl{gap:6px}
+  .bsec{width:42px;height:42px;min-width:42px;font-size:17px}
+  .bsalto{width:50px;height:46px;min-width:50px}
+  .bplay{width:70px;height:70px;min-width:70px;font-size:28px}
+}
+@media (max-width:345px){
+  .ctrl{gap:4px}
+  .bsec{width:38px;height:38px;min-width:38px;font-size:16px}
+  .bsalto{width:45px;height:42px;min-width:45px}
+  .bplay{width:62px;height:62px;min-width:62px;font-size:25px}
+}
 @media (max-width:360px){
   body{font-size:16px}
   .marca{font-size:23px}
   .btn{font-size:16.5px;padding:15px}
+}
+/* ── menú lateral ─────────────────────────────────── */
+.velo-men{display:none;position:fixed;inset:0;background:rgba(6,9,22,.72);z-index:940}
+.velo-men.abierto{display:block}
+.menu{position:fixed;top:0;left:0;bottom:0;width:84%;max-width:340px;background:var(--indigo);
+  z-index:950;transform:translateX(-102%);transition:transform .22s;overflow-y:auto;
+  border-right:1px solid var(--linea);padding-bottom:30px}
+.menu.abierto{transform:translateX(0)}
+.menu-cab{padding:20px 18px 14px;border-bottom:1px solid rgba(169,166,216,.14)}
+.menu-cab img{width:54px;height:54px;border-radius:10px;display:block}
+.menu-cab div{font-family:var(--serif);color:var(--oro-suave);font-size:18px;margin-top:9px}
+.menu-sec{font-size:12px;letter-spacing:.16em;color:var(--lavanda);text-transform:uppercase;
+  padding:18px 18px 7px;font-weight:700}
+.menu-it{display:flex;align-items:center;gap:14px;padding:0 18px;height:65px;cursor:pointer;
+  border-bottom:1px solid rgba(169,166,216,.07);color:var(--perg);font-size:17.5px;font-weight:600}
+.menu-it:active{background:var(--indigo2)}
+.menu-it .mi{font-size:24px;width:28px;text-align:center;flex-shrink:0}
+.menu-it .mx{font-size:13px;color:var(--lavanda);font-weight:600;margin-left:auto}
+
+/* ── progreso / estadísticas ──────────────────────── */
+.stats{display:flex;gap:10px;margin:12px 0 4px}
+.stat{flex:1;background:rgba(169,166,216,.07);border-radius:12px;padding:11px 8px;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:22px;color:var(--oro-suave);line-height:1.2}
+.stat span{font-size:12px;color:var(--lavanda)}
+
+/* ── buscador y filtros ───────────────────────────── */
+.chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch}
+.chip{flex:0 0 auto;padding:8px 14px;border-radius:20px;background:transparent;
+  border:1px solid rgba(169,166,216,.28);color:var(--lavanda);font-size:14px;font-weight:700;cursor:pointer}
+.chip.on{background:rgba(212,175,55,.16);border-color:var(--oro);color:var(--oro-suave)}
+
+/* ── marcas en la lista de temas ──────────────────── */
+.tema-marcas{display:flex;gap:8px;align-items:center;flex-shrink:0;padding-top:2px}
+.mk{font-size:19px;line-height:1;cursor:pointer;background:none;border:none;padding:2px}
+.mk-off{color:rgba(169,166,216,.32)}
+.mk-fav{color:var(--oro)}
+.mk-ok{color:var(--verde)}
+
+/* ── impresión ────────────────────────────────────── */
+#imp{display:none}
+@media print{
+  body>.envoltura,.velo,.menu,.velo-men{display:none!important}
+  body::before{display:none!important}
+  body{background:#fff;color:#000}
+  #imp{display:block!important;padding:0 6mm}
+  #imp h1{font-family:Georgia,serif;font-size:20pt;margin:0 0 4mm;border-bottom:2px solid #000;padding-bottom:2mm}
+  #imp h2{font-family:Georgia,serif;font-size:14pt;margin:7mm 0 2mm}
+  #imp p{font-family:Georgia,serif;font-size:11pt;line-height:1.5;margin:0 0 3mm}
+  #imp .r{border-left:3px solid #000;padding-left:4mm;margin:3mm 0;font-style:italic}
+  #imp .pie{font-size:9pt;color:#555;margin-top:3mm}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -217,11 +307,17 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
     <div class="barra">
       <button class="volver" onclick="ir('p-biblioteca')">←</button>
       <h1 id="prep-titulo">Libro</h1>
+      <button class="volver" onclick="abrirMenu()">☰</button>
     </div>
     <div id="prep-resumen"></div>
+    <div class="tarj" id="prep-progreso"></div>
+    <input class="campo" id="prep-buscar" type="search" placeholder="🔍 Buscar en este libro..."
+           oninput="pintarPreparar()" style="margin-bottom:10px">
+    <div class="chips" id="prep-chips"></div>
     <div class="tarj">
       <div id="prep-temas"></div>
     </div>
+    <button class="btn btn-linea" onclick="escucharDesdeElPrincipio()">🔊 Escuchar el libro</button>
     <button class="btn btn-oro" onclick="abrirSellar()">🔒 Sellar y generar el archivo</button>
     <button class="btn btn-linea" onclick="renombrarLibro()">Cambiar el nombre del libro</button>
     <button class="btn btn-rojo" onclick="borrarLibro()">Borrar este libro</button>
@@ -234,6 +330,42 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
       <h1 id="tema-titulo">Tema</h1>
     </div>
     <div id="tema-cuerpo"></div>
+  </section>
+
+  <!-- ══════════ ESCUCHAR ══════════ -->
+  <section id="p-escuchar" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="salirDeEscuchar()">←</button>
+      <h1 id="esc-titulo">Escuchar</h1>
+    </div>
+    <p class="mini" id="esc-cual" style="margin:-6px 0 14px"></p>
+
+    <div class="repro">
+      <div class="dice" id="esc-dice">Toca ▶ para empezar.</div>
+      <input type="range" id="esc-pos" min="0" max="0" value="0"
+             oninput="irAPedazo(+this.value)" aria-label="Posición">
+      <div class="linea-t"><span id="esc-t1">0:00</span><span id="esc-t2">0:00</span></div>
+      <div class="ctrl">
+        <button class="bsec"   onclick="temaAnterior()"  aria-label="Tema anterior">⏮</button>
+        <button class="bsalto" onclick="saltar(-10)"     aria-label="Retroceder 10 segundos">
+          <span class="fl">↺</span><span class="nu">10</span></button>
+        <button class="bplay" id="esc-play" onclick="playPausa()" aria-label="Reproducir">▶</button>
+        <button class="bsalto" onclick="saltar(10)"      aria-label="Adelantar 10 segundos">
+          <span class="fl">↻</span><span class="nu">10</span></button>
+        <button class="bsec"   onclick="temaSiguiente()" aria-label="Tema siguiente">⏭</button>
+      </div>
+      <div class="vels">
+        <button class="vel" id="v-085" onclick="ponerVelocidad(0.85)">Lento</button>
+        <button class="vel on" id="v-1" onclick="ponerVelocidad(1)">Normal</button>
+        <button class="vel" id="v-125" onclick="ponerVelocidad(1.25)">Rápido</button>
+      </div>
+      <p class="voznota">Deja la pantalla encendida mientras escuchas.<br>
+        Si la apagas, la voz se detiene.</p>
+    </div>
+
+    <button class="btn btn-linea" onclick="cambiarQueSeLee()" id="esc-modo">★ Escuchar solo lo importante</button>
+    <button class="btn btn-linea" onclick="abrirVoces()">🔊 Cambiar la voz</button>
+    <div id="esc-importante"></div>
   </section>
 
   <!-- ══════════ USUARIOS ══════════ -->
@@ -251,6 +383,19 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
   </section>
 
 </div>
+
+<!-- ══════════ MENÚ LATERAL ══════════ -->
+<div class="velo-men" id="velo-men" onclick="cerrarMenu()"></div>
+<nav class="menu" id="menu">
+  <div class="menu-cab">
+    <img src="icon-192.png" alt="">
+    <div>Iglesia Efraín<br><span style="font-size:12.5px;letter-spacing:.28em;color:var(--lavanda)">PARA DIOS</span></div>
+  </div>
+  <div id="menu-cuerpo"></div>
+</nav>
+
+<!-- zona que se usa solo al imprimir -->
+<div id="imp"></div>
 
 <!-- ══════════ VENTANAS EMERGENTES ══════════ -->
 <div class="velo" id="velo" onclick="if(event.target===this)cerrarModal()">
@@ -621,7 +766,13 @@ function ir(p){
   for(var i=0;i<todas.length;i++) todas[i].classList.remove('activa');
   var el = $(p); if(el) el.classList.add('activa');
   window.scrollTo(0,0);
-  if(p === 'p-biblioteca') pintarBiblioteca();
+  // si se sale del reproductor, la voz se calla
+  if(p !== 'p-escuchar' && typeof sonando !== 'undefined' && sonando){
+    pareYo = true; if(voz) voz.cancel(); sonando = false;
+    var bp = $('esc-play'); if(bp) bp.textContent = '▶';
+    if(typeof soltarPantalla === 'function') soltarPantalla();
+  }
+  if(p === 'p-biblioteca'){ libroActual = null; pintarBiblioteca(); }
   if(p === 'p-usuarios')   pintarUsuarios();
   if(p === 'p-preparar')   pintarPreparar();
 }
@@ -686,19 +837,6 @@ async function entrar(){
 }
 
 /* ══════════════════ MENU ══════════════════ */
-function abrirMenu(){
-  modal('<h2>Menú</h2>'
-    + '<button class="btn btn-linea" id="m1">👥 Quién puede entrar</button>'
-    + '<button class="btn btn-linea" id="m2">🔑 Cambiar mi clave maestra</button>'
-    + '<button class="btn btn-linea" id="m3">🛡️ Cómo protege esta app tu libro</button>'
-    + '<button class="btn btn-linea" id="m4">🔒 Cerrar la app</button>'
-    + '<button class="btn btn-linea" id="m0" style="margin-top:8px">Volver</button>');
-  $('m1').onclick = function(){ cerrarModal(); ir('p-usuarios'); };
-  $('m2').onclick = cambiarClaveMaestra;
-  $('m3').onclick = explicarSeguridad;
-  $('m4').onclick = function(){ claveMaestra = null; cerrarModal(); ir('p-entrar'); };
-  $('m0').onclick = cerrarModal;
-}
 function cambiarClaveMaestra(){
   pedirTexto('Cambiar mi clave', 'Escribe la clave NUEVA (mínimo 6)', '', async function(v){
     if(v.length < 6) return errorEn('merr','Necesita al menos 6 caracteres.');
@@ -835,15 +973,65 @@ function pintarPreparar(){
     + '<p class="mini" style="margin:0 0 14px">' + l.temas.length + ' temas · ' + marcas
     + ' frases importantes · ' + min + ' min de lectura</p>';
 
-  $('prep-temas').innerHTML = l.temas.map(function(t,i){
-    return '<div class="tema tarj-toc" onclick="verTema(' + i + ')">'
+  // progreso, minutos y racha
+  var hechosN = 0;
+  l.temas.forEach(function(t,i){ if(esHecho(i)) hechosN++; });
+  var pct = l.temas.length ? Math.round(hechosN / l.temas.length * 100) : 0;
+  var st = stats();
+  $('prep-progreso').innerHTML =
+      '<div style="display:flex;justify-content:space-between;font-size:15px;color:var(--lavanda)">'
+    + '<span>Tu progreso</span><b style="color:var(--oro-suave)">' + pct + '%</b></div>'
+    + '<div class="progreso"><i style="width:' + pct + '%"></i></div>'
+    + '<div class="stats">'
+    + '<div class="stat"><b>' + hechosN + '/' + l.temas.length + '</b><span>escuchados</span></div>'
+    + '<div class="stat"><b>' + Math.round(st.minutos) + '</b><span>minutos</span></div>'
+    + '<div class="stat"><b>' + racha() + '</b><span>días seguidos</span></div>'
+    + '</div>' + revisarAusencia();
+
+  // filtros
+  var cuenta = { todos:l.temas.length, pendientes:0, escuchados:hechosN, favoritos:0 };
+  l.temas.forEach(function(t,i){ if(!esHecho(i)) cuenta.pendientes++; if(esFav(i)) cuenta.favoritos++; });
+  $('prep-chips').innerHTML = [['todos','Todos'],['pendientes','Pendientes'],
+      ['escuchados','Escuchados'],['favoritos','Favoritos']].map(function(f){
+    return '<button class="chip' + (filtro===f[0]?' on':'') + '" onclick="ponerFiltro(\'' + f[0] + '\')">'
+      + f[1] + ' (' + cuenta[f[0]] + ')</button>';
+  }).join('');
+
+  // la lista
+  var q = ($('prep-buscar') ? $('prep-buscar').value : '');
+  var salen = [];
+  l.temas.forEach(function(t,i){
+    if(filtro === 'pendientes'  && esHecho(i)) return;
+    if(filtro === 'escuchados'  && !esHecho(i)) return;
+    if(filtro === 'favoritos'   && !esFav(i)) return;
+    if(!temaCoincide(t, q)) return;
+    salen.push({ t:t, i:i });
+  });
+  if(!salen.length){
+    $('prep-temas').innerHTML = '<div class="vacio" style="padding:26px 10px">'
+      + (q ? 'Nada coincide con lo que buscaste.' : 'No hay temas en este filtro.') + '</div>';
+    return;
+  }
+  $('prep-temas').innerHTML = salen.map(function(x){
+    var t = x.t, i = x.i, nota = notaDe(i);
+    return '<div class="tema">'
       + '<div class="tema-n">' + (i+1) + '</div>'
-      + '<div class="tema-cuerpo">'
+      + '<div class="tema-cuerpo tarj-toc" onclick="verTema(' + i + ')">'
       + '<div class="tema-tit">' + esc(t.titulo) + '</div>'
       + '<div class="tema-info"><span class="estrella">★</span> ' + t.importante.length
-      + ' importantes · ' + (t.texto||[]).length + ' párrafos</div>'
-      + '</div><div style="color:var(--lavanda);font-size:22px;padding-top:2px">›</div></div>';
+      + ' importantes · ' + (t.texto||[]).length + ' párrafos · ' + minutosDelTema(i) + ' min'
+      + (nota ? ' · <span style="color:var(--oro)">✍️ con nota</span>' : '') + '</div>'
+      + '</div>'
+      + '<div class="tema-marcas">'
+      + '<button class="mk ' + (esFav(i)?'mk-fav':'mk-off') + '" onclick="alternarFav(' + i + ',event)" aria-label="Favorito">★</button>'
+      + '<button class="mk ' + (esHecho(i)?'mk-ok':'mk-off') + '" onclick="alternarHecho(' + i + ',event)" aria-label="Escuchado">✓</button>'
+      + '</div></div>';
   }).join('');
+}
+function escucharDesdeElPrincipio(){
+  if(!libroActual.temas.length) return decir('Sin temas','Este libro todavia no tiene nada que leer.');
+  temaActual = 0;
+  escuchar();
 }
 function renombrarLibro(){
   pedirTexto('Nombre del libro', 'Como quieres que se llame', libroActual.titulo, async function(v){
@@ -864,6 +1052,7 @@ function borrarLibro(){
 
 /* ══════════════════ UN TEMA ══════════════════ */
 function verTema(i){
+  if(!libroActual || !libroActual.temas[i]) return ir('p-biblioteca');
   temaActual = i;
   var t = libroActual.temas[i];
   $('tema-titulo').textContent = 'Tema ' + (i+1);
@@ -895,7 +1084,13 @@ function verTema(i){
           }).join('')
         + '</div><p class="mini" style="margin-top:10px">Toca cualquier párrafo para marcarlo como importante.</p></div>';
 
-  html += '<button class="btn btn-linea" onclick="escuchar()">🔊 Escuchar este tema</button>';
+  html += '<button class="btn btn-oro" onclick="escuchar()">🔊 Escuchar este tema</button>'
+        + '<div class="fila"><button class="btn btn-linea" onclick="leerEnVentana()">📖 Leer</button>'
+        + '<button class="btn btn-linea" onclick="abrirNota()">✍️ Nota</button></div>'
+        + '<div class="fila"><button class="btn btn-linea" onclick="abrirRepaso()">❓ Repaso</button>'
+        + '<button class="btn btn-linea" onclick="imprimirTema()">🖨️ Imprimir</button></div>'
+        + '<button class="btn btn-linea" onclick="alternarHecho(' + i + ');verTema(' + i + ')">'
+        + (esHecho(i) ? '✓ Escuchado — quitar la marca' : '✓ Marcar como escuchado') + '</button>';
   $('tema-cuerpo').innerHTML = html;
   ir('p-tema');
   $('tema-titulo').textContent = 'Tema ' + (i+1);
@@ -959,22 +1154,281 @@ function marcarDesdeParrafo(j){
     });
 }
 
-/* ══════════════════ ESCUCHAR (para revisar) ══════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   EL REPRODUCTOR — igual que el de NBS Academia
+   Play/pausa · tema anterior y siguiente · retroceder y adelantar 10 seg ·
+   barra para moverse · velocidad · escoger la voz · avanza solo al terminar ·
+   mantiene la pantalla encendida.
+   ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
-function escuchar(){
-  if(!voz) return decir('Sin voz','Este teléfono no puede leer en voz alta.');
-  voz.cancel();
-  var t = libroActual.temas[temaActual];
-  var partes = [t.titulo].concat(t.texto||[]);
-  partes.forEach(function(p){
-    (p.match(/[^.!?]+[.!?]?/g) || [p]).forEach(function(o){
-      if(!o.trim()) return;
-      var u = new SpeechSynthesisUtterance(o.trim());
-      u.lang = 'es-US'; u.rate = 0.95;
-      voz.speak(u);
+var pedazos = [];        // el tema partido en frases cortas
+var pedazoAhora = 0;
+var sonando = false;
+var pareYo = false;      // para distinguir una pausa mia del final de una frase
+var velocidad = 1;
+var vozElegida = null;
+var soloImportante = false;
+var candado = null;      // Wake Lock: que no se apague la pantalla
+
+/* — partir en frases: la voz del telefono se corta sola pasados unos 15 seg,
+     asi que se le va dando de a poco — */
+function partirEnPedazos(texto){
+  var fuera = [];
+  (texto.match(/[^.!?;]+[.!?;]?/g) || [texto]).forEach(function(f){
+    f = f.trim(); if(!f) return;
+    if(f.length <= 200) return fuera.push(f);
+    var buf = '';
+    f.split(/,\s*/).forEach(function(p){
+      if((buf + ', ' + p).length > 200 && buf){ fuera.push(buf); buf = p; }
+      else buf = buf ? (buf + ', ' + p) : p;
     });
+    if(buf) fuera.push(buf);
   });
-  decir('Leyendo', 'Toca Entendido para callar la voz.', function(){ voz.cancel(); });
+  return fuera;
+}
+function armarPedazos(){
+  var t = libroActual.temas[temaActual];
+  var partes;
+  if(soloImportante){
+    partes = ['Lo mas importante de: ' + t.titulo]
+      .concat((t.importante || []).map(function(f){ return f.t; }));
+    if(partes.length === 1) partes.push('Este tema todavia no tiene nada marcado como importante.');
+  } else {
+    partes = [t.titulo].concat(t.texto || []);
+  }
+  pedazos = [];
+  partes.forEach(function(p){ pedazos = pedazos.concat(partirEnPedazos(String(p))); });
+  pedazoAhora = 0;
+  var barra = $('esc-pos');
+  barra.max = Math.max(0, pedazos.length - 1);
+  barra.value = 0;
+  pintarTiempos();
+  $('esc-dice').textContent = pedazos[0] || 'Este tema esta vacio.';
+}
+/* — cuanto dura mas o menos un pedazo, para poder saltar 10 segundos — */
+function segundosDe(t){ return t.split(/\s+/).length / (2.6 * velocidad); }
+function mmss(s){
+  s = Math.max(0, Math.round(s));
+  return Math.floor(s/60) + ':' + String(s % 60).padStart(2,'0');
+}
+function pintarTiempos(){
+  var ido = 0, todo = 0;
+  for(var i = 0; i < pedazos.length; i++){
+    var d = segundosDe(pedazos[i]);
+    todo += d;
+    if(i < pedazoAhora) ido += d;
+  }
+  $('esc-t1').textContent = mmss(ido);
+  $('esc-t2').textContent = mmss(todo);
+  $('esc-pos').value = pedazoAhora;
+}
+function escogerVoz(){
+  var todas = voz ? voz.getVoices() : [];
+  if(!todas.length) return null;
+  if(vozElegida){
+    var g = todas.filter(function(v){ return v.voiceURI === vozElegida; })[0];
+    if(g) return g;
+  }
+  var guardada = localStorage.getItem('efd_voz');
+  if(guardada){
+    var g2 = todas.filter(function(v){ return v.voiceURI === guardada; })[0];
+    if(g2){ vozElegida = guardada; return g2; }
+  }
+  var esp = todas.filter(function(v){ return /^es/i.test(v.lang || ''); });
+  return esp[0] || null;
+}
+function hablarPedazo(){
+  if(!voz || pedazoAhora >= pedazos.length){ terminoElTema(); return; }
+  var u = new SpeechSynthesisUtterance(pedazos[pedazoAhora]);
+  var v = escogerVoz();
+  if(v){ u.voice = v; u.lang = v.lang || 'es-US'; } else { u.lang = 'es-US'; }
+  u.rate = velocidad;
+  u.onend = function(){
+    if(pareYo) return;
+    pedazoAhora++;
+    pintarTiempos();
+    if(pedazoAhora < pedazos.length){
+      $('esc-dice').textContent = pedazos[pedazoAhora];
+      hablarPedazo();
+    } else {
+      terminoElTema();
+    }
+  };
+  $('esc-dice').textContent = pedazos[pedazoAhora];
+  voz.speak(u);
+}
+function playPausa(){
+  if(!voz) return decir('Sin voz', 'Este telefono no puede leer en voz alta.');
+  if(sonando){
+    pareYo = true; voz.cancel(); sonando = false;
+    $('esc-play').textContent = '▶';
+    soltarPantalla();
+  } else {
+    pareYo = false; sonando = true;
+    $('esc-play').textContent = '⏸';
+    pedirPantalla();
+    voz.cancel();
+    setTimeout(hablarPedazo, 60);
+  }
+}
+function terminoElTema(){
+  sonando = false; $('esc-play').textContent = '▶';
+  soltarPantalla();
+  // queda marcado como escuchado y se suman los minutos
+  if(!soloImportante){
+    marcarHecho(temaActual, true);
+    sumarMinutos(minutosDelTema(temaActual));
+  }
+  // temporizador: si llegó a cero, se calla y no sigue
+  if(tempQuedan > 0){
+    tempQuedan--;
+    if(tempQuedan === 0){
+      decir('Hasta aquí', 'Se acabó el temporizador. Que Dios te bendiga.');
+      return;
+    }
+  }
+  // avanza solo al tema siguiente, como un podcast
+  if(temaActual < libroActual.temas.length - 1){
+    temaActual++;
+    prepararEscuchar(true);
+    setTimeout(function(){ if(!sonando) playPausa(); }, 500);
+  }
+}
+function irAPedazo(i){
+  pedazoAhora = Math.max(0, Math.min(pedazos.length - 1, i));
+  pintarTiempos();
+  $('esc-dice').textContent = pedazos[pedazoAhora] || '';
+  if(sonando){ pareYo = true; voz.cancel();
+    setTimeout(function(){ pareYo = false; hablarPedazo(); }, 90); }
+}
+function saltar(seg){
+  var i = pedazoAhora, resto = Math.abs(seg);
+  if(seg < 0){
+    while(i > 0 && resto > 0){ i--; resto -= segundosDe(pedazos[i]); }
+  } else {
+    while(i < pedazos.length - 1 && resto > 0){ resto -= segundosDe(pedazos[i]); i++; }
+  }
+  irAPedazo(i);
+}
+function temaAnterior(){
+  if(temaActual <= 0) return;
+  temaActual--; prepararEscuchar(true);
+  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
+}
+function temaSiguiente(){
+  if(temaActual >= libroActual.temas.length - 1) return;
+  temaActual++; prepararEscuchar(true);
+  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
+}
+function ponerVelocidad(v){
+  velocidad = v;
+  ['v-085','v-1','v-125'].forEach(function(id){ $(id).classList.remove('on'); });
+  $(v === 0.85 ? 'v-085' : (v === 1.25 ? 'v-125' : 'v-1')).classList.add('on');
+  localStorage.setItem('efd_vel', String(v));
+  pintarTiempos();
+  if(sonando){ pareYo = true; voz.cancel();
+    setTimeout(function(){ pareYo = false; hablarPedazo(); }, 90); }
+}
+function cambiarQueSeLee(){
+  soloImportante = !soloImportante;
+  $('esc-modo').textContent = soloImportante ? '📖 Escuchar el tema completo' : '★ Escuchar solo lo importante';
+  var iba = sonando;
+  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; }
+  armarPedazos();
+  if(iba) setTimeout(playPausa, 220);
+}
+/* — que no se apague la pantalla mientras escucha — */
+async function pedirPantalla(){
+  try{ if('wakeLock' in navigator && !candado) candado = await navigator.wakeLock.request('screen'); }catch(e){}
+}
+function soltarPantalla(){
+  try{ if(candado){ candado.release(); candado = null; } }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible' && sonando) pedirPantalla();
+});
+
+/* — escoger la voz del telefono — */
+var PAISES = {
+  'es-DO':'República Dominicana','es-ES':'España','es-US':'Estados Unidos','es-MX':'México',
+  'es-PR':'Puerto Rico','es-CO':'Colombia','es-AR':'Argentina','es-CL':'Chile','es-PE':'Perú',
+  'es-VE':'Venezuela','es-CU':'Cuba','es-GT':'Guatemala','es-EC':'Ecuador','es-BO':'Bolivia',
+  'es-CR':'Costa Rica','es-PA':'Panamá','es-UY':'Uruguay','es-PY':'Paraguay','es-HN':'Honduras',
+  'es-SV':'El Salvador','es-NI':'Nicaragua','es-419':'Latinoamérica','es':'Español'
+};
+function abrirVoces(todas){
+  var lista = voz ? voz.getVoices() : [];
+  if(!lista.length) return decir('Sin voces', 'Este telefono todavia no reporta ninguna voz. Cierra y vuelve a abrir la app.');
+  var usar = todas ? lista : lista.filter(function(v){ return /^es/i.test(v.lang || ''); });
+  if(!usar.length) usar = lista;
+  var actual = escogerVoz();
+  var html = '<h2>La voz que lee</h2>';
+  if(actual){
+    var pais = PAISES[actual.lang] || actual.lang || '';
+    html += '<div class="aviso ' + (/^es/i.test(actual.lang||'') ? 'av-oro' : 'av-rojo') + '">'
+          + '<b>Sonando ahora:</b> ' + esc(actual.name) + (pais ? ' · ' + esc(pais) : '')
+          + (/^es/i.test(actual.lang||'') ? '' : '<br>Esta voz no es de español: por eso no pronuncia bien la ñ ni los acentos.')
+          + '</div>';
+  }
+  html += usar.map(function(v, i){
+    var p = PAISES[v.lang] || v.lang || '';
+    return '<div class="tarj" style="padding:13px"><div class="libro-tit" style="font-size:16.5px">'
+      + esc(v.name) + '</div><div class="libro-sub">' + esc(p) + '</div>'
+      + '<div style="margin-top:10px">'
+      + '<button class="btn btn-linea btn-chico" onclick="probarVoz(' + i + ',' + (todas?1:0) + ')">Probar</button>'
+      + '<button class="btn btn-oro btn-chico" onclick="usarVoz(' + i + ',' + (todas?1:0) + ')">Usar esta</button>'
+      + '</div></div>';
+  }).join('');
+  if(!todas) html += '<button class="btn btn-linea" onclick="abrirVoces(true)">Ver todos los idiomas</button>';
+  html += '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
+  modal(html);
+}
+function vozNumero(i, todas){
+  var lista = voz.getVoices();
+  var usar = todas ? lista : lista.filter(function(v){ return /^es/i.test(v.lang || ''); });
+  if(!usar.length) usar = lista;
+  return usar[i];
+}
+function probarVoz(i, todas){
+  var v = vozNumero(i, !!todas); if(!v) return;
+  voz.cancel();
+  var u = new SpeechSynthesisUtterance('El Señor es mi pastor, nada me faltará. Así suena esta voz.');
+  u.voice = v; u.lang = v.lang || 'es-US'; u.rate = velocidad;
+  voz.speak(u);
+}
+function usarVoz(i, todas){
+  var v = vozNumero(i, !!todas); if(!v) return;
+  vozElegida = v.voiceURI;
+  localStorage.setItem('efd_voz', v.voiceURI);
+  cerrarModal();
+  decir('Voz cambiada', 'Ahora lee con <b>' + esc(v.name) + '</b>.');
+  if(sonando){ pareYo = true; voz.cancel();
+    setTimeout(function(){ pareYo = false; hablarPedazo(); }, 120); }
+}
+if(voz) voz.onvoiceschanged = function(){};
+
+/* — entrar y salir de la pantalla de escuchar — */
+function escuchar(){ prepararEscuchar(false); ir('p-escuchar'); }
+function prepararEscuchar(soloRefrescar){
+  if(!libroActual || !libroActual.temas[temaActual]) return ir('p-biblioteca');
+  var t = libroActual.temas[temaActual];
+  $('esc-titulo').textContent = 'Tema ' + (temaActual + 1) + ' de ' + libroActual.temas.length;
+  $('esc-cual').textContent = t.titulo;
+  var vg = parseFloat(localStorage.getItem('efd_vel') || '1');
+  if(!soloRefrescar && [0.85,1,1.25].indexOf(vg) >= 0) ponerVelocidad(vg);
+  armarPedazos();
+  $('esc-play').textContent = sonando ? '⏸' : '▶';
+  $('esc-importante').innerHTML = (t.importante || []).length
+    ? '<div class="tarj"><h2 style="font-family:var(--serif);font-size:18px;color:var(--oro-suave);margin:0 0 10px">★ Lo más importante</h2>'
+      + t.importante.map(function(f){ return '<div class="rubrica">' + esc(f.t) + '</div>'; }).join('')
+      + '</div>'
+    : '';
+  localStorage.setItem('efd_ultimo', libroActual.id + '::' + temaActual);
+}
+function salirDeEscuchar(){
+  pareYo = true; if(voz) voz.cancel(); sonando = false;
+  soltarPantalla();
+  verTema(temaActual);
 }
 
 /* ══════════════════ SELLAR Y GENERAR EL ARCHIVO ══════════════════ */
@@ -1075,6 +1529,369 @@ function quitarUsuario(i){
   preguntar('Quitar acceso', 'Se le quita el acceso a <b>' + esc(u[i].nombre) + '</b>.', function(){
     u.splice(i,1); ponerUsuarios(u); pintarUsuarios();
   });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TODO LO QUE TIENE NBS ACADEMIA, aquí aplicado a los libros
+   ══════════════════════════════════════════════════════════════════════════ */
+function leerG(k, x){ try{ return JSON.parse(localStorage.getItem(k)) || x; }catch(e){ return x; } }
+function ponerG(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function llaveTema(i){ return (libroActual ? libroActual.id : '?') + '::' + i; }
+function hoyISO(){ return new Date().toISOString().slice(0,10); }
+
+/* ── escuchados, favoritos y notas ── */
+function hechos(){ return leerG('efd_hechos', {}); }
+function esHecho(i){ return !!hechos()[llaveTema(i)]; }
+function marcarHecho(i, si){
+  var m = hechos();
+  if(si) m[llaveTema(i)] = true; else delete m[llaveTema(i)];
+  ponerG('efd_hechos', m);
+}
+function favs(){ return leerG('efd_favs', {}); }
+function esFav(i){ return !!favs()[llaveTema(i)]; }
+function alternarFav(i, ev){
+  if(ev) ev.stopPropagation();
+  var f = favs(), k = llaveTema(i);
+  if(f[k]) delete f[k]; else f[k] = true;
+  ponerG('efd_favs', f);
+  pintarPreparar();
+}
+function alternarHecho(i, ev){
+  if(ev) ev.stopPropagation();
+  marcarHecho(i, !esHecho(i));
+  pintarPreparar();
+}
+function notas(){ return leerG('efd_notas', {}); }
+function notaDe(i){ return notas()[llaveTema(i)] || ''; }
+function guardarNota(i, t){
+  var n = notas(), k = llaveTema(i);
+  if(t && t.trim()) n[k] = t.trim(); else delete n[k];
+  ponerG('efd_notas', n);
+}
+
+/* ── minutos escuchados y racha de días ── */
+function stats(){ return leerG('efd_stats', { minutos:0, dias:[] }); }
+function sumarMinutos(m){
+  var s = stats();
+  s.minutos = Math.round((s.minutos + m) * 10) / 10;
+  var d = hoyISO();
+  if(s.dias.indexOf(d) < 0) s.dias.push(d);
+  s.dias = s.dias.slice(-400);
+  ponerG('efd_stats', s);
+  localStorage.setItem('efd_ultimodia', d);
+}
+function racha(){
+  var d = stats().dias.slice().sort();
+  if(!d.length) return 0;
+  var n = 0, dia = new Date();
+  for(;;){
+    var s = dia.toISOString().slice(0,10);
+    if(d.indexOf(s) >= 0){ n++; dia.setDate(dia.getDate() - 1); }
+    else if(n === 0 && s === hoyISO()){ dia.setDate(dia.getDate() - 1); }
+    else break;
+    if(n > 400) break;
+  }
+  return n;
+}
+function minutosDelTema(i){
+  var t = libroActual.temas[i];
+  var p = (t.titulo + ' ' + (t.texto || []).join(' ')).split(/\s+/).length;
+  return Math.max(0.2, Math.round(p / 150 * 10) / 10);
+}
+
+/* ── filtros y buscador ── */
+var filtro = 'todos';
+function ponerFiltro(f){ filtro = f; pintarPreparar(); }
+function normal(s){
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function temaCoincide(t, q){
+  if(!q) return true;
+  var texto = normal(t.titulo + ' ' + (t.texto||[]).join(' ') + ' '
+            + (t.importante||[]).map(function(f){ return f.t; }).join(' '));
+  return normal(q).split(/\s+/).every(function(p){ return !p || texto.indexOf(p) >= 0; });
+}
+
+/* ── el tema del día ── */
+function temaDelDia(){
+  if(!libroActual || !libroActual.temas.length) return decir('Sin libro','Abre un libro primero.');
+  var pend = [];
+  libroActual.temas.forEach(function(t,i){ if(!esHecho(i)) pend.push(i); });
+  var i = pend.length ? pend[0] : 0;
+  temaActual = i;
+  cerrarMenu();
+  escuchar();
+}
+
+/* ── temporizador: se apaga sola tras X temas ── */
+var tempQuedan = 0;
+function abrirTemporizador(){
+  cerrarMenu();
+  modal('<h2>Temporizador</h2><p style="font-size:16px;line-height:1.6;margin:0 0 16px">'
+    + 'La app deja de leer sola cuando termine la cantidad de temas que escojas.'
+    + (tempQuedan ? '<br><br><b style="color:var(--oro)">Ahora mismo: se apaga en ' + tempQuedan + ' tema(s).</b>' : '')
+    + '</p>'
+    + [1,2,3,5].map(function(n){
+        return '<button class="btn btn-linea" onclick="ponerTemporizador(' + n + ')">Después de ' + n + ' tema' + (n>1?'s':'') + '</button>';
+      }).join('')
+    + (tempQuedan ? '<button class="btn btn-rojo" onclick="ponerTemporizador(0)">Quitar el temporizador</button>' : '')
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>');
+}
+function ponerTemporizador(n){
+  tempQuedan = n; cerrarModal();
+  if(n) decir('Listo', 'La app se va a callar sola después de <b>' + n + ' tema' + (n>1?'s':'') + '</b>.');
+  else decir('Quitado', 'El temporizador quedó apagado.');
+}
+
+/* ── leer el tema en una ventana ── */
+function leerEnVentana(){
+  var t = libroActual.temas[temaActual];
+  modal('<h2>' + esc(t.titulo) + '</h2>'
+    + ((t.importante||[]).length
+        ? '<p class="mini" style="margin:0 0 8px">★ Lo más importante</p>'
+          + t.importante.map(function(f){ return '<div class="rubrica">' + esc(f.t) + '</div>'; }).join('')
+          + '<div class="regla"></div>'
+        : '')
+    + '<div class="lectura">' + (t.texto||[]).map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>'
+    + '<button class="btn btn-oro" onclick="cerrarModal()">Cerrar</button>');
+}
+
+/* ── notas ── */
+function abrirNota(){
+  var i = temaActual;
+  modal('<h2>Mi nota</h2><p class="mini" style="margin:0 0 10px">'
+    + esc(libroActual.temas[i].titulo) + '</p>'
+    + '<textarea class="campo" id="mtxt" placeholder="Lo que Dios te habló, una pregunta, algo para recordar...">'
+    + esc(notaDe(i)) + '</textarea>'
+    + '<button class="btn btn-oro" id="mok">Guardar la nota</button>'
+    + '<button class="btn btn-linea" id="mno">Cancelar</button>');
+  $('mok').onclick = function(){ guardarNota(i, $('mtxt').value); cerrarModal(); pintarPreparar(); };
+  $('mno').onclick = cerrarModal;
+}
+
+/* ── preguntas de repaso: salen de TU propio texto, no se inventa nada ── */
+function preguntasDe(i){
+  var t = libroActual.temas[i];
+  var fuera = [];
+  (t.importante || []).slice(0, 3).forEach(function(f){
+    var pal = f.t.split(/\s+/).filter(function(p){
+      return p.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g,'').length >= 5;
+    });
+    if(pal.length < 2) return;
+    var elegida = pal[Math.floor(pal.length/2)];
+    var limpia = elegida.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g,'');
+    fuera.push({ frase: f.t.replace(elegida, '________'), respuesta: limpia });
+  });
+  return fuera;
+}
+function abrirRepaso(){
+  var qs = preguntasDe(temaActual);
+  if(!qs.length) return decir('Sin repaso',
+    'Este tema todavía no tiene frases marcadas como importantes.<br><br>'
+    + 'Marca alguna y la app arma las preguntas con tus propias palabras.');
+  var html = '<h2>Repaso</h2><p class="mini" style="margin:0 0 14px">Completa la frase. '
+           + 'Las preguntas salen de lo que marcaste como importante.</p>';
+  qs.forEach(function(q, j){
+    html += '<div class="rubrica">' + esc(q.frase)
+      + '<span class="fuente"><a href="#" onclick="document.getElementById(\'r' + j + '\').style.display=\'block\';return false" style="color:var(--oro)">ver la respuesta</a></span>'
+      + '<div id="r' + j + '" style="display:none;margin-top:9px;color:var(--oro-suave);font-weight:700">'
+      + esc(q.respuesta) + '</div></div>';
+  });
+  html += '<button class="btn btn-oro" onclick="cerrarModal()">Terminar</button>';
+  modal(html);
+}
+
+/* ── imprimir ── */
+function cabeceraImp(){
+  return '<h1>' + esc(libroActual.titulo) + '</h1>';
+}
+function imprimirTema(){
+  var t = libroActual.temas[temaActual];
+  var html = cabeceraImp() + '<h2>' + (temaActual+1) + '. ' + esc(t.titulo) + '</h2>';
+  if((t.importante||[]).length){
+    html += '<p><b>Lo más importante</b></p>';
+    t.importante.forEach(function(f){ html += '<div class="r">' + esc(f.t) + '</div>'; });
+  }
+  (t.texto||[]).forEach(function(p){ html += '<p>' + esc(p) + '</p>'; });
+  var n = notaDe(temaActual);
+  if(n) html += '<p><b>Mi nota:</b> ' + esc(n) + '</p>';
+  html += '<p class="pie">Iglesia Efraín para Dios · uso interno</p>';
+  $('imp').innerHTML = html;
+  setTimeout(function(){ window.print(); }, 120);
+}
+function imprimirLibro(){
+  cerrarMenu();
+  var html = cabeceraImp();
+  libroActual.temas.forEach(function(t, i){
+    html += '<h2>' + (i+1) + '. ' + esc(t.titulo) + '</h2>';
+    (t.importante||[]).forEach(function(f){ html += '<div class="r">' + esc(f.t) + '</div>'; });
+    (t.texto||[]).forEach(function(p){ html += '<p>' + esc(p) + '</p>'; });
+    var n = notaDe(i);
+    if(n) html += '<p><b>Mi nota:</b> ' + esc(n) + '</p>';
+  });
+  html += '<p class="pie">Iglesia Efraín para Dios · uso interno</p>';
+  $('imp').innerHTML = html;
+  setTimeout(function(){ window.print(); }, 120);
+}
+function hojaDeBolsillo(){
+  cerrarMenu();
+  var html = cabeceraImp() + '<h2>Lo más importante de todo el libro</h2>';
+  var n = 0;
+  libroActual.temas.forEach(function(t, i){
+    if(!(t.importante||[]).length) return;
+    html += '<p><b>' + (i+1) + '. ' + esc(t.titulo) + '</b></p>';
+    t.importante.forEach(function(f){ html += '<div class="r">' + esc(f.t) + '</div>'; n++; });
+  });
+  if(!n) html += '<p>Todavía no hay nada marcado como importante.</p>';
+  html += '<p class="pie">Iglesia Efraín para Dios · para llevar contigo</p>';
+  $('imp').innerHTML = html;
+  setTimeout(function(){ window.print(); }, 120);
+}
+
+/* ── recordatorio de verdad: se lo damos al calendario del teléfono ── */
+function abrirRecordatorio(){
+  cerrarMenu();
+  var c = leerG('efd_record', { dia:1, hora:'19:00' });
+  var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  modal('<h2>Recordarme estudiar</h2>'
+    + '<p style="font-size:16px;line-height:1.6;margin:0 0 14px">Se crea un recordatorio en el '
+    + 'calendario de tu teléfono, para que la alarma suene <b>aunque la app esté cerrada</b>.</p>'
+    + '<label class="etq">Qué día</label><select class="campo" id="r-dia">'
+    + dias.map(function(d,i){ return '<option value="' + i + '"' + (i===c.dia?' selected':'') + '>' + d + '</option>'; }).join('')
+    + '</select>'
+    + '<label class="etq">A qué hora</label><input class="campo" id="r-hora" type="time" value="' + c.hora + '">'
+    + '<button class="btn btn-oro" id="mok">Crear el recordatorio</button>'
+    + '<button class="btn btn-linea" id="mno">Cancelar</button>');
+  $('mok').onclick = function(){
+    var dia = +$('r-dia').value, hora = $('r-hora').value || '19:00';
+    ponerG('efd_record', { dia:dia, hora:hora });
+    var DD = ['SU','MO','TU','WE','TH','FR','SA'][dia];
+    var hh = hora.split(':')[0], mm = hora.split(':')[1];
+    var d = new Date(); d.setDate(d.getDate() + ((dia - d.getDay() + 7) % 7));
+    var f = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+    var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Iglesia Efrain Para Dios//ES','BEGIN:VEVENT',
+      'DTSTART:' + f + 'T' + hh + mm + '00',
+      'DURATION:PT30M',
+      'RRULE:FREQ=WEEKLY;BYDAY=' + DD,
+      'SUMMARY:Estudio - Iglesia Efrain para Dios',
+      'DESCRIPTION:Momento de estudiar el libro.',
+      'BEGIN:VALARM','TRIGGER:-PT5M','ACTION:DISPLAY','DESCRIPTION:Estudio',
+      'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    var blob = new Blob([ics], {type:'text/calendar'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'estudio-iglesia-efrain.ics';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    cerrarModal();
+    decir('Descargado', 'Ábrelo y tu teléfono lo va a agregar al calendario, con alarma todos los '
+      + dias[dia].toLowerCase() + ' a las ' + hora + '.');
+  };
+  $('mno').onclick = cerrarModal;
+}
+
+/* ── manual dentro de la app ── */
+var MANUAL = [
+ { t:'Qué es esta app', p:['Aquí preparas los libros de la iglesia: los subes, la app los divide en temas y marca lo importante, tú lo revisas, y al final generas un archivo sellado para mandárselo a los hermanos.',
+   'El libro nunca sale de tu teléfono. No sube a internet ni queda en ningún servidor.'] },
+ { t:'Agregar un libro', p:['Toca "+ Agregar un libro" y escoge el archivo.'],
+   l:['Word (.docx) es lo mejor: la app ve lo que dejaste en negrita o subrayado y lo marca solo.',
+      'También acepta texto (.txt).',
+      'Con PDF hace lo que puede; si no se deja, pásalo a Word.'] },
+ { t:'Cómo divide el libro', l:['Por los títulos de Word','Por "Capítulo 1", "Tema 2", "Parte III"...',
+      'Por líneas en MAYÚSCULAS','Por líneas cortas sin punto final',
+      'Si no encuentra nada, lo corta en partes parejas'] },
+ { t:'Qué marca como importante', l:['Lo que está en negrita o subrayado en tu Word',
+      'Los versículos (Juan 3:16, Salmo 23:1...)','Las frases entre comillas',
+      'Frases que empiezan con "Recuerda", "Lo esencial", "Nunca olvides", "Ten presente"'] },
+ { t:'Tú mandas', p:['Todo lo que hizo la app se puede corregir.'],
+   l:['Cambiar el título de un tema','Unir un tema con el anterior','Quitar un tema',
+      'Quitar frases marcadas o agregar las tuyas','Tocar cualquier párrafo para marcarlo'] },
+ { t:'Los botones del reproductor', l:['⏮ tema anterior','↺10 retroceder diez segundos',
+      '▶ empezar o pausar','10↻ adelantar diez segundos','⏭ tema siguiente',
+      'La barra te lleva a cualquier parte','Lento / Normal / Rápido'] },
+ { t:'Importante al escuchar', p:['La pantalla tiene que quedarse encendida. Si la apagas o cambias de app, la voz se detiene. Es así en todos los teléfonos, no es la app.'] },
+ { t:'Escuchar solo lo importante', p:['Ese botón lee únicamente las frases marcadas del tema. Sirve para repasar un tema entero en un minuto.'] },
+ { t:'Tu progreso', l:['La barra y el porcentaje: cuántos temas llevas escuchados',
+      'Minutos: lo que llevas escuchado en total','Racha: días seguidos que has estudiado'] },
+ { t:'Marcas en cada tema', l:['★ favorito, para encontrarlo rápido','✓ escuchado',
+      'La nota se guarda por tema y se imprime con él'] },
+ { t:'Buscar y filtrar', p:['El buscador mira en los títulos, en el texto y en lo marcado. Perdona los acentos.'],
+   l:['Todos','Pendientes','Escuchados','Favoritos'] },
+ { t:'Materiales para imprimir', l:['Un tema: con lo importante, el texto y tu nota',
+      'El libro completo','Hoja de bolsillo: solo lo importante de todo el libro, para llevar'] },
+ { t:'Recordarme estudiar', p:['Crea un recordatorio en el calendario del teléfono. La alarma suena aunque la app esté cerrada — una app web sola no puede sonar cerrada, por eso se usa el calendario.'] },
+ { t:'Sellar y mandar', p:['Cuando el libro esté como lo quieres, toca "Sellar y generar el archivo". Le pones una clave AL LIBRO y se descarga un archivo .efd.'],
+   l:['Va cifrado: sin la clave es ilegible','Va sellado: si le cambian un byte, se rechaza',
+      'Manda el archivo por WhatsApp y la clave por otro camino'] },
+ { t:'Tu clave maestra', p:['Si la pierdes no hay forma de recuperarla. Nadie puede. Anótala en un lugar seguro.'] }
+];
+function abrirManual(){
+  cerrarMenu();
+  var html = '<h2>Manual de la app</h2>';
+  MANUAL.forEach(function(s){
+    html += '<div class="tarj" style="padding:14px"><div class="libro-tit" style="font-size:17.5px;margin-bottom:8px">'
+          + esc(s.t) + '</div>';
+    (s.p||[]).forEach(function(p){ html += '<p style="font-size:16px;line-height:1.6;margin:0 0 9px">' + esc(p) + '</p>'; });
+    if(s.l) html += '<ul style="font-size:16px;line-height:1.65;margin:0;padding-left:20px">'
+                  + s.l.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    html += '</div>';
+  });
+  html += '<button class="btn btn-linea" onclick="imprimirManual()">🖨 Imprimir el manual</button>'
+        + '<button class="btn btn-oro" onclick="cerrarModal()">Cerrar</button>';
+  modal(html);
+}
+function imprimirManual(){
+  var html = '<h1>Manual — Iglesia Efraín para Dios</h1>';
+  MANUAL.forEach(function(s){
+    html += '<h2>' + esc(s.t) + '</h2>';
+    (s.p||[]).forEach(function(p){ html += '<p>' + esc(p) + '</p>'; });
+    (s.l||[]).forEach(function(x){ html += '<p>· ' + esc(x) + '</p>'; });
+  });
+  $('imp').innerHTML = html;
+  setTimeout(function(){ window.print(); }, 120);
+}
+
+/* ── el menú lateral ── */
+function abrirMenu(){
+  var hayLibro = !!libroActual;
+  var c = '';
+  if(hayLibro){
+    c += '<div class="menu-sec">Escuchar</div>'
+      + '<div class="menu-it" onclick="temaDelDia()"><span class="mi">📅</span>Tema del día</div>'
+      + '<div class="menu-it" onclick="cerrarMenu();escucharDesdeElPrincipio()"><span class="mi">🔊</span>Escuchar el libro</div>'
+      + '<div class="menu-it" onclick="cerrarMenu();abrirVoces()"><span class="mi">🗣️</span>Cambiar la voz</div>'
+      + '<div class="menu-it" onclick="abrirTemporizador()"><span class="mi">⏱️</span>Temporizador'
+      + (tempQuedan ? '<span class="mx">' + tempQuedan + '</span>' : '') + '</div>'
+      + '<div class="menu-sec">Materiales</div>'
+      + '<div class="menu-it" onclick="hojaDeBolsillo()"><span class="mi">📄</span>Hoja de bolsillo</div>'
+      + '<div class="menu-it" onclick="imprimirLibro()"><span class="mi">🖨️</span>Imprimir el libro</div>';
+  }
+  c += '<div class="menu-sec">Recordatorios</div>'
+    + '<div class="menu-it" onclick="abrirRecordatorio()"><span class="mi">🔔</span>Recordarme estudiar</div>'
+    + '<div class="menu-sec">Administrador</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-biblioteca\')"><span class="mi">📚</span>Mis libros</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-usuarios\')"><span class="mi">👥</span>Quién puede entrar</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();cambiarClaveMaestra()"><span class="mi">🔑</span>Cambiar mi clave</div>'
+    + '<div class="menu-sec">Ayuda</div>'
+    + '<div class="menu-it" onclick="abrirManual()"><span class="mi">📘</span>Manual de la app</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();explicarSeguridad()"><span class="mi">🛡️</span>Cómo protege tu libro</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();claveMaestra=null;ir(\'p-entrar\')"><span class="mi">🔒</span>Cerrar la app</div>';
+  $('menu-cuerpo').innerHTML = c;
+  $('menu').classList.add('abierto');
+  $('velo-men').classList.add('abierto');
+}
+function cerrarMenu(){
+  $('menu').classList.remove('abierto');
+  $('velo-men').classList.remove('abierto');
+}
+
+/* ── aviso si lleva días sin estudiar ── */
+function revisarAusencia(){
+  var u = localStorage.getItem('efd_ultimodia');
+  if(!u) return '';
+  var dias = Math.floor((new Date(hoyISO()) - new Date(u)) / 86400000);
+  if(dias < 2) return '';
+  return '<div class="aviso av-oro">Llevas ' + dias + ' días sin estudiar. '
+       + 'Un tema son pocos minutos.</div>';
 }
 
 /* ══════════════════ ARRANQUE ══════════════════ */

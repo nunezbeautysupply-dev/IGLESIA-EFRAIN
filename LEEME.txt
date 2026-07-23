@@ -80,6 +80,83 @@ recuperarla. Nadie puede.
      chat donde mandaste el archivo.
 
 ═══════════════════════════════════════════════════════════════
+  EL AUDIO
+═══════════════════════════════════════════════════════════════
+
+Igual que NBS Academia. Desde cualquier tema toca "Escuchar",
+o desde el libro toca "Escuchar el libro" y empieza por el
+primer tema.
+
+   ⏮   tema anterior
+   ↺10 retroceder 10 segundos
+   ▶   empezar / pausar
+   10↻ adelantar 10 segundos
+   ⏭   tema siguiente
+
+   · barra para moverte a cualquier parte, con el tiempo
+   · Lento / Normal / Rápido
+   · "Cambiar la voz": escoge entre las voces de tu teléfono,
+     con el país de cada una
+   · al terminar un tema pasa SOLO al siguiente
+   · mantiene la pantalla encendida mientras lee
+
+BOTÓN ESPECIAL: "★ Escuchar solo lo importante"
+Lee únicamente las frases que quedaron marcadas. Sirve para
+repasar un tema en un minuto.
+
+⚠ La pantalla tiene que quedarse encendida. Si la apagas o
+  cambias de app, la voz se detiene. Es una limitación de
+  todos los teléfonos, no de la app.
+
+═══════════════════════════════════════════════════════════════
+  TODO LO DEMÁS (igual que NBS Academia)
+═══════════════════════════════════════════════════════════════
+
+MENÚ ☰  (arriba a la derecha)
+   ESCUCHAR       tema del día · escuchar el libro ·
+                  cambiar la voz · temporizador
+   MATERIALES     hoja de bolsillo · imprimir el libro
+   RECORDATORIOS  recordarme estudiar
+   ADMINISTRADOR  mis libros · quién puede entrar ·
+                  cambiar mi clave
+   AYUDA          manual · cómo protege tu libro · cerrar
+
+TU PROGRESO
+   barra con el porcentaje de temas escuchados
+   minutos escuchados en total
+   racha de días seguidos estudiando
+   aviso si llevas 2 días o más sin estudiar
+
+EN CADA TEMA
+   ★  favorito
+   ✓  escuchado (se marca solo al terminar de oírlo)
+   ✍️ nota tuya, se guarda y se imprime con el tema
+   ❓ repaso: completa la frase, armado con TUS frases
+      marcadas — la app no inventa nada
+   📖 leer en ventana
+   🖨️ imprimir ese tema
+
+BUSCADOR Y FILTROS
+   busca en títulos, texto y frases marcadas
+   perdona acentos y mayúsculas
+   filtros: Todos · Pendientes · Escuchados · Favoritos
+
+TEMPORIZADOR
+   se calla sola después de 1, 2, 3 o 5 temas
+
+HOJA DE BOLSILLO
+   una hoja con lo más importante de TODO el libro,
+   para llevar contigo o repartir en el estudio
+
+RECORDARME ESTUDIAR
+   crea un recordatorio en el calendario del teléfono,
+   con alarma semanal. Suena aunque la app esté cerrada.
+
+MANUAL
+   dentro de la app, en el menú ☰ → Ayuda.
+   Se puede imprimir.
+
+═══════════════════════════════════════════════════════════════
   QUÉ LLEVA EL ARCHIVO .efd
 ═══════════════════════════════════════════════════════════════
 
