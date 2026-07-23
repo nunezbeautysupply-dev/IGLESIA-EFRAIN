@@ -1,0 +1,49 @@
+═══════════════════════════════════════════════════════════════
+  IGLESIA EFRAIN PARA DIOS — Actualización v2.3
+  23 de julio de 2026 — Modo "Con aclaraciones" + libro analizado
+═══════════════════════════════════════════════════════════════
+
+QUÉ TRAE ESTA ENTREGA
+1. La app actualizada (index.html, manifest.json, sw.js, íconos)
+   con el nuevo modo de escuchar "Con aclaraciones".
+2. El archivo "tuneles_en_el_universo.json": tu libro completo
+   YA analizado por Claude — 6 capítulos, 31 temas, con sus
+   aclaraciones de términos difíciles y su extracto esencial
+   ya preparados.
+
+CÓMO SUBIR LA ACTUALIZACIÓN DE LA APP
+Reemplaza en tu repositorio los 5 archivos de siempre
+(index.html, manifest.json, sw.js, icon-192.png, icon-512.png)
+y haz Commit + Push como siempre. Espera el "app actualizada".
+
+CÓMO CARGAR TU LIBRO YA ANALIZADO
+1. Abre la app → Mis libros
+2. Toca "+ Importar temas ya analizados (.json)"
+3. Escoge el archivo "tuneles_en_el_universo.json"
+4. Listo — entran los 6 capítulos con sus 31 temas, ya con
+   las aclaraciones y el extracto esencial de cada uno.
+
+⚠ IMPORTANTE SOBRE PRIVACIDAD: este archivo .json SÍ contiene
+el texto completo de tu libro (a diferencia de la app, que
+siempre queda vacía). Trátalo con el mismo cuidado que le
+darías al libro mismo — no lo subas a ningún sitio, mantenlo
+solo en tu teléfono o computadora. Una vez lo importes y lo
+selles como .efd, puedes borrar este .json si quieres.
+
+LAS 3 FORMAS DE ESCUCHAR CADA TEMA (nuevo)
+   📖 Completo         — el texto tal cual está en el libro
+   💡 Con aclaraciones — el texto completo, y cuando llega a un
+                         término difícil se detiene, dice
+                         "Aclaración" y lo explica en palabras
+                         sencillas, sin tocar el texto original
+   ★  Esencial         — solo las frases marcadas como importantes
+
+REVISA TÚ TAMBIÉN
+Las aclaraciones y los extractos los escribió Claude leyendo el
+libro a fondo, pero tú mandas: puedes editar, quitar o agregar
+cualquier aclaración o frase importante de cada tema, igual que
+ya podías hacerlo antes con los temas.
+
+PENDIENTE
+Que confirmes que el libro suena bien en tu teléfono, y luego
+seguimos con la app de los 5 hermanos.
