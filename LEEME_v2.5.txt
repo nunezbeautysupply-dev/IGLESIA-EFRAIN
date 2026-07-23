@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════════
+  IGLESIA EFRAIN PARA DIOS — Actualización v2.5
+  23 de julio de 2026 — Huella digital + aviso de actualización
+═══════════════════════════════════════════════════════════════
+
+QUÉ TRAE ESTA ENTREGA
+
+1. ENTRAR CON HUELLA O FACE ID
+   Ya no tienes que escribir tu clave cada vez.
+   · Menú ☰ → Administrador → "Activar huella para entrar"
+   · Te pide confirmar con el dedo una vez
+   · De ahí en adelante, al abrir la app, se pide la huella
+     sola — sin botones que tocar
+   · Si falla o cancelas: "Reintentar huella" o "Usar mi
+     clave en su lugar" — nunca te quedas sin poder entrar
+   · Para quitarla: mismo lugar del menú, ahora dice
+     "Quitar la huella"
+
+   IMPORTANTE: la huella complementa tu clave maestra, no la
+   reemplaza. Si cambias de teléfono o borras los datos del
+   navegador, necesitarás tu clave otra vez — anótala igual.
+
+2. AVISO DE "LA APP SE ACTUALIZÓ"
+   Igual que en NBS2: cuando subas una versión nueva, la
+   próxima vez que abras la app vas a ver una franja arriba
+   que dice "La app se actualizó", y desaparece sola a los
+   4 segundos. Así sabes con seguridad que ya tienes lo último.
+
+CÓMO ACTUALIZAR
+Reemplaza los 3 archivos (index.html, manifest.json, sw.js)
+en tu repositorio y haz Commit + Push. Espera 2 minutos y
+refresca la app 2 o 3 veces — debes ver el aviso de
+"La app se actualizó" la primera vez que la abras después.
+
+RECUERDA
+Esto es solo la app — tus libros siguen guardados por
+separado en cada aparato, eso no cambió.

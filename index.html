@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260723g-EFD-ADMIN-V2.4">
+<meta name="app-version" content="20260723h-EFD-ADMIN-V2.5">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -163,6 +163,10 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
   border:1px solid rgba(169,166,216,.28);color:var(--lavanda);font-size:14.5px;font-weight:700;cursor:pointer}
 .vel.on{background:rgba(212,175,55,.16);border-color:var(--oro);color:var(--oro-suave)}
 #modos-lectura .vel{font-size:11.5px;padding:9px 2px;line-height:1.25}
+.banner-act{position:fixed;top:0;left:0;right:0;z-index:99999;background:#2a2f4a;color:var(--oro-suave);
+  border-bottom:1px solid rgba(212,175,55,.4);text-align:center;font-size:14.5px;font-weight:700;
+  padding:10px 12px;transform:translateY(-100%);transition:transform .35s ease}
+.banner-act.mostrar{transform:translateY(0)}
 .ahora{font-family:var(--serif);font-size:18.5px;color:var(--oro-suave);font-weight:700;
   line-height:1.3;margin-bottom:10px;text-align:center}
 .dice{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--perg);
@@ -247,6 +251,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 <link rel="icon" href="icon-192.png">
 </head>
 <body>
+<div id="banner-actualizada" class="banner-act">La app se actualizó</div>
 <div class="envoltura">
 
   <!-- ══════════ PRIMERA VEZ: CREAR LA CLAVE MAESTRA ══════════ -->
@@ -283,12 +288,21 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     </div>
     <div class="regla"></div>
     <div class="tarj">
-      <label class="etq" for="ent-c">Clave maestra</label>
-      <input class="campo" id="ent-c" type="password" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')entrar()">
-      <div id="ent-error"></div>
-      <button class="btn btn-oro" onclick="entrar()">Entrar</button>
-      <p class="mini" style="text-align:center;margin:14px 0 0">Solo el administrador</p>
+      <p class="mini" id="ent-msg-huella" style="text-align:center;font-size:16px;color:var(--oro-suave);margin:0 0 16px;display:none">
+        🔒 Pon tu huella para entrar...
+      </p>
+      <div id="ent-campos">
+        <label class="etq" for="ent-c">Clave maestra</label>
+        <input class="campo" id="ent-c" type="password" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')entrar()">
+        <div id="ent-error"></div>
+        <button class="btn btn-oro" onclick="entrar()">Entrar</button>
+        <p class="mini" style="text-align:center;margin:14px 0 0">Solo el administrador</p>
+      </div>
+      <div id="ent-opciones-huella" style="display:none">
+        <button class="btn btn-oro" onclick="intentarHuellaDigital()">🔒 Reintentar huella</button>
+        <button class="btn btn-linea" onclick="mostrarCamposClave()">Usar mi clave en su lugar</button>
+      </div>
     </div>
   </section>
 
@@ -985,6 +999,10 @@ function ir(p){
   if(p === 'p-biblioteca'){ libroActual = null; pintarBiblioteca(); }
   if(p === 'p-usuarios')   pintarUsuarios();
   if(p === 'p-preparar')   pintarPreparar();
+  if(p === 'p-entrar'){
+    if(localStorage.getItem(CRED_HUELLA)) intentarHuellaDigital();
+    else mostrarCamposClave();
+  }
 }
 
 /* ── ventana emergente ── */
@@ -1019,6 +1037,87 @@ function errorEn(id, msg){
 function trabajando(txt){
   modal('<h2>Un momento</h2><p style="font-size:16px;margin:0 0 6px">' + esc(txt) + '</p>'
       + '<div class="progreso"><i id="barra" style="width:35%"></i></div>');
+}
+
+/* ══════════════════ HUELLA DIGITAL (WebAuthn) ══════════════════
+   Complementa la clave maestra, no la reemplaza: solo se guarda el ID
+   de la credencial (nunca la clave), y sirve para no tener que escribir
+   la clave cada vez que se abre la app. Si la huella falla, cancela, o
+   nunca se activó, siempre queda la clave maestra como respaldo. */
+var CRED_HUELLA = 'efd_cred_huella';
+var USER_ID_HUELLA = 'efd_userid_huella';
+
+function huellaDigitalDisponible(){
+  return !!(window.PublicKeyCredential && navigator.credentials);
+}
+function idDeUsuario(){
+  var g = localStorage.getItem(USER_ID_HUELLA);
+  if(g) return Uint8Array.from(atob(g), function(c){ return c.charCodeAt(0); });
+  var nuevo = salAleatoria(16);
+  localStorage.setItem(USER_ID_HUELLA, b64(nuevo));
+  return nuevo;
+}
+async function activarHuellaDigital(){
+  if(!huellaDigitalDisponible()){
+    return decir('No disponible', 'Este navegador o teléfono no tiene lector de huella o Face ID disponible para apps web.');
+  }
+  if(!claveMaestra){
+    return decir('Primero entra con tu clave', 'Activa la huella desde dentro de la app, después de haber entrado con tu clave maestra.');
+  }
+  try{
+    var cred = await navigator.credentials.create({
+      publicKey: {
+        challenge: salAleatoria(32),
+        rp: { name: 'Iglesia Efraín para Dios' },
+        user: { id: idDeUsuario(), name: 'administrador', displayName: 'Administrador' },
+        pubKeyCredParams: [{ type:'public-key', alg:-7 }, { type:'public-key', alg:-257 }],
+        authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required' },
+        timeout: 60000
+      }
+    });
+    if(!cred) throw new Error('cancelado');
+    localStorage.setItem(CRED_HUELLA, b64(new Uint8Array(cred.rawId)));
+    decir('Huella activada', 'De ahora en adelante puedes entrar solo con tu huella o Face ID. Tu clave maestra sigue funcionando como respaldo si algún día la huella no funciona.');
+  }catch(e){
+    decir('No se pudo activar', 'No se pudo registrar la huella. Puedes seguir usando tu clave maestra normalmente, o intentarlo de nuevo más tarde.');
+  }
+}
+function desactivarHuellaDigital(){
+  preguntar('Quitar la huella',
+    '¿Quitar la entrada por huella? Volverás a necesitar tu clave maestra cada vez que abras la app.',
+    function(){ localStorage.removeItem(CRED_HUELLA); decir('Quitada', 'Ya no vas a poder entrar con huella. Usa tu clave maestra.'); });
+}
+function mostrarCamposClave(){
+  $('ent-msg-huella').style.display = 'none';
+  $('ent-campos').style.display = 'block';
+  $('ent-opciones-huella').style.display = 'none';
+  setTimeout(function(){ var c = $('ent-c'); if(c) c.focus(); }, 60);
+}
+async function intentarHuellaDigital(){
+  var credId = localStorage.getItem(CRED_HUELLA);
+  if(!credId || !huellaDigitalDisponible()) return mostrarCamposClave();
+  $('ent-msg-huella').style.display = 'block';
+  $('ent-campos').style.display = 'none';
+  $('ent-opciones-huella').style.display = 'none';
+  try{
+    var raw = Uint8Array.from(atob(credId), function(c){ return c.charCodeAt(0); });
+    var res = await navigator.credentials.get({
+      publicKey: {
+        challenge: salAleatoria(32),
+        allowCredentials: [{ id: raw, type:'public-key' }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+    if(!res) throw new Error('cancelado');
+    // La huella solo abre la puerta; no hace falta la clave real porque
+    // esta app no la usa para cifrar nada en reposo, solo como PIN de entrada.
+    claveMaestra = '(entrada por huella)';
+    ir('p-biblioteca');
+  }catch(e){
+    $('ent-msg-huella').style.display = 'none';
+    $('ent-opciones-huella').style.display = 'block';
+  }
 }
 
 /* ══════════════════ ENTRAR ══════════════════ */
@@ -2125,6 +2224,13 @@ var MANUAL = [
    l:['Va cifrado: sin la clave es ilegible','Va sellado: si le cambian un byte, se rechaza',
       'Manda el archivo por WhatsApp y la clave por otro camino'] },
  { t:'Tu clave maestra', p:['Si la pierdes no hay forma de recuperarla. Nadie puede. Anótala en un lugar seguro.'] },
+ { t:'Entrar con huella o Face ID', p:[
+      'Para no tener que escribir tu clave cada vez que abres la app, puedes activar la huella digital o Face ID de tu teléfono.',
+      'Se activa desde el menú ☰ → Administrador → "Activar huella para entrar" (te pide confirmar con el dedo una vez).',
+      'De ahí en adelante, al abrir la app, se te pide la huella sola, sin botones. Si falla o cancelas, puedes reintentar o usar tu clave maestra en su lugar — nunca te quedas sin poder entrar.'],
+   l:['La huella complementa tu clave maestra, no la reemplaza — si cambias de teléfono o borras los datos del navegador, necesitarás tu clave otra vez.',
+      'Para quitarla: mismo lugar del menú, ahora dirá "Quitar la huella".'] },
+ { t:'Aviso de "la app se actualizó"', p:['Cuando subes una versión nueva de la app, la próxima vez que la abras verás una franja arriba que dice "La app se actualizó" — se queda unos segundos y desaparece sola. Así sabes con seguridad que ya tienes lo último.'] },
  { t:'El menú Administrador', l:['Mis libros: vuelve a la lista de todos tus libros',
       'Quién puede entrar: la lista de los hermanos que tienen acceso, para bloquear a alguien si hace falta',
       'Cambiar mi clave: para cambiar tu clave maestra cuando quieras'] },
@@ -2179,6 +2285,8 @@ function abrirMenu(){
     + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-biblioteca\')"><span class="mi">📚</span>Mis libros</div>'
     + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-usuarios\')"><span class="mi">👥</span>Quién puede entrar</div>'
     + '<div class="menu-it" onclick="cerrarMenu();cambiarClaveMaestra()"><span class="mi">🔑</span>Cambiar mi clave</div>'
+    + '<div class="menu-it" onclick="cerrarMenu();' + (localStorage.getItem(CRED_HUELLA) ? 'desactivarHuellaDigital()' : 'activarHuellaDigital()') + '"><span class="mi">👆</span>'
+    + (localStorage.getItem(CRED_HUELLA) ? 'Quitar la huella' : 'Activar huella para entrar') + '</div>'
     + '<div class="menu-sec">Ayuda</div>'
     + '<div class="menu-it" onclick="abrirManual()"><span class="mi">📘</span>Manual de la app</div>'
     + '<div class="menu-it" onclick="cerrarMenu();explicarSeguridad()"><span class="mi">🛡️</span>Cómo protege tu libro</div>'
@@ -2204,9 +2312,23 @@ function revisarAusencia(){
 
 /* ══════════════════ ARRANQUE ══════════════════ */
 window.addEventListener('DOMContentLoaded', function(){
+  revisarSiSeActualizo();
   if(localStorage.getItem(CLAVE_HASH)) ir('p-entrar');
   else ir('p-inicial');
 });
+
+/* ── avisa una sola vez cuando la version cambio desde la ultima vez ── */
+function revisarSiSeActualizo(){
+  var VERSION_GUARDADA = 'efd_version_vista';
+  var actual = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+  var vista = localStorage.getItem(VERSION_GUARDADA);
+  if(actual && vista && vista !== actual){
+    var b = $('banner-actualizada');
+    b.classList.add('mostrar');
+    setTimeout(function(){ b.classList.remove('mostrar'); }, 4000);
+  }
+  if(actual) localStorage.setItem(VERSION_GUARDADA, actual);
+}
 
 </script>
 <script>
