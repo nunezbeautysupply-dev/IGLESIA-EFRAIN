@@ -1,0 +1,30 @@
+═══════════════════════════════════════════════════════════════
+  IGLESIA EFRAIN PARA DIOS — Actualización v2.4
+  23 de julio de 2026 — Manual completo + ajustes
+═══════════════════════════════════════════════════════════════
+
+QUÉ TRAE ESTA ENTREGA
+1. La app actualizada (index.html, manifest.json, sw.js) con el
+   manual DENTRO de la app ya actualizado — menú ☰ → Ayuda →
+   Manual de la app. Ahora explica también:
+   · Importar temas ya analizados (.json), con su aviso de
+     privacidad
+   · El menú Administrador completo
+   · Cómo usar la app en más de un aparato (computadora +
+     teléfono)
+
+2. "Manual_Iglesia_Efrain_v2.4.docx" — el mismo manual, pero
+   completo y detallado, en un documento Word descargable que
+   puedes guardar, imprimir o consultar fuera de la app.
+
+CÓMO ACTUALIZAR LA APP
+Reemplaza en tu repositorio los 3 archivos (index.html,
+manifest.json, sw.js — los íconos no cambiaron) y haz
+Commit + Push como siempre.
+
+RECUERDA
+Como aprendiste hace un rato: cada aparato guarda su propia
+biblioteca de libros por separado. Si actualizas la app en la
+computadora y en el teléfono, ambos quedan con el manual nuevo,
+pero los LIBROS que tengas cargados hay que seguir pasándolos
+tú mismo entre aparatos (correo, Drive, etc.) — eso no cambió.

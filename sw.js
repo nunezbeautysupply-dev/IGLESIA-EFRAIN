@@ -4,7 +4,7 @@
 //  internet. OJO: aqui NUNCA se guarda ningun libro. Los libros
 //  viven en el almacen privado del navegador y no pasan por aqui.
 // ═══════════════════════════════════════════════════════════════
-var CACHE = 'efd-v6';
+var CACHE = 'efd-v7';
 var BASE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 function sana(r){

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260723f-EFD-ADMIN-V2.3">
+<meta name="app-version" content="20260723g-EFD-ADMIN-V2.4">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -2088,6 +2088,13 @@ var MANUAL = [
    l:['Word (.docx) es lo mejor: la app ve lo que dejaste en negrita o subrayado y lo marca solo.',
       'También acepta texto (.txt).',
       'Con PDF hace lo que puede; si no se deja, pásalo a Word.'] },
+ { t:'Importar temas ya analizados (.json)', p:[
+      'Es otra forma de agregar un libro: en vez de que la app adivine sola los temas leyendo tu Word, importas un archivo .json que ya trae todo preparado de antemano (por ejemplo, cuando Claude analiza el libro por ti a fondo).',
+      'Ese archivo trae cada tema con su texto completo, su extracto de lo más importante, y sus aclaraciones de términos difíciles ya escritas.',
+      'Se usa igual que agregar un libro normal: "+ Importar temas ya analizados (.json)", escoges el archivo, y listo.'],
+   l:['⚠ Ese .json SÍ trae el texto completo del libro adentro (a diferencia de la app, que siempre queda vacía) — trátalo con el mismo cuidado que el libro mismo.',
+      'No lo subas a ningún sitio ni lo compartas por canales públicos.',
+      'Una vez lo importes y lo sellas en .efd, puedes borrar el .json si quieres.'] },
  { t:'Cómo divide el libro', l:['Por los títulos de Word','Por "Capítulo 1", "Tema 2", "Parte III"...',
       'Por líneas en MAYÚSCULAS','Por líneas cortas sin punto final',
       'Si no encuentra nada, lo corta en partes parejas'] },
@@ -2117,7 +2124,13 @@ var MANUAL = [
  { t:'Sellar y mandar', p:['Cuando el libro esté como lo quieres, toca "Sellar y generar el archivo". Le pones una clave AL LIBRO y se descarga un archivo .efd.'],
    l:['Va cifrado: sin la clave es ilegible','Va sellado: si le cambian un byte, se rechaza',
       'Manda el archivo por WhatsApp y la clave por otro camino'] },
- { t:'Tu clave maestra', p:['Si la pierdes no hay forma de recuperarla. Nadie puede. Anótala en un lugar seguro.'] }
+ { t:'Tu clave maestra', p:['Si la pierdes no hay forma de recuperarla. Nadie puede. Anótala en un lugar seguro.'] },
+ { t:'El menú Administrador', l:['Mis libros: vuelve a la lista de todos tus libros',
+      'Quién puede entrar: la lista de los hermanos que tienen acceso, para bloquear a alguien si hace falta',
+      'Cambiar mi clave: para cambiar tu clave maestra cuando quieras'] },
+ { t:'Usar la app en más de un aparato (computadora y teléfono)', p:[
+      'Cada aparato guarda su propia biblioteca por separado — es a propósito, para que el libro nunca pase por internet ni por una nube.',
+      'Por eso, si importas un libro en la computadora, no aparece solo en el teléfono: hay que pasar el archivo de un aparato al otro tú mismo (por correo, por un servicio como Google Drive, o por cable) y repetir el mismo paso de agregar o importar en el otro aparato.'] }
 ];
 function abrirManual(){
   cerrarMenu();
