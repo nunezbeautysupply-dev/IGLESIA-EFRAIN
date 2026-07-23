@@ -58,6 +58,11 @@ recuperarla. Nadie puede.
    → Word (.docx) es lo que mejor funciona, porque la app puede
      ver lo que dejaste en NEGRITA o SUBRAYADO y marcarlo solo.
 
+   ⚠ SI LE SALEN TÍTULOS RAROS (símbolos, letras sueltas):
+     ese archivo no se dejó leer. Bórralo y pasa el libro
+     a Word (.docx). La app ahora lo detecta sola y te avisa
+     antes de agregarlo.
+
 2. La app lo divide en temas y marca lo importante:
    · lo que está en negrita o subrayado en tu Word
    · los versículos (Juan 3:16, Salmo 23:1...)
@@ -72,6 +77,9 @@ recuperarla. Nadie puede.
    · quitar frases marcadas o agregar las tuyas
    · tocar cualquier párrafo para marcarlo
 
+   Para BORRAR un libro: el botón 🗑 rojo a la derecha de cada
+   libro en la lista, o "Borrar este libro" dentro del libro.
+
 4. Cuando estés conforme: "🔒 Sellar y generar el archivo"
    Le pones una clave AL LIBRO y se descarga un archivo .efd
 
@@ -83,9 +91,12 @@ recuperarla. Nadie puede.
   EL AUDIO
 ═══════════════════════════════════════════════════════════════
 
-Igual que NBS Academia. Desde cualquier tema toca "Escuchar",
-o desde el libro toca "Escuchar el libro" y empieza por el
-primer tema.
+Igual que NBS Academia: el reproductor está ARRIBA del todo
+en la pantalla del libro, siempre a la vista. No hay que bajar
+nada para encontrarlo.
+
+Toca cualquier tema de la lista y se carga arriba. Toca ▶.
+El lápiz ✏️ de cada tema es para abrirlo y editarlo.
 
    ⏮   tema anterior
    ↺10 retroceder 10 segundos

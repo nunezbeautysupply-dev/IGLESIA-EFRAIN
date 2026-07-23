@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260723c-EFD-ADMIN-V2.0">
+<meta name="app-version" content="20260723e-EFD-ADMIN-V2.2">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -162,8 +162,16 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 .vel{flex:1;padding:11px 0;border-radius:11px;background:transparent;
   border:1px solid rgba(169,166,216,.28);color:var(--lavanda);font-size:14.5px;font-weight:700;cursor:pointer}
 .vel.on{background:rgba(212,175,55,.16);border-color:var(--oro);color:var(--oro-suave)}
-.dice{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--perg);
-  background:rgba(169,166,216,.07);border-radius:12px;padding:13px 15px;margin-bottom:14px;min-height:76px}
+.ahora{font-family:var(--serif);font-size:18.5px;color:var(--oro-suave);font-weight:700;
+  line-height:1.3;margin-bottom:10px;text-align:center}
+.dice{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--perg);
+  background:rgba(169,166,216,.07);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+  min-height:62px;max-height:96px;overflow:hidden}
+.libro-borrar{background:transparent;border:1px solid rgba(199,97,79,.4);color:var(--rojo);
+  border-radius:10px;width:42px;height:42px;font-size:18px;cursor:pointer;flex-shrink:0}
+.libro-borrar:active{background:rgba(199,97,79,.14)}
+.tema-edit{background:transparent;border:none;color:var(--lavanda);font-size:17px;
+  cursor:pointer;padding:3px 5px}
 .voznota{font-size:13px;color:var(--lavanda);text-align:center;margin-top:10px;line-height:1.5}
 @media (max-width:400px){
   .ctrl{gap:6px}
@@ -310,38 +318,9 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <button class="volver" onclick="abrirMenu()">☰</button>
     </div>
     <div id="prep-resumen"></div>
-    <div class="tarj" id="prep-progreso"></div>
-    <input class="campo" id="prep-buscar" type="search" placeholder="🔍 Buscar en este libro..."
-           oninput="pintarPreparar()" style="margin-bottom:10px">
-    <div class="chips" id="prep-chips"></div>
-    <div class="tarj">
-      <div id="prep-temas"></div>
-    </div>
-    <button class="btn btn-linea" onclick="escucharDesdeElPrincipio()">🔊 Escuchar el libro</button>
-    <button class="btn btn-oro" onclick="abrirSellar()">🔒 Sellar y generar el archivo</button>
-    <button class="btn btn-linea" onclick="renombrarLibro()">Cambiar el nombre del libro</button>
-    <button class="btn btn-rojo" onclick="borrarLibro()">Borrar este libro</button>
-  </section>
-
-  <!-- ══════════ UN TEMA ══════════ -->
-  <section id="p-tema" class="pg">
-    <div class="barra">
-      <button class="volver" onclick="ir('p-preparar')">←</button>
-      <h1 id="tema-titulo">Tema</h1>
-    </div>
-    <div id="tema-cuerpo"></div>
-  </section>
-
-  <!-- ══════════ ESCUCHAR ══════════ -->
-  <section id="p-escuchar" class="pg">
-    <div class="barra">
-      <button class="volver" onclick="salirDeEscuchar()">←</button>
-      <h1 id="esc-titulo">Escuchar</h1>
-    </div>
-    <p class="mini" id="esc-cual" style="margin:-6px 0 14px"></p>
-
-    <div class="repro">
-      <div class="dice" id="esc-dice">Toca ▶ para empezar.</div>
+    <div class="repro" id="repro">
+      <div class="ahora" id="esc-cual">Toca un tema para empezar</div>
+      <div class="dice" id="esc-dice">Toca ▶ para escuchar.</div>
       <input type="range" id="esc-pos" min="0" max="0" value="0"
              oninput="irAPedazo(+this.value)" aria-label="Posición">
       <div class="linea-t"><span id="esc-t1">0:00</span><span id="esc-t2">0:00</span></div>
@@ -359,13 +338,33 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
         <button class="vel on" id="v-1" onclick="ponerVelocidad(1)">Normal</button>
         <button class="vel" id="v-125" onclick="ponerVelocidad(1.25)">Rápido</button>
       </div>
-      <p class="voznota">Deja la pantalla encendida mientras escuchas.<br>
-        Si la apagas, la voz se detiene.</p>
+      <div class="fila" style="margin-top:11px">
+        <button class="btn btn-linea" style="margin:0;padding:11px;font-size:14.5px"
+                onclick="cambiarQueSeLee()" id="esc-modo">★ Solo lo importante</button>
+        <button class="btn btn-linea" style="margin:0;padding:11px;font-size:14.5px"
+                onclick="abrirVoces()">🔊 La voz</button>
+      </div>
+      <p class="voznota">Deja la pantalla encendida mientras escuchas.</p>
     </div>
+    <div class="tarj" id="prep-progreso"></div>
+    <input class="campo" id="prep-buscar" type="search" placeholder="🔍 Buscar en este libro..."
+           oninput="pintarPreparar()" style="margin-bottom:10px">
+    <div class="chips" id="prep-chips"></div>
+    <div class="tarj">
+      <div id="prep-temas"></div>
+    </div>
+    <button class="btn btn-oro" onclick="abrirSellar()">🔒 Sellar y generar el archivo</button>
+    <button class="btn btn-linea" onclick="renombrarLibro()">Cambiar el nombre del libro</button>
+    <button class="btn btn-rojo" onclick="borrarLibro()">Borrar este libro</button>
+  </section>
 
-    <button class="btn btn-linea" onclick="cambiarQueSeLee()" id="esc-modo">★ Escuchar solo lo importante</button>
-    <button class="btn btn-linea" onclick="abrirVoces()">🔊 Cambiar la voz</button>
-    <div id="esc-importante"></div>
+  <!-- ══════════ UN TEMA ══════════ -->
+  <section id="p-tema" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="ir('p-preparar')">←</button>
+      <h1 id="tema-titulo">Tema</h1>
+    </div>
+    <div id="tema-cuerpo"></div>
   </section>
 
   <!-- ══════════ USUARIOS ══════════ -->
@@ -508,9 +507,9 @@ async function quitarLibro(id){
    app funcione sin internet y sin depender de nadie. Del Word se saca ademas
    que estaba en NEGRITA y que estaba SUBRAYADO: eso es oro para marcar lo
    importante, porque tu ya lo marcaste al escribir el libro. */
-async function inflar(datos){
+async function inflar(datos, modo){
   if(typeof DecompressionStream === 'undefined') throw new Error('Este navegador no puede abrir archivos Word. Usa Chrome.');
-  var ds = new DecompressionStream('deflate-raw');
+  var ds = new DecompressionStream(modo || 'deflate-raw');
   var flujo = new Blob([datos]).stream().pipeThrough(ds);
   return new Uint8Array(await new Response(flujo).arrayBuffer());
 }
@@ -583,35 +582,178 @@ async function leerDocx(buf){
   return parrafos;
 }
 
-/* ─────────────────────── LEER UN PDF (lo que se pueda) ─────────────────────── */
+/* ─────────────────────── ¿ESTO PARECE TEXTO DE VERDAD? ───────────────────────
+   Un PDF puede soltar basura binaria que a simple vista "tiene letras". Antes de
+   dar un libro por bueno se comprueba que de verdad sea espanol legible. Sin esto
+   la app aceptaba capitulos con titulos como "Ay IE6 1/2Nr" -paso de verdad-. */
+function pareceTexto(s){
+  if(!s) return false;
+  s = String(s);
+  if(s.replace(/\s/g,'').length < 200) return false;
+  var total = s.length;
+  var letras = (s.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g) || []).length;
+  if(letras / total < 0.55) return false;                 // demasiado simbolo raro
+  var espacios = (s.match(/ /g) || []).length;
+  if(espacios / total < 0.08) return false;               // sin espacios no es texto
+  var raros = (s.match(/[\u0000-\u0008\u000E-\u001F\uFFFD]/g) || []).length;
+  if(raros / total > 0.005) return false;                 // bytes de control
+  // ¿aparecen las palabras que aparecen en CUALQUIER texto en espanol?
+  var bajo = ' ' + s.toLowerCase().replace(/\s+/g,' ') + ' ';
+  var comunes = [' de ',' la ',' que ',' el ',' en ',' y ',' a ',' los ',' se ',' del ',
+                 ' las ',' por ',' un ',' para ',' con ',' no ',' una ',' su ',' es ',' lo ',
+                 ' como ',' mas ',' más ',' pero ',' sus ',' le ',' ya ',' o ',' este ',' si '];
+  var cuantas = 0;
+  for(var i = 0; i < comunes.length; i++) if(bajo.indexOf(comunes[i]) >= 0) cuantas++;
+  return cuantas >= 6;
+}
+
+/* ─────────────────────── DESHACER LOS FILTROS DE UN PDF ───────────────────────
+   Un flujo de PDF puede venir comprimido en VARIAS capas encadenadas, por ejemplo
+   /Filter [ /ASCII85Decode /FlateDecode ]. Hay que deshacerlas en orden. */
+function deAscii85(s){
+  s = s.replace(/^\s*<~/, '').replace(/~>[\s\S]*$/, '').replace(/\s/g, '');
+  var fuera = [], grupo = [], i, j;
+  for(i = 0; i < s.length; i++){
+    var c = s.charAt(i);
+    if(c === 'z' && grupo.length === 0){ fuera.push(0,0,0,0); continue; }
+    var v = s.charCodeAt(i) - 33;
+    if(v < 0 || v > 84) continue;
+    grupo.push(v);
+    if(grupo.length === 5){
+      var n = 0;
+      for(j = 0; j < 5; j++) n = n * 85 + grupo[j];
+      fuera.push((n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255);
+      grupo = [];
+    }
+  }
+  if(grupo.length > 1){
+    var faltan = 5 - grupo.length;
+    for(j = 0; j < faltan; j++) grupo.push(84);
+    var n2 = 0;
+    for(j = 0; j < 5; j++) n2 = n2 * 85 + grupo[j];
+    var b4 = [(n2 >>> 24) & 255, (n2 >>> 16) & 255, (n2 >>> 8) & 255, n2 & 255];
+    for(j = 0; j < 4 - faltan; j++) fuera.push(b4[j]);
+  }
+  return new Uint8Array(fuera);
+}
+function deAsciiHex(s){
+  s = s.replace(/>[\s\S]*$/, '').replace(/[^0-9A-Fa-f]/g, '');
+  if(s.length % 2) s += '0';
+  var b = new Uint8Array(s.length / 2);
+  for(var i = 0; i < b.length; i++) b[i] = parseInt(s.substr(i*2, 2), 16);
+  return b;
+}
+function deRunLength(b){
+  var fuera = [], i = 0;
+  while(i < b.length){
+    var n = b[i++];
+    if(n === 128) break;
+    if(n < 128){ for(var j = 0; j <= n; j++) fuera.push(b[i++]); }
+    else { var v = b[i++]; for(var k = 0; k < 257 - n; k++) fuera.push(v); }
+  }
+  return new Uint8Array(fuera);
+}
+async function deFlate(b){
+  // 'deflate' entiende la cabecera zlib Y la suma de control del final.
+  // Antes se hacia slice(2) + 'deflate-raw' y Chrome fallaba por los 4 bytes
+  // de control que quedaban al final -asi se caia la lectura de los PDF-.
+  try{ return await inflar(b, 'deflate'); }catch(e){}
+  try{ return await inflar(b, 'deflate-raw'); }catch(e){}
+  return await inflar(b.slice(2), 'deflate-raw');
+}
+function bytesDeTexto(s){
+  var b = new Uint8Array(s.length);
+  for(var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 0xff;
+  return b;
+}
+async function deshacerFiltros(datosTxt, cabecera){
+  var lista = [];
+  var mf = cabecera.match(/\/Filter\s*(\[[^\]]*\]|\/\w+)/);
+  if(mf){
+    var f, rf = /\/(\w+)/g;
+    while((f = rf.exec(mf[1]))) lista.push(f[1]);
+  }
+  var b = bytesDeTexto(datosTxt);
+  if(!lista.length) return texto(b);                  // sin filtro: va tal cual
+  for(var i = 0; i < lista.length; i++){
+    var n = lista[i];
+    if(n === 'ASCII85Decode')       b = deAscii85(texto(b));
+    else if(n === 'ASCIIHexDecode') b = deAsciiHex(texto(b));
+    else if(n === 'FlateDecode')    b = await deFlate(b);
+    else if(n === 'RunLengthDecode')b = deRunLength(b);
+    else if(n === 'DCTDecode' || n === 'JPXDecode' || n === 'CCITTFaxDecode') return null; // es imagen
+    else return null;                                 // filtro que no sabemos deshacer
+  }
+  return texto(b);
+}
+
+/* ─────────────────────── LEER UN PDF ───────────────────────
+   Se buscan SOLO los flujos que de verdad llevan el texto de la pagina: los que
+   traen los operadores BT/ET y Tj/TJ. Los flujos de imagenes y de fuentes se
+   saltan, porque antes se colaban y salia basura. */
+function esFlujoDeTexto(c){
+  if(!c) return false;
+  if(c.indexOf('BT') < 0) return false;
+  return c.indexOf('Tj') >= 0 || c.indexOf('TJ') >= 0 || c.indexOf("'") >= 0;
+}
+function sacarTextoPdf(contenido){
+  var fuera = '';
+  // se recorren los operadores de texto en orden
+  var re = /(\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>)\s*(Tj|TJ|')|\[([\s\S]*?)\]\s*TJ|(T\*|Td|TD|TL)/g;
+  var m;
+  while((m = re.exec(contenido))){
+    if(m[4]){ fuera += '\n'; continue; }            // salto de linea del PDF
+    var trozos = [];
+    if(m[3] != null){
+      var rr = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|-?\d+(\.\d+)?/g, x;
+      while((x = rr.exec(m[3]))){
+        if(x[0].charAt(0) === '(' || x[0].charAt(0) === '<') trozos.push(x[0]);
+        else if(parseFloat(x[0]) < -180) trozos.push('( )');   // separacion grande = espacio
+      }
+    } else if(m[1] != null){
+      trozos.push(m[1]);
+    }
+    trozos.forEach(function(t){
+      if(t.charAt(0) === '<'){
+        var hex = t.slice(1,-1).replace(/\s/g,'');
+        for(var i = 0; i + 1 < hex.length; i += 2){
+          var c = parseInt(hex.substr(i,2), 16);
+          if(c >= 32 || c === 10) fuera += String.fromCharCode(c);
+        }
+      } else {
+        fuera += t.slice(1,-1)
+          .replace(/\\([nr])/g, '\n')
+          .replace(/\\t/g, ' ')
+          .replace(/\\(\d{1,3})/g, function(_,o){ return String.fromCharCode(parseInt(o,8)); })
+          .replace(/\\(.)/g, '$1');
+      }
+    });
+  }
+  return fuera;
+}
 async function leerPdf(buf){
   var b = new Uint8Array(buf), crudo = '';
-  for(var i=0;i<b.length;i++) crudo += String.fromCharCode(b[i]);
-  var partes = [], re = /stream\r?\n?([\s\S]*?)endstream/g, m;
+  for(var i = 0; i < b.length; i++) crudo += String.fromCharCode(b[i]);
+  var partes = [];
+  var re = /stream\r?\n?([\s\S]*?)\r?\n?endstream/g, m;
   while((m = re.exec(crudo))){
-    var datos = m[1];
-    var bin = new Uint8Array(datos.length);
-    for(var j=0;j<datos.length;j++) bin[j] = datos.charCodeAt(j) & 0xff;
-    var contenido = '';
-    try{
-      // los PDF suelen venir comprimidos con zlib (2 bytes de cabecera + deflate)
-      contenido = texto(await inflar(bin.slice(2)));
-    }catch(e){
-      contenido = datos;
-    }
-    if(contenido.indexOf('Tj') < 0 && contenido.indexOf('TJ') < 0) continue;
-    var t = '', mm, rt = /\((?:\\.|[^\\()])*\)/g;
-    while((mm = rt.exec(contenido))){
-      var s = mm[0].slice(1,-1)
-        .replace(/\\([nrtbf])/g, function(_,c){ return c==='n'||c==='r' ? '\n' : ' '; })
-        .replace(/\\(\d{1,3})/g, function(_,o){ return String.fromCharCode(parseInt(o,8)); })
-        .replace(/\\(.)/g, '$1');
-      t += s;
-    }
-    if(t.trim()) partes.push(t);
+    // El diccionario de ESTE flujo va entre su "obj" y la palabra "stream".
+    // -Antes se miraban los 500 caracteres de atras y se agarraba el diccionario
+    //  del objeto anterior, y por eso se saltaban flujos buenos.-
+    var desde = crudo.lastIndexOf(' obj', m.index);
+    if(desde < 0 || m.index - desde > 4000) desde = Math.max(0, m.index - 400);
+    var cabecera = crudo.slice(desde, m.index);
+    if(/\/Subtype\s*\/Image|\/FontFile|\/Type\s*\/Font|\/Subtype\s*\/Type1C/.test(cabecera)) continue;
+    var contenido = null;
+    try{ contenido = await deshacerFiltros(m[1], cabecera); }catch(e){ contenido = null; }
+    if(!esFlujoDeTexto(contenido)) continue;
+    var t = sacarTextoPdf(contenido);
+    if(t.replace(/\s/g,'').length > 8) partes.push(t);
   }
-  var todo = partes.join('\n').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
-  if(todo.length < 200) throw new Error('PDF_DIFICIL');
+  var todo = partes.join('\n')
+    .replace(/\r/g,'\n').replace(/[ \t]+/g,' ')
+    .replace(/\n[ ]+/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+  if(!pareceTexto(todo)) throw new Error('PDF_DIFICIL');
   return todo.split('\n').map(function(l){
     return { txt:l.trim(), titulo:false, nivel:0, marcados:[] };
   }).filter(function(p){ return p.txt; });
@@ -766,8 +908,8 @@ function ir(p){
   for(var i=0;i<todas.length;i++) todas[i].classList.remove('activa');
   var el = $(p); if(el) el.classList.add('activa');
   window.scrollTo(0,0);
-  // si se sale del reproductor, la voz se calla
-  if(p !== 'p-escuchar' && typeof sonando !== 'undefined' && sonando){
+  // si se sale del libro, la voz se calla
+  if(p !== 'p-preparar' && typeof sonando !== 'undefined' && sonando){
     pareYo = true; if(voz) voz.cancel(); sonando = false;
     var bp = $('esc-play'); if(bp) bp.textContent = '▶';
     if(typeof soltarPantalla === 'function') soltarPantalla();
@@ -880,14 +1022,19 @@ async function pintarBiblioteca(){
   libros.sort(function(a,b){ return (b.creado||'').localeCompare(a.creado||''); });
   el.innerHTML = libros.map(function(l){
     var min = Math.round(contarPalabras(l) / 150);
-    return '<div class="tarj tarj-toc" onclick="abrirLibro(\'' + l.id + '\')">'
-      + '<div class="libro"><div class="libro-ico">📖</div><div style="flex:1;min-width:0">'
+    return '<div class="tarj">'
+      + '<div class="libro">'
+      + '<div class="libro-ico tarj-toc" onclick="abrirLibro(\'' + l.id + '\')">📖</div>'
+      + '<div style="flex:1;min-width:0" class="tarj-toc" onclick="abrirLibro(\'' + l.id + '\')">'
       + '<div class="libro-tit">' + esc(l.titulo) + '</div>'
       + '<div class="libro-sub">' + l.temas.length + ' temas · ' + min + ' min de lectura</div>'
       + '<div class="libro-sub">' + (l.sellado
           ? '<span class="sello-si">✓ sellado el ' + esc(l.sellado) + '</span>'
           : '<span class="sello-no">⚠ falta sellarlo</span>') + '</div>'
-      + '</div></div></div>';
+      + '</div>'
+      + '<button class="libro-borrar" onclick="borrarDesdeLista(\'' + l.id + '\',event)" '
+      + 'aria-label="Borrar este libro" title="Borrar">🗑</button>'
+      + '</div></div>';
   }).join('');
 }
 function contarPalabras(l){
@@ -896,6 +1043,20 @@ function contarPalabras(l){
     (t.texto||[]).forEach(function(p){ n += p.split(/\s+/).length; });
   });
   return n;
+}
+function borrarDesdeLista(id, ev){
+  if(ev) ev.stopPropagation();
+  traerLibro(id).then(function(l){
+    if(!l) return;
+    preguntar('Borrar el libro',
+      'Se va a borrar <b>' + esc(l.titulo) + '</b> de este teléfono, con sus '
+      + l.temas.length + ' temas.<br><br>Esto no se puede deshacer.',
+      async function(){
+        await quitarLibro(id);
+        if(libroActual && libroActual.id === id) libroActual = null;
+        pintarBiblioteca();
+      });
+  });
 }
 async function abrirLibro(id){
   libroActual = await traerLibro(id);
@@ -921,10 +1082,19 @@ async function leerArchivo(input){
       }catch(e){
         cerrarModal();
         return decir('Este PDF no se deja leer',
-          'Muchos PDF guardan el texto como imagen o de forma que no se puede sacar.<br><br>'
-          + '<b>La solución es fácil:</b> abre el PDF, guárdalo o cópialo a un documento de Word (.docx) '
-          + 'y súbelo así. Además Word funciona mejor, porque la app puede ver lo que dejaste '
-          + 'en <b>negrita</b> o subrayado y marcarlo como lo importante.');
+          'Este PDF guarda el texto de una forma que no se puede sacar — o son páginas '
+          + 'escaneadas, que en realidad son fotos.<br><br>'
+          + '<b>La solución es fácil:</b> pásalo a Word (.docx) y súbelo así.<br><br>'
+          + '<span style="color:var(--lavanda);font-size:15px">'
+          + '<b>Cómo pasarlo:</b><br>'
+          + '1. Abre Word en la computadora<br>'
+          + '2. Archivo → Abrir → escoge el PDF<br>'
+          + '3. Word te dice que lo va a convertir → Aceptar<br>'
+          + '4. Guárdalo como .docx<br><br>'
+          + 'O más simple: abre el PDF, selecciona todo el texto, cópialo y pégalo '
+          + 'en un Word en blanco.</span><br><br>'
+          + 'Con Word además la app ve lo que dejaste en <b>negrita</b> o subrayado '
+          + 'y lo marca solo como lo importante.');
       }
     } else {
       parrafos = texto(buf).split(/\r?\n/).map(function(l){
@@ -932,6 +1102,22 @@ async function leerArchivo(input){
       }).filter(function(p){ return p.txt; });
     }
     if(!parrafos.length) throw new Error('Ese archivo no trae texto.');
+
+    // NUNCA aceptar un libro que no sea texto legible de verdad.
+    // Antes se colaba basura del PDF y salian capitulos con titulos raros.
+    var muestra = parrafos.map(function(p){ return p.txt; }).join(' ');
+    if(!pareceTexto(muestra)){
+      cerrarModal();
+      return decir('Ese archivo no se dejó leer',
+        'La app lo abrió pero lo que salió no es texto legible: son símbolos sueltos, '
+        + 'no palabras.<br><br>'
+        + '<b>Pasa el libro a Word (.docx) y súbelo así.</b> Es lo que mejor funciona, '
+        + 'y además la app puede ver lo que dejaste en <b>negrita</b> o subrayado '
+        + 'y marcarlo solo como lo importante.<br><br>'
+        + '<span style="color:var(--lavanda);font-size:15px">Para pasarlo: abre el PDF, '
+        + 'selecciona todo, cópialo y pégalo en un documento de Word. O en Word: '
+        + 'Archivo → Abrir → escoge el PDF, y Word lo convierte solo.</span>');
+    }
 
     var temas = partirEnTemas(parrafos);
     var titulo = f.name.replace(/\.(docx|pdf|txt)$/i,'').replace(/[_-]+/g,' ').trim() || 'Libro';
@@ -961,6 +1147,8 @@ async function leerArchivo(input){
 function pintarPreparar(){
   if(!libroActual) return ir('p-biblioteca');
   var l = libroActual;
+  if(temaActual < 0 || temaActual >= l.temas.length) temaActual = 0;
+  if(!pedazos.length && l.temas.length) prepararEscuchar(true);
   $('prep-titulo').textContent = l.titulo;
   var marcas = l.temas.reduce(function(s,t){ return s + t.importante.length; }, 0);
   var min = Math.round(contarPalabras(l) / 150);
@@ -1016,22 +1204,18 @@ function pintarPreparar(){
     var t = x.t, i = x.i, nota = notaDe(i);
     return '<div class="tema">'
       + '<div class="tema-n">' + (i+1) + '</div>'
-      + '<div class="tema-cuerpo tarj-toc" onclick="verTema(' + i + ')">'
+      + '<div class="tema-cuerpo tarj-toc" onclick="cargarEnReproductor(' + i + ')">'
       + '<div class="tema-tit">' + esc(t.titulo) + '</div>'
       + '<div class="tema-info"><span class="estrella">★</span> ' + t.importante.length
       + ' importantes · ' + (t.texto||[]).length + ' párrafos · ' + minutosDelTema(i) + ' min'
       + (nota ? ' · <span style="color:var(--oro)">✍️ con nota</span>' : '') + '</div>'
       + '</div>'
       + '<div class="tema-marcas">'
+      + '<button class="tema-edit" onclick="verTema(' + i + ');event.stopPropagation()" aria-label="Abrir el tema">✏️</button>'
       + '<button class="mk ' + (esFav(i)?'mk-fav':'mk-off') + '" onclick="alternarFav(' + i + ',event)" aria-label="Favorito">★</button>'
       + '<button class="mk ' + (esHecho(i)?'mk-ok':'mk-off') + '" onclick="alternarHecho(' + i + ',event)" aria-label="Escuchado">✓</button>'
       + '</div></div>';
   }).join('');
-}
-function escucharDesdeElPrincipio(){
-  if(!libroActual.temas.length) return decir('Sin temas','Este libro todavia no tiene nada que leer.');
-  temaActual = 0;
-  escuchar();
 }
 function renombrarLibro(){
   pedirTexto('Nombre del libro', 'Como quieres que se llame', libroActual.titulo, async function(v){
@@ -1407,28 +1591,40 @@ function usarVoz(i, todas){
 }
 if(voz) voz.onvoiceschanged = function(){};
 
-/* — entrar y salir de la pantalla de escuchar — */
-function escuchar(){ prepararEscuchar(false); ir('p-escuchar'); }
+/* — el reproductor vive ARRIBA de la pantalla del libro, siempre a la vista,
+     igual que en NBS Academia — */
 function prepararEscuchar(soloRefrescar){
-  if(!libroActual || !libroActual.temas[temaActual]) return ir('p-biblioteca');
+  if(!libroActual || !libroActual.temas[temaActual]) return;
   var t = libroActual.temas[temaActual];
-  $('esc-titulo').textContent = 'Tema ' + (temaActual + 1) + ' de ' + libroActual.temas.length;
-  $('esc-cual').textContent = t.titulo;
+  var c = $('esc-cual');
+  if(c) c.textContent = (temaActual + 1) + '. ' + t.titulo;
   var vg = parseFloat(localStorage.getItem('efd_vel') || '1');
   if(!soloRefrescar && [0.85,1,1.25].indexOf(vg) >= 0) ponerVelocidad(vg);
   armarPedazos();
-  $('esc-play').textContent = sonando ? '⏸' : '▶';
-  $('esc-importante').innerHTML = (t.importante || []).length
-    ? '<div class="tarj"><h2 style="font-family:var(--serif);font-size:18px;color:var(--oro-suave);margin:0 0 10px">★ Lo más importante</h2>'
-      + t.importante.map(function(f){ return '<div class="rubrica">' + esc(f.t) + '</div>'; }).join('')
-      + '</div>'
-    : '';
+  var bp = $('esc-play'); if(bp) bp.textContent = sonando ? '⏸' : '▶';
   localStorage.setItem('efd_ultimo', libroActual.id + '::' + temaActual);
 }
-function salirDeEscuchar(){
-  pareYo = true; if(voz) voz.cancel(); sonando = false;
-  soltarPantalla();
-  verTema(temaActual);
+/* Tocar un tema de la lista lo pone en el reproductor y sube la pantalla */
+function cargarEnReproductor(i){
+  temaActual = i;
+  var iba = sonando;
+  if(sonando){ pareYo = true; if(voz) voz.cancel(); sonando = false; }
+  prepararEscuchar(true);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(iba) setTimeout(playPausa, 260);
+  pintarPreparar();
+}
+/* Desde la pantalla de un tema: lo pone a sonar y vuelve al libro */
+function escuchar(){
+  ir('p-preparar');
+  prepararEscuchar(true);
+  window.scrollTo(0, 0);
+  if(!sonando) setTimeout(playPausa, 200);
+}
+function escucharDesdeElPrincipio(){
+  if(!libroActual || !libroActual.temas.length) return decir('Sin temas','Este libro todavía no tiene nada que leer.');
+  temaActual = 0;
+  escuchar();
 }
 
 /* ══════════════════ SELLAR Y GENERAR EL ARCHIVO ══════════════════ */
