@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="app-version" content="20260723a-EFD-ADMIN-V1.0">
+<meta name="theme-color" content="#0B1026">
+<title>Iglesia Efraín para Dios</title>
+<style>
+:root{
+  --noche:#0B1026;      /* el cielo */
+  --indigo:#1A2247;     /* las tarjetas */
+  --indigo2:#232C57;    /* tarjetas al tocar */
+  --oro:#D4AF37;        /* luz de vela */
+  --oro-suave:#E8CF7A;
+  --lavanda:#A9A6D8;    /* lo secundario */
+  --perg:#F2EDE3;       /* el texto */
+  --linea:rgba(212,175,55,.22);
+  --rojo:#C7614F;
+  --verde:#5E9E7E;
+  --serif:Georgia,'Noto Serif','Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--noche);
+  color:var(--perg);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.55;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* el resplandor de vela detras de la cabecera: la firma visual de la app */
+body::before{
+  content:'';position:fixed;top:-180px;left:50%;transform:translateX(-50%);
+  width:640px;height:420px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,rgba(212,175,55,.16) 0%,rgba(212,175,55,.06) 38%,transparent 70%);
+}
+.envoltura{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:0 16px 60px}
+
+/* ── cabecera ─────────────────────────────────────── */
+.cab{padding:26px 0 18px;text-align:center}
+.emblema{width:112px;height:112px;border-radius:14px;display:block;margin:0 auto;
+  box-shadow:0 0 34px rgba(212,175,55,.30),0 6px 18px rgba(0,0,0,.5)}
+@media (max-width:360px){.emblema{width:96px;height:96px}}
+.marca{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--oro-suave);
+  letter-spacing:.02em;margin-top:6px;text-shadow:0 0 26px rgba(212,175,55,.28)}
+.marca small{display:block;font-size:14.5px;letter-spacing:.34em;color:var(--lavanda);
+  font-family:var(--sans);font-weight:600;margin-top:5px;text-transform:uppercase;text-shadow:none}
+.regla{height:1px;background:linear-gradient(90deg,transparent,var(--linea) 22%,var(--linea) 78%,transparent);margin:16px 0 4px}
+
+/* ── barra superior de las pantallas internas ─────── */
+.barra{display:flex;align-items:center;gap:10px;padding:16px 0 12px}
+.barra h1{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--oro-suave);margin:0;flex:1;line-height:1.25}
+.volver{background:none;border:1px solid var(--linea);color:var(--lavanda);border-radius:11px;
+  padding:9px 13px;font-size:15.5px;font-family:var(--sans);cursor:pointer;flex-shrink:0}
+.volver:active{background:var(--indigo)}
+
+/* ── tarjetas ─────────────────────────────────────── */
+.tarj{background:var(--indigo);border:1px solid rgba(169,166,216,.14);border-radius:16px;
+  padding:18px;margin-bottom:14px}
+.tarj-toc{cursor:pointer}
+.tarj-toc:active{background:var(--indigo2)}
+
+/* ── campos ───────────────────────────────────────── */
+.etq{display:block;font-size:14px;color:var(--lavanda);margin:0 0 7px;font-weight:600;letter-spacing:.02em}
+.campo{width:100%;padding:15px 14px;background:#0E1533;border:1px solid rgba(169,166,216,.24);
+  border-radius:12px;color:var(--perg);font-size:17.5px;font-family:var(--sans);margin-bottom:15px}
+.campo:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(212,175,55,.16)}
+textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-height:1.6;resize:vertical}
+
+/* ── botones ──────────────────────────────────────── */
+.btn{width:100%;padding:16px;border:none;border-radius:13px;font-size:17.5px;font-weight:700;
+  font-family:var(--sans);cursor:pointer;margin-bottom:11px;display:block}
+.btn:focus-visible{outline:3px solid var(--oro);outline-offset:2px}
+.btn-oro{background:linear-gradient(180deg,var(--oro-suave),var(--oro));color:#2A1F04}
+.btn-oro:active{filter:brightness(.92)}
+.btn-linea{background:transparent;color:var(--lavanda);border:1px solid rgba(169,166,216,.3)}
+.btn-linea:active{background:var(--indigo)}
+.btn-rojo{background:transparent;color:var(--rojo);border:1px solid rgba(199,97,79,.45)}
+.btn-chico{width:auto;display:inline-block;padding:9px 14px;font-size:14.5px;margin:0 7px 7px 0}
+
+/* ── avisos ───────────────────────────────────────── */
+.aviso{border-radius:12px;padding:13px 15px;font-size:15px;margin-bottom:15px;line-height:1.5}
+.av-oro{background:rgba(212,175,55,.1);border:1px solid var(--linea);color:var(--oro-suave)}
+.av-rojo{background:rgba(199,97,79,.12);border:1px solid rgba(199,97,79,.4);color:#E8A093}
+.av-verde{background:rgba(94,158,126,.12);border:1px solid rgba(94,158,126,.4);color:#9BD3B6}
+
+/* ── lista de libros ──────────────────────────────── */
+.libro{display:flex;gap:14px;align-items:flex-start}
+.libro-ico{font-size:30px;line-height:1;flex-shrink:0;margin-top:2px}
+.libro-tit{font-family:var(--serif);font-size:19.5px;font-weight:700;color:var(--perg);line-height:1.3}
+.libro-sub{font-size:14.5px;color:var(--lavanda);margin-top:5px}
+.sello-si{color:var(--verde);font-weight:700}
+.sello-no{color:var(--oro);font-weight:700}
+
+/* ── temas ────────────────────────────────────────── */
+.tema{display:flex;gap:13px;align-items:flex-start;padding:15px 0;border-bottom:1px solid rgba(169,166,216,.12)}
+.tema:last-child{border-bottom:none}
+.tema-n{font-family:var(--serif);font-size:19px;color:var(--oro);font-weight:700;
+  min-width:30px;text-align:right;flex-shrink:0;padding-top:1px}
+.tema-cuerpo{flex:1;min-width:0}
+.tema-tit{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--perg);line-height:1.32;word-wrap:break-word}
+.tema-info{font-size:13.5px;color:var(--lavanda);margin-top:5px}
+.estrella{color:var(--oro)}
+
+/* ── frase importante: rúbrica iluminada ──────────── */
+.rubrica{background:rgba(212,175,55,.07);border-left:3px solid var(--oro);
+  border-radius:0 12px 12px 0;padding:13px 15px;margin:11px 0;
+  font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--perg)}
+.rubrica .fuente{display:block;font-family:var(--sans);font-size:13px;color:var(--oro);
+  margin-top:8px;font-weight:600;letter-spacing:.03em}
+
+/* ── texto del libro ──────────────────────────────── */
+.lectura{font-family:var(--serif);font-size:18px;line-height:1.75;color:var(--perg)}
+.lectura p{margin:0 0 15px}
+
+/* ── ventana emergente ────────────────────────────── */
+.velo{display:none;position:fixed;inset:0;background:rgba(6,9,22,.82);z-index:900;
+  align-items:center;justify-content:center;padding:18px}
+.velo.abierto{display:flex}
+.modal{background:var(--indigo);border:1px solid var(--linea);border-radius:18px;
+  max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:22px}
+.modal h2{font-family:var(--serif);font-size:21px;color:var(--oro-suave);margin:0 0 14px}
+
+/* ── varios ───────────────────────────────────────── */
+.vacio{text-align:center;padding:44px 20px;color:var(--lavanda);font-size:16px;line-height:1.6}
+.vacio .ico{font-size:44px;display:block;margin-bottom:14px;opacity:.55}
+.pg{display:none}
+.pg.activa{display:block}
+.fila{display:flex;gap:10px}
+.fila>*{flex:1}
+.oculto{display:none !important}
+.mini{font-size:13.5px;color:var(--lavanda);line-height:1.5}
+.progreso{height:5px;background:rgba(169,166,216,.16);border-radius:3px;overflow:hidden;margin:14px 0}
+.progreso i{display:block;height:100%;background:linear-gradient(90deg,var(--oro),var(--oro-suave));width:0;transition:width .25s}
+@media (max-width:360px){
+  body{font-size:16px}
+  .marca{font-size:23px}
+  .btn{font-size:16.5px;padding:15px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+<div class="envoltura">
+
+  <!-- ══════════ PRIMERA VEZ: CREAR LA CLAVE MAESTRA ══════════ -->
+  <section id="p-inicial" class="pg">
+    <div class="cab">
+      <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
+      <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+    </div>
+    <div class="regla"></div>
+    <div class="tarj">
+      <h2 style="font-family:var(--serif);font-size:20px;color:var(--oro-suave);margin:0 0 12px">Esta es tu app</h2>
+      <p class="mini" style="font-size:15px;margin:0 0 18px">
+        Antes de empezar, crea tu <b style="color:var(--perg)">clave maestra</b>.
+        Solo tú la conoces. Con ella abres esta app y sellas tus libros.
+      </p>
+      <div class="aviso av-rojo">
+        Si pierdes esta clave no hay forma de recuperarla. Nadie puede.
+        Anótala en un lugar seguro.
+      </div>
+      <label class="etq" for="ini-c1">Clave maestra (mínimo 6 caracteres)</label>
+      <input class="campo" id="ini-c1" type="password" autocomplete="new-password">
+      <label class="etq" for="ini-c2">Escríbela otra vez</label>
+      <input class="campo" id="ini-c2" type="password" autocomplete="new-password">
+      <div id="ini-error"></div>
+      <button class="btn btn-oro" onclick="crearClaveMaestra()">Crear mi clave</button>
+    </div>
+  </section>
+
+  <!-- ══════════ ENTRAR ══════════ -->
+  <section id="p-entrar" class="pg">
+    <div class="cab">
+      <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
+      <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+    </div>
+    <div class="regla"></div>
+    <div class="tarj">
+      <label class="etq" for="ent-c">Clave maestra</label>
+      <input class="campo" id="ent-c" type="password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')entrar()">
+      <div id="ent-error"></div>
+      <button class="btn btn-oro" onclick="entrar()">Entrar</button>
+      <p class="mini" style="text-align:center;margin:14px 0 0">Solo el administrador</p>
+    </div>
+  </section>
+
+  <!-- ══════════ BIBLIOTECA ══════════ -->
+  <section id="p-biblioteca" class="pg">
+    <div class="cab" style="padding-bottom:10px">
+      <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
+      <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+    </div>
+    <div class="regla"></div>
+    <div class="barra">
+      <h1>Mis libros</h1>
+      <button class="volver" onclick="abrirMenu()">☰</button>
+    </div>
+    <div id="lista-libros"></div>
+    <button class="btn btn-oro" onclick="pedirArchivo()">+ Agregar un libro</button>
+    <input type="file" id="archivo" accept=".txt,.docx,.pdf" class="oculto" onchange="leerArchivo(this)">
+    <p class="mini" style="text-align:center;margin-top:14px">
+      Word (.docx) es lo que mejor se lee. También acepta texto (.txt) y PDF.
+    </p>
+  </section>
+
+  <!-- ══════════ PREPARAR UN LIBRO ══════════ -->
+  <section id="p-preparar" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="ir('p-biblioteca')">←</button>
+      <h1 id="prep-titulo">Libro</h1>
+    </div>
+    <div id="prep-resumen"></div>
+    <div class="tarj">
+      <div id="prep-temas"></div>
+    </div>
+    <button class="btn btn-oro" onclick="abrirSellar()">🔒 Sellar y generar el archivo</button>
+    <button class="btn btn-linea" onclick="renombrarLibro()">Cambiar el nombre del libro</button>
+    <button class="btn btn-rojo" onclick="borrarLibro()">Borrar este libro</button>
+  </section>
+
+  <!-- ══════════ UN TEMA ══════════ -->
+  <section id="p-tema" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="ir('p-preparar')">←</button>
+      <h1 id="tema-titulo">Tema</h1>
+    </div>
+    <div id="tema-cuerpo"></div>
+  </section>
+
+  <!-- ══════════ USUARIOS ══════════ -->
+  <section id="p-usuarios" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="ir('p-biblioteca')">←</button>
+      <h1>Quién puede entrar</h1>
+    </div>
+    <div class="aviso av-oro">
+      Puedes dar acceso a 5 personas. Ellos solo escuchan y leen: no pueden
+      agregar libros ni cambiar nada.
+    </div>
+    <div id="lista-usuarios"></div>
+    <button class="btn btn-oro" onclick="nuevoUsuario()">+ Dar acceso a alguien</button>
+  </section>
+
+</div>
+
+<!-- ══════════ VENTANAS EMERGENTES ══════════ -->
+<div class="velo" id="velo" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   IGLESIA EFRAIN PARA DIOS — App del administrador
+   ──────────────────────────────────────────────────────────────────────────
+   REGLA QUE MANDA SOBRE TODO: el libro NUNCA sale de este telefono.
+   No se sube a ningun servidor, no viaja a internet, no queda en el codigo.
+   Vive en el almacen del navegador y solo sale cuando TU generas el archivo
+   sellado y cifrado para mandarselo a los hermanos.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+var CLAVE_HASH   = 'efd_clave';       // huella de la clave maestra (no la clave)
+var CLAVE_SAL    = 'efd_sal';
+var CLAVE_USERS  = 'efd_usuarios';
+var PIMIENTA     = 'IglesiaEfrainParaDios::2026';   // marca de la casa
+var claveMaestra = null;              // solo vive en memoria mientras la app esta abierta
+var libroActual  = null;
+var temaActual   = -1;
+
+/* ─────────────────────── HERRAMIENTAS DE CIFRADO ─────────────────────── */
+function bytes(txt){ return new TextEncoder().encode(txt); }
+function texto(buf){ return new TextDecoder().decode(buf); }
+function b64(buf){
+  var b = new Uint8Array(buf), s = '';
+  for(var i=0;i<b.length;i++) s += String.fromCharCode(b[i]);
+  return btoa(s);
+}
+function deB64(s){
+  var bin = atob(s), b = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) b[i] = bin.charCodeAt(i);
+  return b;
+}
+function salAleatoria(n){ return crypto.getRandomValues(new Uint8Array(n||16)); }
+
+// Convierte una clave escrita por una persona en una llave de cifrado de verdad.
+// 200.000 vueltas: probar claves a la fuerza se vuelve lentisimo.
+async function llaveDesde(clave, sal, uso){
+  var base = await crypto.subtle.importKey('raw', bytes(clave), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt:sal, iterations:200000, hash:'SHA-256' },
+    base, { name:'AES-GCM', length:256 }, false, uso || ['encrypt','decrypt']);
+}
+async function huella(clave, sal){
+  var base = await crypto.subtle.importKey('raw', bytes(clave), 'PBKDF2', false, ['deriveBits']);
+  var bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt:sal, iterations:200000, hash:'SHA-256' }, base, 256);
+  return b64(bits);
+}
+async function sha256(txt){
+  return b64(await crypto.subtle.digest('SHA-256', bytes(txt)));
+}
+
+/* ─────────────────────── ALMACEN (IndexedDB) ─────────────────────── */
+/* Los libros pueden pesar varios MB. localStorage se queda corto, asi que
+   los libros van en IndexedDB y solo las cosas chiquitas en localStorage. */
+var BD = null;
+function abrirBD(){
+  return new Promise(function(ok, mal){
+    if(BD) return ok(BD);
+    var p = indexedDB.open('efd_biblioteca', 1);
+    p.onupgradeneeded = function(e){
+      var db = e.target.result;
+      if(!db.objectStoreNames.contains('libros')) db.createObjectStore('libros', {keyPath:'id'});
+    };
+    p.onsuccess = function(e){ BD = e.target.result; ok(BD); };
+    p.onerror = function(){ mal(new Error('No se pudo abrir el almacen del telefono.')); };
+  });
+}
+async function guardarLibro(libro){
+  var db = await abrirBD();
+  return new Promise(function(ok, mal){
+    var t = db.transaction('libros','readwrite');
+    t.objectStore('libros').put(libro);
+    t.oncomplete = function(){ ok(true); };
+    t.onerror = function(){ mal(new Error('No se pudo guardar el libro.')); };
+  });
+}
+async function traerLibros(){
+  var db = await abrirBD();
+  return new Promise(function(ok){
+    var t = db.transaction('libros','readonly'), r = t.objectStore('libros').getAll();
+    r.onsuccess = function(){ ok(r.result || []); };
+    r.onerror = function(){ ok([]); };
+  });
+}
+async function traerLibro(id){
+  var db = await abrirBD();
+  return new Promise(function(ok){
+    var r = db.transaction('libros','readonly').objectStore('libros').get(id);
+    r.onsuccess = function(){ ok(r.result || null); };
+    r.onerror = function(){ ok(null); };
+  });
+}
+async function quitarLibro(id){
+  var db = await abrirBD();
+  return new Promise(function(ok){
+    var t = db.transaction('libros','readwrite');
+    t.objectStore('libros').delete(id);
+    t.oncomplete = function(){ ok(true); };
+  });
+}
+
+/* ─────────────────────── LEER UN ARCHIVO WORD (.docx) ───────────────────────
+   Un .docx es un ZIP. Aqui se abre a mano, sin librerias de fuera, para que la
+   app funcione sin internet y sin depender de nadie. Del Word se saca ademas
+   que estaba en NEGRITA y que estaba SUBRAYADO: eso es oro para marcar lo
+   importante, porque tu ya lo marcaste al escribir el libro. */
+async function inflar(datos){
+  if(typeof DecompressionStream === 'undefined') throw new Error('Este navegador no puede abrir archivos Word. Usa Chrome.');
+  var ds = new DecompressionStream('deflate-raw');
+  var flujo = new Blob([datos]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(flujo).arrayBuffer());
+}
+async function sacarDeZip(buf, queArchivo){
+  var d = new DataView(buf), b = new Uint8Array(buf), i;
+  // buscar el final del directorio central, de atras para adelante
+  var fin = -1;
+  for(i = b.length - 22; i >= 0 && i > b.length - 66000; i--){
+    if(d.getUint32(i, true) === 0x06054b50){ fin = i; break; }
+  }
+  if(fin < 0) throw new Error('El archivo Word esta dañado o no es un .docx.');
+  var cuantos = d.getUint16(fin + 10, true);
+  var donde   = d.getUint32(fin + 16, true);
+  for(i = 0; i < cuantos; i++){
+    if(d.getUint32(donde, true) !== 0x02014b50) break;
+    var metodo  = d.getUint16(donde + 10, true);
+    var compTam = d.getUint32(donde + 20, true);
+    var nomTam  = d.getUint16(donde + 28, true);
+    var extTam  = d.getUint16(donde + 30, true);
+    var comTam  = d.getUint16(donde + 32, true);
+    var local   = d.getUint32(donde + 42, true);
+    var nombre  = texto(b.slice(donde + 46, donde + 46 + nomTam));
+    if(nombre === queArchivo){
+      var lNom = d.getUint16(local + 26, true), lExt = d.getUint16(local + 28, true);
+      var ini  = local + 30 + lNom + lExt;
+      var crudo = b.slice(ini, ini + compTam);
+      return metodo === 0 ? crudo : await inflar(crudo);
+    }
+    donde += 46 + nomTam + extTam + comTam;
+  }
+  throw new Error('Ese Word no trae texto legible.');
+}
+function limpiarXml(s){
+  return s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')
+          .replace(/&apos;/g,"'").replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);})
+          .replace(/&amp;/g,'&');
+}
+async function leerDocx(buf){
+  var xml = texto(await sacarDeZip(buf, 'word/document.xml'));
+  var parrafos = [];
+  var trozos = xml.split('<w:p ').join('<w:p>').split('<w:p>');
+  for(var i = 1; i < trozos.length; i++){
+    var p = trozos[i];
+    var corte = p.indexOf('</w:p>');
+    if(corte >= 0) p = p.slice(0, corte);
+    // ¿es un titulo de Word?
+    var esTitulo = /w:pStyle[^>]*w:val="(Heading|Ttulo|Titulo|Title)/i.test(p);
+    var nivel = 0;
+    var mt = p.match(/w:pStyle[^>]*w:val="(?:Heading|Ttulo|Titulo)(\d)/i);
+    if(mt) nivel = parseInt(mt[1]);
+    // recorrer los pedazos de texto y ver cuales van resaltados
+    var linea = '', marcados = [], r, re = /<w:r[ >][\s\S]*?<\/w:r>/g;
+    while((r = re.exec(p))){
+      var run = r[0];
+      var props = (run.match(/<w:rPr>[\s\S]*?<\/w:rPr>/) || [''])[0];
+      var negrita = /<w:b\/>|<w:b [^>]*w:val="(1|true|on)"/.test(props);
+      var subray  = /<w:u [^>]*w:val="(?!none)/.test(props);
+      var resalte = /<w:highlight/.test(props);
+      var t = '', tt, rt = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
+      while((tt = rt.exec(run))) t += limpiarXml(tt[1]);
+      if(/<w:tab\/>/.test(run)) t = ' ' + t;
+      if(!t) continue;
+      if((negrita || subray || resalte) && t.trim().length > 3) marcados.push(t.trim());
+      linea += t;
+    }
+    linea = linea.replace(/\s+/g,' ').trim();
+    if(linea || esTitulo) parrafos.push({ txt:linea, titulo:esTitulo, nivel:nivel, marcados:marcados });
+  }
+  if(!parrafos.length) throw new Error('Ese Word no trae texto.');
+  return parrafos;
+}
+
+/* ─────────────────────── LEER UN PDF (lo que se pueda) ─────────────────────── */
+async function leerPdf(buf){
+  var b = new Uint8Array(buf), crudo = '';
+  for(var i=0;i<b.length;i++) crudo += String.fromCharCode(b[i]);
+  var partes = [], re = /stream\r?\n?([\s\S]*?)endstream/g, m;
+  while((m = re.exec(crudo))){
+    var datos = m[1];
+    var bin = new Uint8Array(datos.length);
+    for(var j=0;j<datos.length;j++) bin[j] = datos.charCodeAt(j) & 0xff;
+    var contenido = '';
+    try{
+      // los PDF suelen venir comprimidos con zlib (2 bytes de cabecera + deflate)
+      contenido = texto(await inflar(bin.slice(2)));
+    }catch(e){
+      contenido = datos;
+    }
+    if(contenido.indexOf('Tj') < 0 && contenido.indexOf('TJ') < 0) continue;
+    var t = '', mm, rt = /\((?:\\.|[^\\()])*\)/g;
+    while((mm = rt.exec(contenido))){
+      var s = mm[0].slice(1,-1)
+        .replace(/\\([nrtbf])/g, function(_,c){ return c==='n'||c==='r' ? '\n' : ' '; })
+        .replace(/\\(\d{1,3})/g, function(_,o){ return String.fromCharCode(parseInt(o,8)); })
+        .replace(/\\(.)/g, '$1');
+      t += s;
+    }
+    if(t.trim()) partes.push(t);
+  }
+  var todo = partes.join('\n').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  if(todo.length < 200) throw new Error('PDF_DIFICIL');
+  return todo.split('\n').map(function(l){
+    return { txt:l.trim(), titulo:false, nivel:0, marcados:[] };
+  }).filter(function(p){ return p.txt; });
+}
+
+/* ─────────────────────── PARTIR EL LIBRO EN TEMAS ───────────────────────
+   Sin inteligencia artificial de pago: la app se guia por como estan escritos
+   los libros de verdad. Y despues TU revisas y corriges lo que quieras. */
+var RE_CAPITULO = /^\s*(cap[ií]tulo|tema|lecci[oó]n|parte|secci[oó]n|estudio)\s+([0-9]{1,3}|[IVXLCDM]{1,7})\b[.:\-\s]*(.*)$/i;
+var RE_SOLO_NUM = /^\s*([0-9]{1,3}|[IVXLCDM]{1,7})\s*[.\-:]?\s*(.{0,70})$/;
+var RE_VERSICULO = /\b([1-3]\s?)?[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,}\.?\s+\d{1,3}\s*[:,]\s*\d{1,3}(\s*[-–]\s*\d{1,3})?\b/g;
+
+function pareceTitulo(p, siguiente){
+  var t = (p.txt||'').trim();
+  if(!t) return false;
+  if(p.titulo) return true;                                   // Word ya lo dijo
+  if(t.length > 95) return false;
+  if(RE_CAPITULO.test(t)) return true;
+  var letras = t.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g,'');
+  if(letras.length >= 4){
+    var mayus = t.replace(/[^A-ZÁÉÍÓÚÑ]/g,'').length;
+    if(mayus / letras.length > 0.82) return true;             // TODO EN MAYUSCULAS
+  }
+  // linea corta, sin punto final, y despues empieza un parrafo largo
+  if(t.length < 62 && !/[.;:,]$/.test(t) && siguiente && (siguiente.txt||'').length > 120) return true;
+  return false;
+}
+
+function detectarImportante(parrafos){
+  var fuera = [];
+  parrafos.forEach(function(p){
+    // 1. lo que TU dejaste en negrita o subrayado en el Word
+    (p.marcados||[]).forEach(function(m){
+      if(m.split(/\s+/).length >= 4) fuera.push({ t:m, de:'resaltado en tu Word' });
+    });
+    var t = p.txt || '';
+    // 2. versiculos
+    var v, r1 = new RegExp(RE_VERSICULO.source, 'g');
+    while((v = r1.exec(t))){
+      var desde = Math.max(0, v.index);
+      var frase = t.slice(desde, desde + 190);
+      var pun = frase.search(/[.;]\s/);
+      if(pun > 30) frase = frase.slice(0, pun + 1);
+      fuera.push({ t:frase.trim(), de:'versiculo ' + v[0].trim() });
+    }
+    // 3. frases entre comillas
+    var c, r2 = /[«"“]([^«»"“”]{25,300})[»"”]/g;
+    while((c = r2.exec(t))) fuera.push({ t:c[1].trim(), de:'entre comillas' });
+    // 4. frases que anuncian lo esencial
+    var oraciones = t.split(/(?<=[.!?])\s+/);
+    oraciones.forEach(function(o){
+      if(/^\s*(recuerda|lo esencial|nunca olvides|no olvides|ten presente|lo m[aá]s importante|la clave (es|est[aá])|f[ií]jate|entiende esto|escucha bien|la promesa)/i.test(o)
+         && o.split(/\s+/).length >= 5){
+        fuera.push({ t:o.trim(), de:'frase clave' });
+      }
+    });
+  });
+  // quitar repetidas y las que se contienen unas a otras
+  var vistas = [], limpio = [];
+  fuera.forEach(function(f){
+    var k = f.t.toLowerCase().replace(/\s+/g,' ').slice(0,90);
+    if(vistas.indexOf(k) >= 0) return;
+    vistas.push(k); limpio.push(f);
+  });
+  return limpio.slice(0, 14);
+}
+
+function partirEnTemas(parrafos){
+  var temas = [], actual = null, i;
+  for(i = 0; i < parrafos.length; i++){
+    var p = parrafos[i];
+    if(pareceTitulo(p, parrafos[i+1])){
+      if(actual && actual.parrafos.length) temas.push(actual);
+      var tit = (p.txt || '').trim();
+      var mc = tit.match(RE_CAPITULO);
+      if(mc && mc[3] && mc[3].trim()) tit = mc[3].trim();
+      actual = { titulo: tit || ('Tema ' + (temas.length + 1)), parrafos: [] };
+    } else {
+      if(!actual) actual = { titulo:'Introducción', parrafos:[] };
+      if((p.txt||'').trim()) actual.parrafos.push(p);
+    }
+  }
+  if(actual && actual.parrafos.length) temas.push(actual);
+
+  // Si el libro no traia titulos claros, se parte por tamaño para que sea
+  // manejable: pedazos de unas 700 palabras, cortando en un parrafo completo.
+  if(temas.length < 2){
+    var todos = parrafos.filter(function(p){ return (p.txt||'').trim(); });
+    temas = []; var buf = [], palabras = 0;
+    todos.forEach(function(p){
+      buf.push(p); palabras += (p.txt||'').split(/\s+/).length;
+      if(palabras >= 700){
+        temas.push({ titulo:'Parte ' + (temas.length + 1), parrafos:buf });
+        buf = []; palabras = 0;
+      }
+    });
+    if(buf.length) temas.push({ titulo:'Parte ' + (temas.length + 1), parrafos:buf });
+  }
+
+  return temas.map(function(t, n){
+    return {
+      n: n + 1,
+      titulo: t.titulo,
+      texto: t.parrafos.map(function(p){ return p.txt; }).filter(Boolean),
+      importante: detectarImportante(t.parrafos)
+    };
+  });
+}
+
+/* ─────────────────────── SELLAR Y CIFRAR EL LIBRO ───────────────────────
+   Lo que sale de aqui es un archivo .efd que puedes mandar por WhatsApp:
+     · CIFRADO: sin la clave del libro no se lee nada. Es basura ilegible.
+     · SELLADO: si alguien le cambia un solo byte, la app de ellos lo rechaza.
+     · MARCADO: dice que salio de TU app. */
+async function sellarLibro(libro, claveDelLibro){
+  var contenido = JSON.stringify({
+    titulo: libro.titulo,
+    temas: libro.temas,
+    creado: libro.creado,
+    porQuien: 'administrador'
+  });
+  var sal = salAleatoria(16);
+  var iv  = salAleatoria(12);
+  var llave = await llaveDesde(claveDelLibro + '::' + PIMIENTA, sal, ['encrypt']);
+  var cifrado = await crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, llave, bytes(contenido));
+  var marca = await sha256(libro.titulo + '::' + b64(sal) + '::' + PIMIENTA);
+  return {
+    app: 'IGLESIA-EFRAIN-PARA-DIOS',
+    v: 1,
+    titulo: libro.titulo,
+    temas: libro.temas.length,
+    creado: new Date().toISOString().slice(0,10),
+    sal: b64(sal),
+    iv: b64(iv),
+    marca: marca,
+    datos: b64(cifrado)
+  };
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA INTERFAZ — lo que ves y tocas
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s));
+  return d.innerHTML;
+}
+function ir(p){
+  var todas = document.querySelectorAll('.pg');
+  for(var i=0;i<todas.length;i++) todas[i].classList.remove('activa');
+  var el = $(p); if(el) el.classList.add('activa');
+  window.scrollTo(0,0);
+  if(p === 'p-biblioteca') pintarBiblioteca();
+  if(p === 'p-usuarios')   pintarUsuarios();
+  if(p === 'p-preparar')   pintarPreparar();
+}
+
+/* ── ventana emergente ── */
+function modal(html){ $('modal').innerHTML = html; $('velo').classList.add('abierto'); }
+function cerrarModal(){ $('velo').classList.remove('abierto'); }
+function decir(titulo, texto, alCerrar){
+  modal('<h2>' + esc(titulo) + '</h2><p style="font-size:16px;line-height:1.6;margin:0 0 18px">'
+      + texto + '</p><button class="btn btn-oro" id="mok">Entendido</button>');
+  $('mok').onclick = function(){ cerrarModal(); if(alCerrar) alCerrar(); };
+}
+function preguntar(titulo, texto, alSi){
+  modal('<h2>' + esc(titulo) + '</h2><p style="font-size:16px;line-height:1.6;margin:0 0 18px">'
+      + texto + '</p><button class="btn btn-oro" id="msi">Sí, continuar</button>'
+      + '<button class="btn btn-linea" id="mno">Mejor no</button>');
+  $('msi').onclick = function(){ cerrarModal(); alSi(); };
+  $('mno').onclick = cerrarModal;
+}
+function pedirTexto(titulo, etiqueta, valor, alDar, tipo){
+  modal('<h2>' + esc(titulo) + '</h2><label class="etq">' + esc(etiqueta) + '</label>'
+      + '<input class="campo" id="mtxt" type="' + (tipo||'text') + '" value="' + esc(valor||'') + '">'
+      + '<div id="merr"></div>'
+      + '<button class="btn btn-oro" id="mok">Guardar</button>'
+      + '<button class="btn btn-linea" id="mno">Cancelar</button>');
+  setTimeout(function(){ $('mtxt').focus(); }, 90);
+  $('mtxt').onkeydown = function(e){ if(e.key === 'Enter') $('mok').click(); };
+  $('mok').onclick = function(){ alDar(($('mtxt').value || '').trim()); };
+  $('mno').onclick = cerrarModal;
+}
+function errorEn(id, msg){
+  $(id).innerHTML = msg ? '<div class="aviso av-rojo">' + esc(msg) + '</div>' : '';
+}
+function trabajando(txt){
+  modal('<h2>Un momento</h2><p style="font-size:16px;margin:0 0 6px">' + esc(txt) + '</p>'
+      + '<div class="progreso"><i id="barra" style="width:35%"></i></div>');
+}
+
+/* ══════════════════ ENTRAR ══════════════════ */
+async function crearClaveMaestra(){
+  var c1 = $('ini-c1').value, c2 = $('ini-c2').value;
+  if(c1.length < 6) return errorEn('ini-error', 'La clave necesita al menos 6 caracteres.');
+  if(c1 !== c2)     return errorEn('ini-error', 'Las dos claves no son iguales.');
+  errorEn('ini-error','');
+  var sal = salAleatoria(16);
+  localStorage.setItem(CLAVE_SAL, b64(sal));
+  localStorage.setItem(CLAVE_HASH, await huella(c1, sal));
+  claveMaestra = c1;
+  $('ini-c1').value = ''; $('ini-c2').value = '';
+  decir('Listo', 'Tu clave quedó creada. Nadie más puede entrar a esta app.', function(){ ir('p-biblioteca'); });
+}
+async function entrar(){
+  var c = $('ent-c').value;
+  if(!c) return errorEn('ent-error','Escribe tu clave.');
+  var sal = deB64(localStorage.getItem(CLAVE_SAL));
+  var h = await huella(c, sal);
+  if(h !== localStorage.getItem(CLAVE_HASH)) return errorEn('ent-error','Esa clave no es la correcta.');
+  errorEn('ent-error','');
+  claveMaestra = c;
+  $('ent-c').value = '';
+  ir('p-biblioteca');
+}
+
+/* ══════════════════ MENU ══════════════════ */
+function abrirMenu(){
+  modal('<h2>Menú</h2>'
+    + '<button class="btn btn-linea" id="m1">👥 Quién puede entrar</button>'
+    + '<button class="btn btn-linea" id="m2">🔑 Cambiar mi clave maestra</button>'
+    + '<button class="btn btn-linea" id="m3">🛡️ Cómo protege esta app tu libro</button>'
+    + '<button class="btn btn-linea" id="m4">🔒 Cerrar la app</button>'
+    + '<button class="btn btn-linea" id="m0" style="margin-top:8px">Volver</button>');
+  $('m1').onclick = function(){ cerrarModal(); ir('p-usuarios'); };
+  $('m2').onclick = cambiarClaveMaestra;
+  $('m3').onclick = explicarSeguridad;
+  $('m4').onclick = function(){ claveMaestra = null; cerrarModal(); ir('p-entrar'); };
+  $('m0').onclick = cerrarModal;
+}
+function cambiarClaveMaestra(){
+  pedirTexto('Cambiar mi clave', 'Escribe la clave NUEVA (mínimo 6)', '', async function(v){
+    if(v.length < 6) return errorEn('merr','Necesita al menos 6 caracteres.');
+    var sal = salAleatoria(16);
+    localStorage.setItem(CLAVE_SAL, b64(sal));
+    localStorage.setItem(CLAVE_HASH, await huella(v, sal));
+    claveMaestra = v;
+    cerrarModal();
+    decir('Cambiada', 'Tu clave maestra quedó cambiada. Anótala en un lugar seguro.');
+  }, 'password');
+}
+function explicarSeguridad(){
+  modal('<h2>Cómo protege esta app tu libro</h2>'
+   + '<div class="rubrica">El libro <b>nunca</b> sale de este teléfono. No se sube a internet, '
+   + 'no está dentro del código de la app, y no queda en ningún servidor.'
+   + '<span class="fuente">Esa es la regla que manda sobre todo</span></div>'
+   + '<p style="font-size:16px;line-height:1.65">Cuando sellas un libro se crea un archivo <b>.efd</b> '
+   + 'para que se lo mandes a los hermanos. Ese archivo lleva tres cosas:</p>'
+   + '<p style="font-size:16px;line-height:1.65"><b style="color:var(--oro)">1. Va cifrado.</b> '
+   + 'Sin la clave que tú le pongas, es basura ilegible. Aunque el archivo se pierda o alguien lo reenvíe, '
+   + 'no se puede leer.</p>'
+   + '<p style="font-size:16px;line-height:1.65"><b style="color:var(--oro)">2. Va sellado.</b> '
+   + 'Si alguien le cambia un solo byte, la app de ellos lo rechaza.</p>'
+   + '<p style="font-size:16px;line-height:1.65"><b style="color:var(--oro)">3. Va marcado.</b> '
+   + 'Dice que salió de tu app y de ninguna otra.</p>'
+   + '<div class="aviso av-oro" style="margin-top:16px">Lo honesto: esto detiene a cualquier persona normal. '
+   + 'Alguien con conocimientos serios de programación podría estudiar la app y buscarle la vuelta. '
+   + 'Lo que sí queda garantizado es que tu libro nunca sube a internet.</div>'
+   + '<button class="btn btn-oro" onclick="cerrarModal()">Entendido</button>');
+}
+
+/* ══════════════════ BIBLIOTECA ══════════════════ */
+async function pintarBiblioteca(){
+  var libros = await traerLibros();
+  var el = $('lista-libros');
+  if(!libros.length){
+    el.innerHTML = '<div class="vacio"><span class="ico">📖</span>'
+      + 'Todavía no hay ningún libro.<br>Toca el botón de abajo para agregar el primero.</div>';
+    return;
+  }
+  libros.sort(function(a,b){ return (b.creado||'').localeCompare(a.creado||''); });
+  el.innerHTML = libros.map(function(l){
+    var min = Math.round(contarPalabras(l) / 150);
+    return '<div class="tarj tarj-toc" onclick="abrirLibro(\'' + l.id + '\')">'
+      + '<div class="libro"><div class="libro-ico">📖</div><div style="flex:1;min-width:0">'
+      + '<div class="libro-tit">' + esc(l.titulo) + '</div>'
+      + '<div class="libro-sub">' + l.temas.length + ' temas · ' + min + ' min de lectura</div>'
+      + '<div class="libro-sub">' + (l.sellado
+          ? '<span class="sello-si">✓ sellado el ' + esc(l.sellado) + '</span>'
+          : '<span class="sello-no">⚠ falta sellarlo</span>') + '</div>'
+      + '</div></div></div>';
+  }).join('');
+}
+function contarPalabras(l){
+  var n = 0;
+  (l.temas||[]).forEach(function(t){
+    (t.texto||[]).forEach(function(p){ n += p.split(/\s+/).length; });
+  });
+  return n;
+}
+async function abrirLibro(id){
+  libroActual = await traerLibro(id);
+  if(!libroActual) return decir('No está', 'Ese libro ya no aparece.');
+  ir('p-preparar');
+}
+
+/* ══════════════════ AGREGAR UN LIBRO ══════════════════ */
+function pedirArchivo(){ $('archivo').click(); }
+async function leerArchivo(input){
+  var f = input.files && input.files[0];
+  input.value = '';
+  if(!f) return;
+  trabajando('Leyendo "' + f.name + '"...');
+  try{
+    var buf = await f.arrayBuffer();
+    var nombre = f.name.toLowerCase(), parrafos;
+    if(nombre.endsWith('.docx')){
+      parrafos = await leerDocx(buf);
+    } else if(nombre.endsWith('.pdf')){
+      try{
+        parrafos = await leerPdf(buf);
+      }catch(e){
+        cerrarModal();
+        return decir('Este PDF no se deja leer',
+          'Muchos PDF guardan el texto como imagen o de forma que no se puede sacar.<br><br>'
+          + '<b>La solución es fácil:</b> abre el PDF, guárdalo o cópialo a un documento de Word (.docx) '
+          + 'y súbelo así. Además Word funciona mejor, porque la app puede ver lo que dejaste '
+          + 'en <b>negrita</b> o subrayado y marcarlo como lo importante.');
+      }
+    } else {
+      parrafos = texto(buf).split(/\r?\n/).map(function(l){
+        return { txt:l.trim(), titulo:false, nivel:0, marcados:[] };
+      }).filter(function(p){ return p.txt; });
+    }
+    if(!parrafos.length) throw new Error('Ese archivo no trae texto.');
+
+    var temas = partirEnTemas(parrafos);
+    var titulo = f.name.replace(/\.(docx|pdf|txt)$/i,'').replace(/[_-]+/g,' ').trim() || 'Libro';
+    var libro = {
+      id: 'L' + Date.now().toString(36),
+      titulo: titulo,
+      creado: new Date().toISOString().slice(0,10),
+      sellado: null,
+      temas: temas
+    };
+    await guardarLibro(libro);
+    libroActual = libro;
+    cerrarModal();
+    var conMarcas = temas.reduce(function(s,t){ return s + t.importante.length; }, 0);
+    decir('Libro agregado',
+      'Encontré <b>' + temas.length + ' temas</b> y marqué <b>' + conMarcas + ' frases importantes</b>.<br><br>'
+      + 'Ahora revísalo: puedes cambiar los títulos, unir temas, partirlos, y quitar o agregar '
+      + 'lo que quieras marcar como importante. <b>Tú mandas</b> — la app solo hizo el primer trabajo.',
+      function(){ ir('p-preparar'); });
+  }catch(e){
+    cerrarModal();
+    decir('No se pudo leer', esc(e.message || 'Ese archivo no se pudo abrir.'));
+  }
+}
+
+/* ══════════════════ PREPARAR EL LIBRO ══════════════════ */
+function pintarPreparar(){
+  if(!libroActual) return ir('p-biblioteca');
+  var l = libroActual;
+  $('prep-titulo').textContent = l.titulo;
+  var marcas = l.temas.reduce(function(s,t){ return s + t.importante.length; }, 0);
+  var min = Math.round(contarPalabras(l) / 150);
+  $('prep-resumen').innerHTML =
+      '<div class="aviso ' + (l.sellado ? 'av-verde' : 'av-oro') + '">'
+    + (l.sellado
+        ? '✓ Sellado el ' + esc(l.sellado) + '. Si cambias algo, vuelve a sellarlo.'
+        : 'Revisa los temas y cuando estés conforme, séllalo para poder mandarlo.')
+    + '</div>'
+    + '<p class="mini" style="margin:0 0 14px">' + l.temas.length + ' temas · ' + marcas
+    + ' frases importantes · ' + min + ' min de lectura</p>';
+
+  $('prep-temas').innerHTML = l.temas.map(function(t,i){
+    return '<div class="tema tarj-toc" onclick="verTema(' + i + ')">'
+      + '<div class="tema-n">' + (i+1) + '</div>'
+      + '<div class="tema-cuerpo">'
+      + '<div class="tema-tit">' + esc(t.titulo) + '</div>'
+      + '<div class="tema-info"><span class="estrella">★</span> ' + t.importante.length
+      + ' importantes · ' + (t.texto||[]).length + ' párrafos</div>'
+      + '</div><div style="color:var(--lavanda);font-size:22px;padding-top:2px">›</div></div>';
+  }).join('');
+}
+function renombrarLibro(){
+  pedirTexto('Nombre del libro', 'Como quieres que se llame', libroActual.titulo, async function(v){
+    if(!v) return errorEn('merr','Ponle un nombre.');
+    libroActual.titulo = v; libroActual.sellado = null;
+    await guardarLibro(libroActual); cerrarModal(); pintarPreparar();
+  });
+}
+function borrarLibro(){
+  preguntar('Borrar el libro',
+    'Se va a borrar <b>' + esc(libroActual.titulo) + '</b> de este teléfono.<br><br>Esto no se puede deshacer.',
+    async function(){
+      await quitarLibro(libroActual.id);
+      libroActual = null;
+      ir('p-biblioteca');
+    });
+}
+
+/* ══════════════════ UN TEMA ══════════════════ */
+function verTema(i){
+  temaActual = i;
+  var t = libroActual.temas[i];
+  $('tema-titulo').textContent = 'Tema ' + (i+1);
+  var html =
+      '<div class="tarj"><div class="tema-tit" style="font-size:21px">' + esc(t.titulo) + '</div>'
+    + '<button class="btn btn-linea btn-chico" style="margin-top:12px" onclick="renombrarTema()">Cambiar el título</button>'
+    + (i > 0 ? '<button class="btn btn-linea btn-chico" onclick="unirConAnterior()">Unir con el anterior</button>' : '')
+    + '<button class="btn btn-rojo btn-chico" onclick="borrarTema()">Quitar este tema</button>'
+    + '</div>';
+
+  html += '<div class="tarj"><h2 style="font-family:var(--serif);font-size:19px;color:var(--oro-suave);margin:0 0 4px">'
+        + '★ Lo más importante</h2>'
+        + '<p class="mini" style="margin:0 0 14px">Esto es lo que verán destacado los hermanos.</p>';
+  if(!t.importante.length){
+    html += '<p class="mini">Todavía no hay nada marcado en este tema.</p>';
+  } else {
+    html += t.importante.map(function(f,j){
+      return '<div class="rubrica">' + esc(f.t)
+        + '<span class="fuente">' + esc(f.de)
+        + ' · <a href="#" onclick="quitarImportante(' + j + ');return false" style="color:var(--rojo)">quitar</a></span></div>';
+    }).join('');
+  }
+  html += '<button class="btn btn-linea" style="margin-top:12px" onclick="agregarImportante()">+ Marcar otra frase</button></div>';
+
+  html += '<div class="tarj"><h2 style="font-family:var(--serif);font-size:19px;color:var(--oro-suave);margin:0 0 12px">'
+        + 'El texto del tema</h2><div class="lectura">'
+        + (t.texto||[]).map(function(p,j){
+            return '<p onclick="marcarDesdeParrafo(' + j + ')" style="cursor:pointer">' + esc(p) + '</p>';
+          }).join('')
+        + '</div><p class="mini" style="margin-top:10px">Toca cualquier párrafo para marcarlo como importante.</p></div>';
+
+  html += '<button class="btn btn-linea" onclick="escuchar()">🔊 Escuchar este tema</button>';
+  $('tema-cuerpo').innerHTML = html;
+  ir('p-tema');
+  $('tema-titulo').textContent = 'Tema ' + (i+1);
+}
+async function guardarYVolverAPintar(){
+  libroActual.sellado = null;
+  await guardarLibro(libroActual);
+  verTema(temaActual);
+}
+function renombrarTema(){
+  pedirTexto('Título del tema', 'Cómo se llama este tema', libroActual.temas[temaActual].titulo, async function(v){
+    if(!v) return errorEn('merr','Ponle un título.');
+    libroActual.temas[temaActual].titulo = v;
+    cerrarModal(); await guardarYVolverAPintar();
+  });
+}
+function borrarTema(){
+  preguntar('Quitar el tema', 'Se quita <b>' + esc(libroActual.temas[temaActual].titulo)
+    + '</b> de este libro.', async function(){
+    libroActual.temas.splice(temaActual,1);
+    libroActual.sellado = null;
+    await guardarLibro(libroActual);
+    ir('p-preparar');
+  });
+}
+function unirConAnterior(){
+  preguntar('Unir temas', 'Este tema se va a juntar con el anterior, en uno solo.', async function(){
+    var a = libroActual.temas[temaActual-1], b = libroActual.temas[temaActual];
+    a.texto = (a.texto||[]).concat(b.texto||[]);
+    a.importante = (a.importante||[]).concat(b.importante||[]).slice(0,14);
+    libroActual.temas.splice(temaActual,1);
+    libroActual.sellado = null;
+    await guardarLibro(libroActual);
+    ir('p-preparar');
+  });
+}
+function quitarImportante(j){
+  libroActual.temas[temaActual].importante.splice(j,1);
+  guardarYVolverAPintar();
+}
+function agregarImportante(){
+  modal('<h2>Marcar una frase</h2><label class="etq">Escribe o pega la frase</label>'
+    + '<textarea class="campo" id="mtxt"></textarea><div id="merr"></div>'
+    + '<button class="btn btn-oro" id="mok">Marcar como importante</button>'
+    + '<button class="btn btn-linea" id="mno">Cancelar</button>');
+  $('mok').onclick = async function(){
+    var v = ($('mtxt').value||'').trim();
+    if(v.length < 6) return errorEn('merr','Escribe la frase completa.');
+    libroActual.temas[temaActual].importante.push({ t:v, de:'marcado por ti' });
+    cerrarModal(); await guardarYVolverAPintar();
+  };
+  $('mno').onclick = cerrarModal;
+}
+function marcarDesdeParrafo(j){
+  var p = libroActual.temas[temaActual].texto[j];
+  preguntar('Marcar como importante',
+    '<div class="rubrica" style="margin:0">' + esc(p.slice(0,300)) + (p.length>300?'…':'') + '</div>',
+    async function(){
+      libroActual.temas[temaActual].importante.push({ t:p, de:'marcado por ti' });
+      await guardarYVolverAPintar();
+    });
+}
+
+/* ══════════════════ ESCUCHAR (para revisar) ══════════════════ */
+var voz = window.speechSynthesis;
+function escuchar(){
+  if(!voz) return decir('Sin voz','Este teléfono no puede leer en voz alta.');
+  voz.cancel();
+  var t = libroActual.temas[temaActual];
+  var partes = [t.titulo].concat(t.texto||[]);
+  partes.forEach(function(p){
+    (p.match(/[^.!?]+[.!?]?/g) || [p]).forEach(function(o){
+      if(!o.trim()) return;
+      var u = new SpeechSynthesisUtterance(o.trim());
+      u.lang = 'es-US'; u.rate = 0.95;
+      voz.speak(u);
+    });
+  });
+  decir('Leyendo', 'Toca Entendido para callar la voz.', function(){ voz.cancel(); });
+}
+
+/* ══════════════════ SELLAR Y GENERAR EL ARCHIVO ══════════════════ */
+function abrirSellar(){
+  if(!libroActual.temas.length) return decir('Falta contenido','Este libro no tiene temas.');
+  modal('<h2>Sellar el libro</h2>'
+    + '<p style="font-size:16px;line-height:1.6;margin:0 0 14px">Ponle una <b>clave a este libro</b>. '
+    + 'Es la que tendrás que decirles a los hermanos para que puedan abrirlo. '
+    + 'No la mandes por el mismo WhatsApp donde mandas el archivo.</p>'
+    + '<label class="etq">Clave del libro (mínimo 4)</label>'
+    + '<input class="campo" id="mtxt" type="text" placeholder="Ej: Efrain2026">'
+    + '<div id="merr"></div>'
+    + '<button class="btn btn-oro" id="mok">Sellar y descargar</button>'
+    + '<button class="btn btn-linea" id="mno">Cancelar</button>');
+  $('mok').onclick = async function(){
+    var c = ($('mtxt').value||'').trim();
+    if(c.length < 4) return errorEn('merr','La clave necesita al menos 4 caracteres.');
+    trabajando('Cifrando y sellando el libro...');
+    try{
+      var paquete = await sellarLibro(libroActual, c);
+      var nombre = libroActual.titulo.replace(/[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ ]/g,'').replace(/\s+/g,'_') + '.efd';
+      var blob = new Blob([JSON.stringify(paquete)], {type:'application/octet-stream'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = nombre;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+      libroActual.sellado = new Date().toISOString().slice(0,10);
+      await guardarLibro(libroActual);
+      cerrarModal();
+      decir('Sellado y listo',
+        'Se descargó el archivo <b>' + esc(nombre) + '</b>.<br><br>'
+        + 'Mándaselo a los hermanos por WhatsApp. Para abrirlo van a necesitar la clave '
+        + '<b>' + esc(c) + '</b> — dísela por otro camino, no por el mismo chat.',
+        function(){ pintarPreparar(); });
+    }catch(e){
+      cerrarModal();
+      decir('No se pudo sellar', esc(e.message||'Ocurrió un problema.'));
+    }
+  };
+  $('mno').onclick = cerrarModal;
+}
+
+/* ══════════════════ QUIÉN PUEDE ENTRAR ══════════════════ */
+function usuarios(){ try{ return JSON.parse(localStorage.getItem(CLAVE_USERS)||'[]'); }catch(e){ return []; } }
+function ponerUsuarios(u){ localStorage.setItem(CLAVE_USERS, JSON.stringify(u)); }
+function pintarUsuarios(){
+  var u = usuarios(), el = $('lista-usuarios');
+  if(!u.length){
+    el.innerHTML = '<div class="vacio"><span class="ico">👥</span>Todavía no le has dado acceso a nadie.</div>';
+    return;
+  }
+  el.innerHTML = u.map(function(x,i){
+    return '<div class="tarj"><div style="display:flex;align-items:center;gap:12px">'
+      + '<div style="flex:1;min-width:0"><div class="libro-tit" style="font-size:18px">' + esc(x.nombre) + '</div>'
+      + '<div class="libro-sub">' + (x.bloqueado
+          ? '<span style="color:var(--rojo);font-weight:700">bloqueado</span>'
+          : '<span class="sello-si">puede entrar</span>') + '</div></div></div>'
+      + '<div style="margin-top:12px">'
+      + '<button class="btn btn-linea btn-chico" onclick="cambiarClaveUsuario(' + i + ')">Cambiar su clave</button>'
+      + '<button class="btn btn-linea btn-chico" onclick="alternarUsuario(' + i + ')">'
+      + (x.bloqueado ? 'Dejarlo entrar' : 'Bloquear') + '</button>'
+      + '<button class="btn btn-rojo btn-chico" onclick="quitarUsuario(' + i + ')">Quitar</button>'
+      + '</div></div>';
+  }).join('');
+}
+function nuevoUsuario(){
+  if(usuarios().length >= 5) return decir('Ya son cinco','Acordamos un máximo de 5 personas. Quita a alguien si quieres agregar a otro.');
+  pedirTexto('Dar acceso', 'Nombre de la persona', '', function(nombre){
+    if(!nombre) return errorEn('merr','Escribe el nombre.');
+    cerrarModal();
+    setTimeout(function(){
+      pedirTexto('Su clave', 'Clave para ' + nombre + ' (mínimo 4)', '', async function(c){
+        if(c.length < 4) return errorEn('merr','La clave necesita al menos 4 caracteres.');
+        var sal = salAleatoria(16);
+        var u = usuarios();
+        u.push({ nombre:nombre, sal:b64(sal), hash: await huella(c, sal), bloqueado:false });
+        ponerUsuarios(u); cerrarModal(); pintarUsuarios();
+        decir('Listo', 'Dile a <b>' + esc(nombre) + '</b> que entre con esa clave. '
+          + 'Él o ella podrá cambiarla después si quiere.');
+      });
+    }, 120);
+  });
+}
+function cambiarClaveUsuario(i){
+  var u = usuarios();
+  pedirTexto('Nueva clave', 'Clave para ' + u[i].nombre, '', async function(c){
+    if(c.length < 4) return errorEn('merr','Necesita al menos 4 caracteres.');
+    var sal = salAleatoria(16);
+    u[i].sal = b64(sal); u[i].hash = await huella(c, sal);
+    ponerUsuarios(u); cerrarModal(); pintarUsuarios();
+  });
+}
+function alternarUsuario(i){
+  var u = usuarios(); u[i].bloqueado = !u[i].bloqueado; ponerUsuarios(u); pintarUsuarios();
+}
+function quitarUsuario(i){
+  var u = usuarios();
+  preguntar('Quitar acceso', 'Se le quita el acceso a <b>' + esc(u[i].nombre) + '</b>.', function(){
+    u.splice(i,1); ponerUsuarios(u); pintarUsuarios();
+  });
+}
+
+/* ══════════════════ ARRANQUE ══════════════════ */
+window.addEventListener('DOMContentLoaded', function(){
+  if(localStorage.getItem(CLAVE_HASH)) ir('p-entrar');
+  else ir('p-inicial');
+});
+
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

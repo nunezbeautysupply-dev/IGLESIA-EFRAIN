@@ -1,0 +1,101 @@
+═══════════════════════════════════════════════════════════════
+  IGLESIA EFRAIN PARA DIOS — App del administrador
+  Versión 1.0 · 23 de julio de 2026
+═══════════════════════════════════════════════════════════════
+
+QUÉ ES
+Esta es TU app. Con ella preparas los libros: los subes, la app
+los divide en temas y marca lo importante, tú lo revisas y lo
+corriges, y al final generas un archivo sellado para mandárselo
+a los hermanos.
+
+LA REGLA QUE MANDA
+El libro NUNCA sale de tu teléfono. No se sube a internet, no
+está dentro del código de la app, no queda en ningún servidor.
+
+═══════════════════════════════════════════════════════════════
+  CÓMO PUBLICARLA
+═══════════════════════════════════════════════════════════════
+
+PASO 1 — Crea un repositorio nuevo en github.com
+   Nombre sugerido:  IGLESIA-EFRAIN
+   (público está bien: la app va vacía, sin ningún libro dentro)
+
+PASO 2 — En GitHub Desktop: Clone
+
+PASO 3 — Copia estos 5 archivos a la carpeta y haz Commit + Push
+   index.html
+   manifest.json
+   sw.js
+   icon-192.png
+   icon-512.png
+
+PASO 4 — Cloudflare
+   Workers & Pages → Create → Pages → Connect to Git
+   → IGLESIA-EFRAIN → Save and Deploy
+   ⚠ Cloudflare exige minúsculas: llámalo  iglesia-efrain
+
+PASO 5 — Si dice "No URLs enabled"
+   Overview → Domains and routes → habilita workers.dev
+
+PASO 6 — Instálala en tu teléfono
+   Ábrela en Chrome → menú ⋮ → Instalar aplicación
+   El ícono es el emblema de la iglesia.
+
+═══════════════════════════════════════════════════════════════
+  LA PRIMERA VEZ QUE LA ABRAS
+═══════════════════════════════════════════════════════════════
+
+Te va a pedir crear tu CLAVE MAESTRA.
+Anótala en un lugar seguro: si la pierdes, no hay forma de
+recuperarla. Nadie puede.
+
+═══════════════════════════════════════════════════════════════
+  CÓMO PREPARAR UN LIBRO
+═══════════════════════════════════════════════════════════════
+
+1. Toca "+ Agregar un libro" y escoge tu archivo.
+   → Word (.docx) es lo que mejor funciona, porque la app puede
+     ver lo que dejaste en NEGRITA o SUBRAYADO y marcarlo solo.
+
+2. La app lo divide en temas y marca lo importante:
+   · lo que está en negrita o subrayado en tu Word
+   · los versículos (Juan 3:16, Salmo 23:1...)
+   · las frases entre comillas
+   · las frases que empiezan con "Recuerda", "Lo esencial",
+     "Nunca olvides", "Ten presente"...
+
+3. REVÍSALO. Tú mandas:
+   · cambiar el título de cualquier tema
+   · unir dos temas
+   · quitar un tema
+   · quitar frases marcadas o agregar las tuyas
+   · tocar cualquier párrafo para marcarlo
+
+4. Cuando estés conforme: "🔒 Sellar y generar el archivo"
+   Le pones una clave AL LIBRO y se descarga un archivo .efd
+
+5. Manda el .efd por WhatsApp.
+   ⚠ La clave del libro dísela por OTRO camino, no por el mismo
+     chat donde mandaste el archivo.
+
+═══════════════════════════════════════════════════════════════
+  QUÉ LLEVA EL ARCHIVO .efd
+═══════════════════════════════════════════════════════════════
+
+  CIFRADO   sin la clave del libro es basura ilegible
+  SELLADO   si le cambian un solo byte, se rechaza
+  MARCADO   dice que salió de tu app
+
+Lo honesto: esto detiene a cualquier persona normal. Alguien con
+conocimientos serios de programación podría estudiarlo y buscarle
+la vuelta. Lo que sí queda garantizado es que tu libro nunca
+sube a internet.
+
+═══════════════════════════════════════════════════════════════
+  LO QUE SIGUE
+═══════════════════════════════════════════════════════════════
+
+La app de los hermanos (la que solo escucha y lee, sin botón de
+subir). Cuando pruebes esta con tu libro real y me digas si los
+temas salieron bien, la construyo.
