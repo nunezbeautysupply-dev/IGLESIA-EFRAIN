@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260723h-EFD-ADMIN-V2.5">
+<meta name="app-version" content="20260725b-EFD-ADMIN-V2.7">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -249,6 +249,26 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+  // Solo se sube aqui la LISTA DE QUIEN PUEDE ENTRAR -nombres y claves, cifradas
+  // con hash, nunca en claro-. El LIBRO nunca sube a esta nube, sigue siendo
+  // solo local en cada telefono, como se acordo.
+  var firebaseConfig = {
+    apiKey: "AIzaSyDu3OFi8zC_AOaYmIdtPa8iVd3oRfEKN0I",
+    authDomain: "iglesia-efrain-usuarios.firebaseapp.com",
+    projectId: "iglesia-efrain-usuarios",
+    storageBucket: "iglesia-efrain-usuarios.firebasestorage.app",
+    messagingSenderId: "466535493132",
+    appId: "1:466535493132:web:9a0712c5ed760185698829"
+  };
+  var db = null;
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }catch(e){ console.error('Firebase no se pudo iniciar', e); }
+</script>
 </head>
 <body>
 <div id="banner-actualizada" class="banner-act">La app se actualizó</div>
@@ -352,10 +372,15 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
           <span class="fl">↻</span><span class="nu">10</span></button>
         <button class="bsec"   onclick="temaSiguiente()" aria-label="Tema siguiente">⏭</button>
       </div>
-      <div class="vels">
-        <button class="vel" id="v-085" onclick="ponerVelocidad(0.85)">Lento</button>
-        <button class="vel on" id="v-1" onclick="ponerVelocidad(1)">Normal</button>
-        <button class="vel" id="v-125" onclick="ponerVelocidad(1.25)">Rápido</button>
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px 14px;margin:6px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+          <span style="font-size:13.5px;color:var(--oro-suave);font-weight:700">🎚️ Velocidad</span>
+          <span id="velLblEfd" style="font-size:16px;color:var(--oro);font-weight:800">1.0x</span>
+        </div>
+        <input type="range" id="velSliderEfd" min="0.5" max="1.8" step="0.05" value="1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--oro-suave);opacity:.7;margin-top:-4px">
+          <span>Más lento</span><span>Más rápido</span>
+        </div>
       </div>
       <div class="vels" id="modos-lectura">
         <button class="vel on" id="m-completo"     onclick="ponerModoLectura('completo')">📖 Completo</button>
@@ -1698,10 +1723,14 @@ function temaSiguiente(){
   temaActual++; prepararEscuchar(true);
   if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
 }
+// Deslizador de velocidad AJUSTABLE (25 jul, pedido por Sensei: mismo cambio que en
+// NBS Academia). Antes eran 3 botones -Lento 0.85x, Normal 1x, Rapido 1.25x- y la
+// diferencia no se sentia bien. Ahora se mueve a cualquier punto entre 0.5x y 1.8x.
 function ponerVelocidad(v){
   velocidad = v;
-  ['v-085','v-1','v-125'].forEach(function(id){ $(id).classList.remove('on'); });
-  $(v === 0.85 ? 'v-085' : (v === 1.25 ? 'v-125' : 'v-1')).classList.add('on');
+  var slider = $('velSliderEfd'), lbl = $('velLblEfd');
+  if(slider) slider.value = v;
+  if(lbl) lbl.textContent = v.toFixed(2).replace(/0$/,'').replace(/\.$/,'.0') + 'x';
   localStorage.setItem('efd_vel', String(v));
   pintarTiempos();
   if(sonando){ pareYo = true; voz.cancel();
@@ -1794,7 +1823,7 @@ function prepararEscuchar(soloRefrescar){
   var c = $('esc-cual');
   if(c) c.textContent = (temaActual + 1) + '. ' + t.titulo;
   var vg = parseFloat(localStorage.getItem('efd_vel') || '1');
-  if(!soloRefrescar && [0.85,1,1.25].indexOf(vg) >= 0) ponerVelocidad(vg);
+  if(!soloRefrescar && vg >= 0.5 && vg <= 1.8) ponerVelocidad(vg);
   armarPedazos();
   var bp = $('esc-play'); if(bp) bp.textContent = sonando ? '⏸' : '▶';
   localStorage.setItem('efd_ultimo', libroActual.id + '::' + temaActual);
@@ -1864,7 +1893,17 @@ function abrirSellar(){
 
 /* ══════════════════ QUIÉN PUEDE ENTRAR ══════════════════ */
 function usuarios(){ try{ return JSON.parse(localStorage.getItem(CLAVE_USERS)||'[]'); }catch(e){ return []; } }
-function ponerUsuarios(u){ localStorage.setItem(CLAVE_USERS, JSON.stringify(u)); }
+function ponerUsuarios(u){
+  localStorage.setItem(CLAVE_USERS, JSON.stringify(u));
+  // Sube la lista a Firebase -pedido por Sensei el 25 jul: poder bloquear a alguien
+  // a control remoto, sin importar cuantas personas tenga agregadas-. Si no hay
+  // internet en el momento, no pasa nada grave: se sube la proxima vez que
+  // agregues/quites/cambies a alguien y SI haya internet.
+  try{
+    if(db) db.collection('efd_config').doc('usuarios').set({ lista: u, actualizado: new Date().toISOString() })
+      .catch(function(e){ console.error('No se pudo subir la lista a la nube', e); });
+  }catch(e){}
+}
 function pintarUsuarios(){
   var u = usuarios(), el = $('lista-usuarios');
   if(!u.length){
@@ -1886,7 +1925,8 @@ function pintarUsuarios(){
   }).join('');
 }
 function nuevoUsuario(){
-  if(usuarios().length >= 5) return decir('Ya son cinco','Acordamos un máximo de 5 personas. Quita a alguien si quieres agregar a otro.');
+  // Sin limite -pedido por Sensei el 25 jul: "no me le pongas limites"-. Antes solo
+  // dejaba 5 personas; ahora puede agregar tantas como necesite.
   pedirTexto('Dar acceso', 'Nombre de la persona', '', function(nombre){
     if(!nombre) return errorEn('merr','Escribe el nombre.');
     cerrarModal();
@@ -2160,8 +2200,11 @@ function abrirRecordatorio(){
     var hh = hora.split(':')[0], mm = hora.split(':')[1];
     var d = new Date(); d.setDate(d.getDate() + ((dia - d.getDay() + 7) % 7));
     var f = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+    // ARREGLADO 25 jul (mismo bug encontrado y corregido en NBS Academia ese mismo dia):
+    // le faltaba decir en que ZONA HORARIA estaba la hora -"hora flotante"-. Sin eso,
+    // cada calendario adivina a su manera y muchas veces la alarma no suena.
     var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Iglesia Efrain Para Dios//ES','BEGIN:VEVENT',
-      'DTSTART:' + f + 'T' + hh + mm + '00',
+      'DTSTART;TZID=America/New_York:' + f + 'T' + hh + mm + '00',
       'DURATION:PT30M',
       'RRULE:FREQ=WEEKLY;BYDAY=' + DD,
       'SUMMARY:Estudio - Iglesia Efrain para Dios',
@@ -2313,16 +2356,58 @@ function revisarAusencia(){
 /* ══════════════════ ARRANQUE ══════════════════ */
 window.addEventListener('DOMContentLoaded', function(){
   revisarSiSeActualizo();
+  // Deslizador de velocidad: mostrar la preferencia guardada apenas abre, y escuchar
+  // cuando lo mueva -mismo mecanismo que ya tiene NBS Academia-.
+  var vg0 = parseFloat(localStorage.getItem('efd_vel') || '1');
+  if(isNaN(vg0) || vg0 < 0.5 || vg0 > 1.8) vg0 = 1;
+  velocidad = vg0;
+  var sliderVel = $('velSliderEfd');
+  if(sliderVel){
+    sliderVel.value = vg0;
+    var lblVel = $('velLblEfd');
+    if(lblVel) lblVel.textContent = vg0.toFixed(2).replace(/0$/,'').replace(/\.$/,'.0') + 'x';
+    sliderVel.oninput = function(){
+      var v = parseFloat(this.value);
+      var l = $('velLblEfd');
+      if(l) l.textContent = v.toFixed(2).replace(/0$/,'').replace(/\.$/,'.0') + 'x';
+    };
+    sliderVel.onchange = function(){ ponerVelocidad(parseFloat(this.value)); };
+  }
   if(localStorage.getItem(CLAVE_HASH)) ir('p-entrar');
   else ir('p-inicial');
 });
 
 /* ── avisa una sola vez cuando la version cambio desde la ultima vez ── */
+// Sonido del letrero de actualizacion (25 jul, pedido por Sensei) -mismo "ding-dong"
+// suave que ya tienen NBS2 y la Academia, hecho desde cero con el propio telefono,
+// sin archivos de audio con derechos de autor.
+var _ctxAudioEfd = null;
+function _pitidoEfd(frecuencia, inicioSeg, duracionSeg, volumen){
+  try{
+    if(!_ctxAudioEfd) _ctxAudioEfd = new (window.AudioContext || window.webkitAudioContext)();
+    if(_ctxAudioEfd.state === 'suspended') _ctxAudioEfd.resume();
+    var osc = _ctxAudioEfd.createOscillator();
+    var vol = _ctxAudioEfd.createGain();
+    osc.type = 'sine'; osc.frequency.value = frecuencia;
+    osc.connect(vol); vol.connect(_ctxAudioEfd.destination);
+    var t0 = _ctxAudioEfd.currentTime + inicioSeg;
+    vol.gain.setValueAtTime(0, t0);
+    vol.gain.linearRampToValueAtTime(volumen, t0 + 0.02);
+    vol.gain.linearRampToValueAtTime(0, t0 + duracionSeg);
+    osc.start(t0); osc.stop(t0 + duracionSeg + 0.02);
+  }catch(e){}
+}
+function sonidoActualizacionEfd(){
+  _pitidoEfd(660, 0,    0.16, 0.22);
+  _pitidoEfd(880, 0.14, 0.22, 0.22);
+}
+
 function revisarSiSeActualizo(){
   var VERSION_GUARDADA = 'efd_version_vista';
   var actual = (document.querySelector('meta[name="app-version"]') || {}).content || '';
   var vista = localStorage.getItem(VERSION_GUARDADA);
   if(actual && vista && vista !== actual){
+    sonidoActualizacionEfd();
     var b = $('banner-actualizada');
     b.classList.add('mostrar');
     setTimeout(function(){ b.classList.remove('mostrar'); }, 4000);
