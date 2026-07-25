@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260725b-EFD-ADMIN-V2.7">
+<meta name="app-version" content="20260725c-EFD-ADMIN-V2.8">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -291,6 +291,8 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
         Si pierdes esta clave no hay forma de recuperarla. Nadie puede.
         Anótala en un lugar seguro.
       </div>
+      <label class="etq" for="ini-codigo">Código de instalación</label>
+      <input class="campo" id="ini-codigo" type="password" autocomplete="off">
       <label class="etq" for="ini-c1">Clave maestra (mínimo 6 caracteres)</label>
       <input class="campo" id="ini-c1" type="password" autocomplete="new-password">
       <label class="etq" for="ini-c2">Escríbela otra vez</label>
@@ -1146,7 +1148,19 @@ async function intentarHuellaDigital(){
 }
 
 /* ══════════════════ ENTRAR ══════════════════ */
+// El HASH -no el codigo en claro- del codigo de instalacion. Pedido por Sensei
+// el 25 jul: "yo soy el unico que puede tener autoridad para entrar" -encontro
+// que CUALQUIERA que abriera el link podia crear su propia clave maestra en su
+// propio telefono. Ahora, en un telefono NUEVO -que todavia no tiene clave
+// creada-, hace falta este codigo antes de poder crear cualquier clave. El
+// telefono de Sensei, que YA tiene su clave creada, no pasa por aqui -entra
+// directo con su clave de siempre, sin pedirle nada extra-.
+var CODIGO_INSTALACION_HASH = '+KHuSMSxuDaoUb2rVXEsd9luNMb7pk6p7YGIQB/14Ag=';
+
 async function crearClaveMaestra(){
+  var codigo = $('ini-codigo').value;
+  var hCodigo = await sha256(codigo + '::' + PIMIENTA);
+  if(hCodigo !== CODIGO_INSTALACION_HASH) return errorEn('ini-error', 'Código de instalación incorrecto.');
   var c1 = $('ini-c1').value, c2 = $('ini-c2').value;
   if(c1.length < 6) return errorEn('ini-error', 'La clave necesita al menos 6 caracteres.');
   if(c1 !== c2)     return errorEn('ini-error', 'Las dos claves no son iguales.');
@@ -1155,7 +1169,7 @@ async function crearClaveMaestra(){
   localStorage.setItem(CLAVE_SAL, b64(sal));
   localStorage.setItem(CLAVE_HASH, await huella(c1, sal));
   claveMaestra = c1;
-  $('ini-c1').value = ''; $('ini-c2').value = '';
+  $('ini-codigo').value = ''; $('ini-c1').value = ''; $('ini-c2').value = '';
   decir('Listo', 'Tu clave quedó creada. Nadie más puede entrar a esta app.', function(){ ir('p-biblioteca'); });
 }
 async function entrar(){
