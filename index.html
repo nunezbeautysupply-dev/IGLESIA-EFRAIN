@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260725c-EFD-ADMIN-V2.8">
+<meta name="app-version" content="20260823a-EFD-ADMIN-V2.9">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -128,6 +128,36 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
 
 /* ── varios ───────────────────────────────────────── */
 .vacio{text-align:center;padding:44px 20px;color:var(--lavanda);font-size:16px;line-height:1.6}
+
+/* ── BUSCADOR (v2.9) ────────────────────────────────── */
+.busca-abre{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;
+  background:#0E1533;border:1px solid rgba(169,166,216,.24);border-radius:12px;
+  color:var(--lavanda);font-size:16px;cursor:pointer;margin-bottom:10px;text-align:left}
+.busca-abre:active{background:var(--indigo2)}
+.res{background:var(--indigo);border:1px solid rgba(169,166,216,.14);border-radius:14px;
+  padding:12px 13px;margin-bottom:9px}
+.res-tit{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--oro-suave);
+  margin-bottom:6px;line-height:1.3}
+.res-frase{font-family:var(--serif);font-size:15.5px;line-height:1.55;color:var(--perg);
+  margin:0 0 9px;opacity:.95}
+.res-frase mark{background:rgba(212,175,55,.30);color:var(--oro-suave);
+  border-radius:3px;padding:0 2px;font-weight:700}
+.res-acc{display:flex;gap:8px}
+.res-acc button{flex:1;padding:9px;border:none;border-radius:10px;font-size:14.5px;
+  font-weight:700;font-family:var(--sans);cursor:pointer}
+.res-ver{background:transparent;border:1px solid var(--linea)!important;color:var(--lavanda)}
+.res-oir{background:linear-gradient(135deg,var(--oro),#B8952C);color:#1A1204}
+.res-mas{font-size:13px;color:var(--lavanda);text-align:center;padding:4px 0 10px}
+.busca-info{font-size:13.5px;color:var(--lavanda);margin:2px 0 12px;line-height:1.5}
+.busca-info b{color:var(--oro-suave)}
+/* ── BOTÓN DE AYUDA SIEMPRE VISIBLE ─────────────────── */
+.ayuda-flota{position:fixed;right:14px;bottom:16px;width:48px;height:48px;border-radius:50%;
+  border:1px solid var(--linea);background:linear-gradient(135deg,var(--indigo2),var(--indigo));
+  color:var(--oro-suave);font-size:22px;font-weight:700;cursor:pointer;z-index:40;
+  box-shadow:0 4px 16px rgba(0,0,0,.55),0 0 18px rgba(212,175,55,.18);
+  display:none;align-items:center;justify-content:center;padding:0}
+.ayuda-flota.se-ve{display:flex}
+.ayuda-flota:active{background:var(--indigo2)}
 .vacio .ico{font-size:44px;display:block;margin-bottom:14px;opacity:.55}
 .pg{display:none}
 .pg.activa{display:block}
@@ -396,8 +426,8 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <p class="voznota">Deja la pantalla encendida mientras escuchas.</p>
     </div>
     <div class="tarj" id="prep-progreso"></div>
-    <input class="campo" id="prep-buscar" type="search" placeholder="🔍 Buscar en este libro..."
-           oninput="pintarPreparar()" style="margin-bottom:10px">
+    <button class="busca-abre" onclick="abrirBuscar()">
+      <span style="font-size:18px">🔍</span><span>Buscar cualquier cosa en este libro...</span></button>
     <div class="chips" id="prep-chips"></div>
     <div class="tarj">
       <div id="prep-temas"></div>
@@ -416,6 +446,19 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div id="tema-cuerpo"></div>
   </section>
 
+  <!-- ══════════ BUSCAR EN EL LIBRO ══════════ -->
+  <section id="p-buscar" class="pg">
+    <div class="barra">
+      <button class="volver" onclick="ir('p-preparar')">←</button>
+      <h1>Buscar</h1>
+    </div>
+    <input class="campo" id="bus-q" type="search" autocomplete="off"
+           placeholder="Escribe una palabra o una frase..."
+           oninput="pintarBuscar()" style="margin-bottom:8px">
+    <div class="busca-info" id="bus-info"></div>
+    <div id="bus-res"></div>
+  </section>
+
   <!-- ══════════ USUARIOS ══════════ -->
   <section id="p-usuarios" class="pg">
     <div class="barra">
@@ -431,6 +474,10 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
   </section>
 
 </div>
+
+<!-- ══════════ AYUDA SIEMPRE A LA VISTA ══════════ -->
+<button class="ayuda-flota" id="ayuda-flota" onclick="abrirManual()"
+        aria-label="Ayuda: abrir el manual de la app">?</button>
 
 <!-- ══════════ MENÚ LATERAL ══════════ -->
 <div class="velo-men" id="velo-men" onclick="cerrarMenu()"></div>
@@ -1023,6 +1070,8 @@ function ir(p){
     var bp = $('esc-play'); if(bp) bp.textContent = '▶';
     if(typeof soltarPantalla === 'function') soltarPantalla();
   }
+  var fa = $('ayuda-flota');
+  if(fa) fa.classList.toggle('se-ve', p !== 'p-inicial' && p !== 'p-entrar');
   if(p === 'p-biblioteca'){ libroActual = null; pintarBiblioteca(); }
   if(p === 'p-usuarios')   pintarUsuarios();
   if(p === 'p-preparar')   pintarPreparar();
@@ -2057,6 +2106,247 @@ function temaCoincide(t, q){
   return normal(q).split(/\s+/).every(function(p){ return !p || texto.indexOf(p) >= 0; });
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   EL BUSCADOR DE VERDAD  (v2.9)
+   Busca en el titulo, en el texto y en las frases importantes de cada tema.
+   Perdona acentos y mayusculas, entiende raices de palabra y sinonimos,
+   y te muestra LA FRASE donde esta, no solo el tema.
+   Todo pasa dentro del telefono. Nada sale a internet.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Familias de palabras: si buscas una, se buscan todas las de su fila. */
+var FAMILIAS = [
+  ['dios','señor','jehova','padre eterno','creador','altisimo','todopoderoso'],
+  ['jesus','cristo','mesias','salvador','redentor','cordero','nazareno'],
+  ['espiritu santo','consolador','paracleto'],
+  ['angel','arcangel','querubin','serafin','mensajero celestial'],
+  ['pecado','falta','culpa','transgresion','iniquidad','maldad'],
+  ['perdon','misericordia','clemencia','indulto'],
+  ['gracia','favor','don'],
+  ['oracion','orar','rezar','rogar','suplica','clamor','plegaria'],
+  ['fe','creer','confianza','confiar'],
+  ['amor','amar','caridad','querer'],
+  ['biblia','escritura','palabra de dios','evangelio','texto sagrado'],
+  ['iglesia','congregacion','asamblea','templo','santuario','tabernaculo'],
+  ['salvacion','salvar','redencion','rescate','libertad'],
+  ['cielo','paraiso','gloria','reino de los cielos'],
+  ['infierno','condenacion','perdicion','lago de fuego'],
+  ['bendicion','bendecir','bendito','bienaventurado'],
+  ['maldicion','maldecir','maldito'],
+  ['profeta','profecia','profetizar','vidente','revelacion'],
+  ['alma','espiritu','ser interior'],
+  ['muerte','morir','fallecer','difunto','sepulcro','tumba'],
+  ['vida','vivir','existencia'],
+  ['rey','reino','trono','corona','reinar'],
+  ['sacrificio','ofrenda','holocausto','inmolacion'],
+  ['discipulo','apostol','seguidor','siervo'],
+  ['milagro','prodigio','señal','maravilla'],
+  ['juicio','juzgar','sentencia','tribunal'],
+  ['resurreccion','resucitar','levantarse de entre los muertos'],
+  ['bautismo','bautizar','agua'],
+  ['alabanza','alabar','adorar','adoracion','glorificar','exaltar'],
+  ['ayuno','ayunar','abstinencia'],
+  ['diezmo','primicia','ofrenda'],
+  ['demonio','diablo','satanas','enemigo','maligno','tentador'],
+  ['luz','lumbrera','claridad','resplandor'],
+  ['oscuridad','tinieblas','sombra'],
+  ['santidad','santo','santificar','consagrar','puro'],
+  ['arrepentimiento','arrepentirse','conversion','volverse'],
+  ['promesa','pacto','alianza','convenio','juramento'],
+  ['corazon','sentimiento','interior'],
+  ['sabiduria','entendimiento','conocimiento','discernimiento','ciencia'],
+  ['obediencia','obedecer','sujecion','someterse'],
+  ['esperanza','esperar','aguardar'],
+  ['paz','sosiego','reposo','descanso'],
+  ['guerra','batalla','lucha','pelea','combate'],
+  ['pobre','necesitado','humilde','menesteroso'],
+  ['riqueza','riquezas','dinero','tesoro','oro'],
+  ['hijo','descendencia','simiente','generacion'],
+  ['pueblo','nacion','gente','multitud'],
+  ['ley','mandamiento','estatuto','precepto','ordenanza'],
+  ['gozo','alegria','regocijo','contentamiento'],
+  ['dolor','sufrimiento','afliccion','angustia','tribulacion'],
+  ['tentacion','prueba','tentar','probar'],
+  ['unción','ungir','ungido'],
+  ['efrain','jose','manases','israel','jacob']
+];
+
+/* Terminaciones que se quitan para llegar a la raiz de la palabra. */
+var COLAS = ['mente','aciones','iciones','ciones','amiento','imiento','isimo','isima',
+             'iendo','ando','aron','eron','ados','idos','adas','idas','emos','amos','imos',
+             'cion','sion','ado','ido','ada','ida','ara','era','ora','oso','osa',
+             'ar','er','ir','es','as','os','a','o','s'];
+
+function raizDe(p){
+  p = normal(p);
+  for(var i=0;i<COLAS.length;i++){
+    var c = COLAS[i];
+    if(p.length - c.length >= 4 && p.slice(-c.length) === c) return p.slice(0, -c.length);
+  }
+  return p;
+}
+
+/* De lo que escribiste saca todas las formas que hay que buscar. */
+function expandir(q){
+  var palabras = normal(q).split(/\s+/).filter(function(x){ return x.length > 1; });
+  return palabras.map(function(p){
+    var formas = {}, raiz = raizDe(p);
+    formas[p] = 1;
+    if(raiz.length >= 4) formas[raiz] = 1;
+    FAMILIAS.forEach(function(fam){
+      var dentro = fam.some(function(w){
+        var nw = normal(w);
+        return nw === p || nw.indexOf(p) === 0 || (raiz.length >= 4 && nw.indexOf(raiz) === 0);
+      });
+      if(dentro) fam.forEach(function(w){
+        var nw = normal(w), r = raizDe(nw);
+        formas[r.length >= 4 ? r : nw] = 1;
+      });
+    });
+    return { escrita:p, formas:Object.keys(formas) };
+  });
+}
+
+/* Una frase coincide si tiene TODAS las palabras (en alguna de sus formas). */
+function fraseCoincide(txtNorm, grupos){
+  return grupos.every(function(g){
+    return g.formas.some(function(f){ return txtNorm.indexOf(f) >= 0; });
+  });
+}
+
+/* Recorta la frase alrededor de lo encontrado y lo pinta de oro. */
+function recorte(frase, grupos){
+  var n = normal(frase), pos = -1;
+  grupos.forEach(function(g){
+    g.formas.forEach(function(f){
+      var p = n.indexOf(f);
+      if(p >= 0 && (pos < 0 || p < pos)) pos = p;
+    });
+  });
+  if(pos < 0) pos = 0;
+  var ini = Math.max(0, pos - 70), fin = Math.min(frase.length, pos + 150);
+  if(ini > 0){ var e = frase.indexOf(' ', ini); if(e > 0 && e < ini + 18) ini = e + 1; }
+  var trozo = frase.slice(ini, fin);
+  var html = (ini > 0 ? '…' : '') + esc(trozo) + (fin < frase.length ? '…' : '');
+  /* pintar: se trabaja sobre el texto ya escapado */
+  var plano = html, marcado = '', usado = normal(plano), i = 0;
+  var puntos = [];
+  grupos.forEach(function(g){
+    g.formas.forEach(function(f){
+      if(f.length < 3) return;
+      var d = 0;
+      while(true){
+        var p = usado.indexOf(f, d);
+        if(p < 0) break;
+        puntos.push([p, p + f.length]);
+        d = p + 1;
+      }
+    });
+  });
+  if(!puntos.length) return html;
+  puntos.sort(function(a,b){ return a[0] - b[0]; });
+  var juntos = [puntos[0]];
+  for(var k=1;k<puntos.length;k++){
+    var u = juntos[juntos.length-1];
+    if(puntos[k][0] <= u[1]) u[1] = Math.max(u[1], puntos[k][1]);
+    else juntos.push(puntos[k]);
+  }
+  /* extender la marca hasta el final de la palabra */
+  juntos.forEach(function(u){
+    while(u[1] < plano.length && /[a-z0-9áéíóúñü]/i.test(plano[u[1]])) u[1]++;
+  });
+  juntos.forEach(function(u){
+    if(u[0] < i) return;
+    marcado += plano.slice(i, u[0]) + '<mark>' + plano.slice(u[0], u[1]) + '</mark>';
+    i = u[1];
+  });
+  return marcado + plano.slice(i);
+}
+
+var busGrupos = [];
+function abrirBuscar(){
+  cerrarMenu();
+  if(!libroActual) return decir('Sin libro', 'Abre un libro primero.');
+  ir('p-buscar');
+  setTimeout(function(){ var c = $('bus-q'); if(c) c.focus(); }, 120);
+  pintarBuscar();
+}
+
+function pintarBuscar(){
+  var q = ($('bus-q') ? $('bus-q').value : '').trim();
+  if(!libroActual) return;
+  if(q.length < 2){
+    $('bus-info').innerHTML = '';
+    $('bus-res').innerHTML = '<div class="vacio">Escribe lo que buscas.<br><br>'
+      + 'Busca en el título, en el texto y en lo marcado como importante.<br>'
+      + 'No importan los acentos ni las mayúsculas, y también encuentra '
+      + 'palabras parecidas y de la misma familia.</div>';
+    return;
+  }
+  var grupos = expandir(q);
+  busGrupos = grupos;
+  if(!grupos.length){ $('bus-res').innerHTML = '<div class="vacio">Escribe algo más largo.</div>'; return; }
+
+  var hallazgos = [], temasCon = 0;
+  libroActual.temas.forEach(function(t, i){
+    var aqui = [];
+    if(fraseCoincide(normal(t.titulo), grupos)) aqui.push({ tipo:'tit', txt:t.titulo });
+    (t.importante || []).forEach(function(f){
+      if(fraseCoincide(normal(f.t), grupos)) aqui.push({ tipo:'imp', txt:f.t });
+    });
+    (t.texto || []).forEach(function(p){
+      if(fraseCoincide(normal(p), grupos)) aqui.push({ tipo:'txt', txt:p });
+    });
+    if(aqui.length){ temasCon++; hallazgos.push({ i:i, t:t, frases:aqui }); }
+  });
+
+  var total = hallazgos.reduce(function(a,h){ return a + h.frases.length; }, 0);
+
+  /* que formas se buscaron ademas de la escrita */
+  var otras = {};
+  grupos.forEach(function(g){
+    g.formas.forEach(function(f){ if(f !== g.escrita && f.length >= 4) otras[f] = 1; });
+  });
+  var listaOtras = Object.keys(otras).slice(0, 10);
+  $('bus-info').innerHTML =
+      '<b>' + total + '</b> ' + (total === 1 ? 'resultado' : 'resultados')
+    + ' en <b>' + temasCon + '</b> ' + (temasCon === 1 ? 'tema' : 'temas')
+    + (listaOtras.length ? '<br>también buscó: ' + esc(listaOtras.join(' · ')) : '');
+
+  if(!total){
+    $('bus-res').innerHTML = '<div class="vacio">No encontré nada con eso.<br><br>'
+      + 'Prueba con una sola palabra, o con otra manera de decirlo.</div>';
+    return;
+  }
+
+  $('bus-res').innerHTML = hallazgos.map(function(h){
+    var muestra = h.frases.slice(0, 3);
+    var extra   = h.frases.length - muestra.length;
+    return '<div class="res">'
+      + '<div class="res-tit">' + (h.i + 1) + ' · ' + esc(h.t.titulo)
+      + (esFav(h.i) ? ' <span style="color:var(--oro)">★</span>' : '')
+      + (esHecho(h.i) ? ' <span style="color:var(--verde)">✓</span>' : '') + '</div>'
+      + muestra.map(function(f){
+          return '<p class="res-frase">'
+            + (f.tipo === 'imp' ? '<span style="color:var(--oro)">★</span> ' : '')
+            + recorte(f.txt, grupos) + '</p>';
+        }).join('')
+      + (extra > 0 ? '<div class="res-mas">y ' + extra + ' ' + (extra === 1 ? 'vez más' : 'veces más') + ' en este tema</div>' : '')
+      + '<div class="res-acc">'
+      + '<button class="res-ver" onclick="verTema(' + h.i + ');ir(\'p-tema\')">📖 Ver</button>'
+      + '<button class="res-oir" onclick="oirDesdeBuscar(' + h.i + ')">▶ Escuchar</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function oirDesdeBuscar(i){
+  temaActual = i;
+  ir('p-preparar');
+  prepararEscuchar(true);
+  window.scrollTo(0, 0);
+  if(!sonando) setTimeout(playPausa, 220);
+}
+
 /* ── el tema del día ── */
 function temaDelDia(){
   if(!libroActual || !libroActual.temas.length) return decir('Sin libro','Abre un libro primero.');
@@ -2240,6 +2530,17 @@ function abrirRecordatorio(){
 var MANUAL = [
  { t:'Qué es esta app', p:['Aquí preparas los libros de la iglesia: los subes, la app los divide en temas y marca lo importante, tú lo revisas, y al final generas un archivo sellado para mandárselo a los hermanos.',
    'El libro nunca sale de tu teléfono. No sube a internet ni queda en ningún servidor.'] },
+ { t:'Buscar cualquier cosa en el libro',
+   p:['Abre el libro y toca la barra "Buscar cualquier cosa en este libro", o entra por el menu (☰) a "Buscar en el libro".',
+      'Escribe una palabra o una frase. La app te muestra el pedazo de texto donde aparece, con la palabra resaltada en dorado, y de que tema es.'],
+   l:['No importan los acentos ni las mayusculas: "angel" encuentra "Angel" y "ANGEL".',
+      'Entiende raices: si buscas "bendicion" tambien encuentra "bendecir" y "bendito".',
+      'Entiende familias de palabras: si buscas "oracion" tambien encuentra "orar", "rezar" y "clamor". Debajo de la caja te dice que otras palabras busco.',
+      'Si escribes dos palabras, solo salen las frases que tengan las dos.',
+      '📖 Ver te lleva al tema completo. ▶ Escuchar lo pone a sonar de una vez.',
+      'La busqueda pasa dentro de tu telefono. No sale nada a internet.'] },
+ { t:'El boton ? de ayuda',
+   p:['El circulo con el signo ? que ves abajo a la derecha abre este manual desde cualquier pantalla. Siempre esta ahi.'] },
  { t:'Agregar un libro', p:['Toca "+ Agregar un libro" y escoge el archivo.'],
    l:['Word (.docx) es lo mejor: la app ve lo que dejaste en negrita o subrayado y lo marca solo.',
       'También acepta texto (.txt).',
@@ -2337,6 +2638,7 @@ function abrirMenu(){
       + '<div class="menu-it" onclick="imprimirLibro()"><span class="mi">🖨️</span>Imprimir el libro</div>';
   }
   c += '<div class="menu-sec">Recordatorios</div>'
+    + '<div class="menu-it" onclick="abrirBuscar()"><span class="mi">🔍</span>Buscar en el libro</div>'
     + '<div class="menu-it" onclick="abrirRecordatorio()"><span class="mi">🔔</span>Recordarme estudiar</div>'
     + '<div class="menu-sec">Administrador</div>'
     + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-biblioteca\')"><span class="mi">📚</span>Mis libros</div>'
