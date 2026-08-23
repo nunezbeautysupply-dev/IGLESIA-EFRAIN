@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260823a-EFD-ADMIN-V2.9">
+<meta name="app-version" content="20260823b-EFD-ADMIN-V3.0">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -128,6 +128,31 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
 
 /* ── varios ───────────────────────────────────────── */
 .vacio{text-align:center;padding:44px 20px;color:var(--lavanda);font-size:16px;line-height:1.6}
+
+/* ── CAPITULOS PLEGABLES Y COMANDO DE VOZ (v3.0) ─────── */
+.cap-cab{display:flex;align-items:center;gap:10px;width:100%;padding:12px 13px;margin-bottom:7px;
+  background:linear-gradient(135deg,rgba(212,175,55,.13),rgba(212,175,55,.05));
+  border:1px solid var(--linea);border-radius:13px;cursor:pointer;text-align:left;
+  color:var(--perg);font-family:var(--sans)}
+.cap-cab:active{background:var(--indigo2)}
+.cap-fl{font-size:13px;color:var(--oro);width:14px;flex-shrink:0;transition:transform .2s}
+.cap-cab.abierto .cap-fl{transform:rotate(90deg)}
+.cap-tit{display:block;font-family:var(--serif);font-size:16.5px;font-weight:700;
+  color:var(--oro-suave);line-height:1.3}
+.cap-dat{display:block;font-size:12px;color:var(--lavanda);margin-top:3px;
+  font-family:var(--sans);font-weight:400;line-height:1.4}
+.cap-caja{padding-left:13px;border-left:2px solid rgba(212,175,55,.22);margin:0 0 9px 8px}
+.cap-caja[hidden]{display:none}
+.sub-n{font-size:12.5px!important;color:var(--oro)!important;font-weight:700}
+.cmd-caja{display:flex;gap:7px;margin-bottom:10px}
+.cmd-caja input{flex:1;padding:12px 13px;background:#0E1533;
+  border:1px solid rgba(169,166,216,.24);border-radius:12px;color:var(--perg);
+  font-size:15.5px;font-family:var(--sans)}
+.cmd-caja input::placeholder{color:var(--lavanda);opacity:.75}
+.cmd-caja button{flex:0 0 52px;border:none;border-radius:12px;font-size:19px;cursor:pointer;
+  background:linear-gradient(135deg,var(--oro),#B8952C);color:#1A1204;font-weight:700}
+.cmd-dice{font-size:13px;color:var(--lavanda);margin:-4px 0 10px;line-height:1.45;min-height:1px}
+.cmd-dice.malo{color:var(--rojo)}
 
 /* ── BUSCADOR (v2.9) ────────────────────────────────── */
 .busca-abre{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;
@@ -436,6 +461,12 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <p class="voznota">Deja la pantalla encendida mientras escuchas.</p>
     </div>
     <div class="tarj" id="prep-progreso"></div>
+    <div class="cmd-caja">
+      <input id="cmd-q" type="text" autocomplete="off" placeholder='Ej: "lee el capítulo 5"'
+             onkeydown="if(event.key==='Enter')ejecutarOrden()">
+      <button onclick="ejecutarOrden()" aria-label="Ejecutar la orden">▶</button>
+    </div>
+    <div class="cmd-dice" id="cmd-dice"></div>
     <button class="busca-abre" onclick="abrirBuscar()">
       <span style="font-size:18px">🔍</span><span>Buscar cualquier cosa en este libro...</span></button>
     <div class="chips" id="prep-chips"></div>
@@ -1082,7 +1113,7 @@ function ir(p){
   }
   var fa = $('ayuda-flota');
   if(fa) fa.classList.toggle('se-ve', p !== 'p-inicial' && p !== 'p-entrar');
-  if(p === 'p-biblioteca'){ libroActual = null; pintarBiblioteca(); }
+  if(p === 'p-biblioteca'){ libroActual = null; capsAbiertos = null; pintarBiblioteca(); }
   if(p === 'p-usuarios')   pintarUsuarios();
   if(p === 'p-preparar')   pintarPreparar();
   if(p === 'p-entrar'){
@@ -1465,12 +1496,20 @@ function pintarPreparar(){
       + (q ? 'Nada coincide con lo que buscaste.' : 'No hay temas en este filtro.') + '</div>';
     return;
   }
-  $('prep-temas').innerHTML = salen.map(function(x){
-    var t = x.t, i = x.i, nota = notaDe(i);
+  /* ── la lista, agrupada por capitulo (v3.0) ── */
+  inicializarCaps();
+  var visibles = {};
+  salen.forEach(function(x){ visibles[x.i] = 1; });
+  var filtrando = !!q || filtro !== 'todos';
+  var mapa = mapaDelLibro();
+
+  function pintarUnTema(i, subNum){
+    var t = libroActual.temas[i], nota = notaDe(i);
+    var p = partesDelTitulo(t);
     return '<div class="tema">'
-      + '<div class="tema-n">' + (i+1) + '</div>'
+      + '<div class="tema-n">' + (subNum ? '<span class="sub-n">' + subNum + '</span>' : (i+1)) + '</div>'
       + '<div class="tema-cuerpo tarj-toc" onclick="cargarEnReproductor(' + i + ')">'
-      + '<div class="tema-tit">' + esc(t.titulo) + '</div>'
+      + '<div class="tema-tit">' + esc(subNum ? p.sub : t.titulo) + '</div>'
       + '<div class="tema-info"><span class="estrella">★</span> ' + t.importante.length
       + ' importantes · ' + (t.texto||[]).length + ' párrafos · ' + minutosDelTema(i) + ' min'
       + (nota ? ' · <span style="color:var(--oro)">✍️ con nota</span>' : '') + '</div>'
@@ -1480,6 +1519,31 @@ function pintarPreparar(){
       + '<button class="mk ' + (esFav(i)?'mk-fav':'mk-off') + '" onclick="alternarFav(' + i + ',event)" aria-label="Favorito">★</button>'
       + '<button class="mk ' + (esHecho(i)?'mk-ok':'mk-off') + '" onclick="alternarHecho(' + i + ',event)" aria-label="Escuchado">✓</button>'
       + '</div></div>';
+  }
+
+  $('prep-temas').innerHTML = mapa.map(function(g){
+    var dentro = g.temas.filter(function(x){ return visibles[x.i]; });
+    if(!dentro.length) return '';
+
+    /* un tema suelto, sin capitulo: se pinta como siempre */
+    if(!g.cap) return dentro.map(function(x){ return pintarUnTema(x.i, 0); }).join('');
+
+    var hechos = g.temas.filter(function(x){ return esHecho(x.i); }).length;
+    var mins   = Math.max(1, Math.round(g.temas.reduce(function(a,x){ return a + minutosDelTema(x.i); }, 0)));
+    var abierto = filtrando || !!capsAbiertos[g.num];
+    return '<button class="cap-cab' + (abierto ? ' abierto' : '') + '" onclick="alternarCap(' + g.num + ')">'
+      + '<span class="cap-fl">▶</span>'
+      + '<span style="flex:1;min-width:0">'
+      +   '<span class="cap-tit">' + esc(g.cap) + '</span>'
+      +   '<span class="cap-dat">' + g.temas.length + ' temas · ' + mins + ' min · '
+      +   hechos + '/' + g.temas.length + ' escuchados'
+      +   (dentro.length !== g.temas.length ? ' · ' + dentro.length + ' coinciden' : '') + '</span>'
+      + '</span></button>'
+      + '<div class="cap-caja"' + (abierto ? '' : ' hidden') + '>'
+      + dentro.map(function(x){
+          return pintarUnTema(x.i, g.temas.indexOf(x) + 1);
+        }).join('')
+      + '</div>';
   }).join('');
 }
 function renombrarLibro(){
@@ -1509,6 +1573,7 @@ function verTema(i){
       '<div class="tarj"><div class="tema-tit" style="font-size:21px">' + esc(t.titulo) + '</div>'
     + '<button class="btn btn-linea btn-chico" style="margin-top:12px" onclick="renombrarTema()">Cambiar el título</button>'
     + (i > 0 ? '<button class="btn btn-linea btn-chico" onclick="unirConAnterior()">Unir con el anterior</button>' : '')
+    + ((t.texto||[]).length > 1 ? '<button class="btn btn-linea btn-chico" onclick="abrirPartir()">✂️ Partir en sub-temas</button>' : '')
     + '<button class="btn btn-rojo btn-chico" onclick="borrarTema()">Quitar este tema</button>'
     + '</div>';
 
@@ -1556,6 +1621,76 @@ function renombrarTema(){
     cerrarModal(); await guardarYVolverAPintar();
   });
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   PARTIR UN TEMA LARGO EN SUB-TEMAS  (v3.0)
+   Escoges el parrafo donde empieza la segunda parte. Los dos pedazos quedan
+   bajo el mismo capitulo. El titulo completo se conserva para que la app de
+   los hermanos siga mostrando lo mismo de siempre.
+   ══════════════════════════════════════════════════════════════════════════ */
+function abrirPartir(){
+  var t = libroActual.temas[temaActual];
+  var ps = t.texto || [];
+  if(ps.length < 2) return decir('No se puede partir', 'Este tema tiene un solo párrafo.');
+  var html = '<h2>Partir en sub-temas</h2>'
+    + '<p style="font-size:15.5px;line-height:1.55;margin:0 0 6px;color:var(--lavanda)">'
+    + 'Toca el párrafo donde quieres que <b>empiece la segunda parte</b>.</p>'
+    + '<div style="max-height:46vh;overflow:auto;margin:10px 0 14px">';
+  for(var j = 1; j < ps.length; j++){
+    var trozo = String(ps[j]).slice(0, 110);
+    html += '<div class="tarj tarj-toc" style="padding:10px 12px;margin-bottom:7px;cursor:pointer" '
+          + 'onclick="hacerPartir(' + j + ')">'
+          + '<div style="font-size:11.5px;color:var(--oro);font-weight:700;letter-spacing:.08em">'
+          + 'CORTAR AQUÍ · párrafo ' + (j+1) + ' de ' + ps.length + '</div>'
+          + '<div style="font-family:var(--serif);font-size:14.5px;line-height:1.5;margin-top:4px">'
+          + esc(trozo) + (ps[j].length > 110 ? '…' : '') + '</div></div>';
+  }
+  html += '</div><button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>';
+  modal(html);
+}
+
+async function hacerPartir(corte){
+  var t = libroActual.temas[temaActual];
+  var ps = t.texto || [];
+  if(corte < 1 || corte >= ps.length) return;
+  var p = partesDelTitulo(t);
+  var cap = p.cap || p.sub;                 // si no tenia capitulo, el titulo pasa a serlo
+  var s1  = p.cap ? p.sub + ' (1)' : 'Parte 1';
+  var s2  = p.cap ? p.sub + ' (2)' : 'Parte 2';
+  var a = ps.slice(0, corte), b = ps.slice(corte);
+
+  /* Cada frase importante se va al pedazo al que de verdad pertenece.
+     Se cuenta cuantas de sus palabras aparecen en cada lado y gana el mayor;
+     asi funciona aunque la frase este cortada o reescrita. */
+  var textoA = normal(a.join(' ')), textoB = normal(b.join(' '));
+  function pegaEn(frase, donde){
+    var pal = normal(frase).split(/\s+/).filter(function(w){ return w.length > 3; });
+    if(!pal.length) return 0;
+    var n = 0;
+    pal.forEach(function(w){ if(donde.indexOf(w) >= 0) n++; });
+    return n / pal.length;
+  }
+  var impA = [], impB = [];
+  (t.importante || []).forEach(function(f){
+    (pegaEn(f.t, textoB) > pegaEn(f.t, textoA) ? impB : impA).push(f);
+  });
+
+  var uno = { n:t.n, titulo: cap + ' — ' + s1, cap: cap, sub: s1,
+              texto: a, importante: impA, aclaraciones: t.aclaraciones || [] };
+  var dos = { titulo: cap + ' — ' + s2, cap: cap, sub: s2,
+              texto: b, importante: impB, aclaraciones: t.aclaraciones || [] };
+
+  libroActual.temas.splice(temaActual, 1, uno, dos);
+  libroActual.temas.forEach(function(x, k){ x.n = k + 1; });
+  libroActual.sellado = null;
+  await guardarLibro(libroActual);
+  cerrarModal();
+  capsAbiertos = null;
+  temaActual = -1;
+  ir('p-preparar');
+  decir('Listo', 'El tema quedó partido en dos sub-temas dentro de <b>' + esc(cap) + '</b>.<br><br>'
+      + 'Puedes seguir partiéndolos, o cambiarles el título desde cada uno.');
+}
+
 function borrarTema(){
   preguntar('Quitar el tema', 'Se quita <b>' + esc(libroActual.temas[temaActual].titulo)
     + '</b> de este libro.', async function(){
@@ -2117,6 +2252,155 @@ function temaCoincide(t, q){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   CAPITULOS Y SUB-TEMAS  (v3.0)
+   Los libros que vienen en .json ya traen capitulos: al importarlos, el
+   capitulo se pega delante del titulo ("Capitulo III — La doble porcion").
+   Aqui se vuelve a separar para poder agrupar la lista, SIN tocar el titulo
+   guardado: asi el archivo sellado y la app de los hermanos siguen igual.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* De "Capitulo III — La doble porcion" saca { cap, sub }. */
+function partesDelTitulo(t){
+  var tit = String(t && t.titulo || '');
+  if(t && t.cap) return { cap: t.cap, sub: t.sub || tit };
+  var m = tit.match(/^\s*(Cap[ií]tulo\s+[^\u2014\u2013-]{1,40}?)\s*[\u2014\u2013]\s*(.+)$/i);
+  if(m) return { cap: m[1].trim(), sub: m[2].trim() };
+  m = tit.match(/^\s*(Parte\s+[^\u2014\u2013-]{1,30}?)\s*[\u2014\u2013]\s*(.+)$/i);
+  if(m) return { cap: m[1].trim(), sub: m[2].trim() };
+  return { cap: null, sub: tit };
+}
+
+/* Arma el mapa del libro: que capitulos hay y que temas tiene cada uno. */
+function mapaDelLibro(){
+  if(!libroActual) return [];
+  var grupos = [], ultimo = null;
+  libroActual.temas.forEach(function(t, i){
+    var p = partesDelTitulo(t);
+    if(p.cap && ultimo && ultimo.cap === p.cap){
+      ultimo.temas.push({ i:i, t:t, sub:p.sub });
+    } else {
+      ultimo = { cap:p.cap, temas:[{ i:i, t:t, sub:p.sub }] };
+      grupos.push(ultimo);
+    }
+  });
+  grupos.forEach(function(g, n){ g.num = n + 1; });
+  return grupos;
+}
+
+/* Que capitulos estan desplegados. Por defecto, solo donde estas parado. */
+var capsAbiertos = null;
+function inicializarCaps(){
+  if(capsAbiertos) return;
+  capsAbiertos = {};
+  var m = mapaDelLibro();
+  m.forEach(function(g){
+    if(g.temas.some(function(x){ return x.i === temaActual; })) capsAbiertos[g.num] = 1;
+  });
+  if(!Object.keys(capsAbiertos).length && m.length) capsAbiertos[m[0].num] = 1;
+}
+function alternarCap(n){
+  inicializarCaps();
+  if(capsAbiertos[n]) delete capsAbiertos[n]; else capsAbiertos[n] = 1;
+  pintarPreparar();
+}
+function abrirTodosLosCaps(){
+  capsAbiertos = {};
+  mapaDelLibro().forEach(function(g){ capsAbiertos[g.num] = 1; });
+  pintarPreparar();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   "LEE EL CAPITULO 5"  (v3.0)
+   Entiende: capitulo 5 · tema 5 · 3.2 · el siguiente · el anterior ·
+             el ultimo · el primero · el pendiente · o un pedazo del titulo.
+   ══════════════════════════════════════════════════════════════════════════ */
+var NUMEROS = { uno:1, dos:2, tres:3, cuatro:4, cinco:5, seis:6, siete:7, ocho:8, nueve:9,
+  diez:10, once:11, doce:12, trece:13, catorce:14, quince:15, dieciseis:16, diecisiete:17,
+  dieciocho:18, diecinueve:19, veinte:20, primero:1, primer:1, segundo:2, tercero:3, tercer:3,
+  cuarto:4, quinto:5, sexto:6, septimo:7, octavo:8, noveno:9, decimo:10,
+  i:1, ii:2, iii:3, iv:4, v:5, vi:6, vii:7, viii:8, ix:9, x:10, xi:11, xii:12, xiii:13,
+  xiv:14, xv:15, xvi:16, xvii:17, xviii:18, xix:19, xx:20 };
+
+function aNumero(txt){
+  var t = normal(txt || '').trim();
+  if(/^\d+$/.test(t)) return parseInt(t, 10);
+  return NUMEROS[t] || null;
+}
+
+/* Devuelve el indice del tema que pediste, o null si no se entiende. */
+function entenderOrden(orden){
+  var q = normal(orden).replace(/[.,;!¿?]+$/g,'').trim();
+  if(!q || !libroActual || !libroActual.temas.length) return null;
+  var mapa = mapaDelLibro(), n = libroActual.temas.length;
+
+  /* "3.2" = capitulo 3, sub-tema 2 */
+  var mp = q.match(/(\d+)\s*[.\-]\s*(\d+)/);
+  if(mp){
+    var g = mapa[parseInt(mp[1],10) - 1];
+    if(g){ var x = g.temas[parseInt(mp[2],10) - 1]; if(x) return x.i; }
+  }
+  /* palabras sueltas */
+  if(/\b(siguiente|proximo|proxima|que sigue)\b/.test(q))
+    return Math.min(n - 1, (temaActual < 0 ? -1 : temaActual) + 1);
+  if(/\b(anterior|atras|previo)\b/.test(q)) return Math.max(0, temaActual - 1);
+  if(/\b(ultimo|ultima|final)\b/.test(q)) return n - 1;
+  if(/\b(primero|primera|principio|comienzo|empieza)\b/.test(q) && !/capitulo|tema/.test(q)) return 0;
+  if(/\b(pendiente|donde (me )?quede|falta)\b/.test(q)){
+    for(var k = 0; k < n; k++) if(!esHecho(k)) return k;
+    return 0;
+  }
+  /* "capitulo 5" */
+  var mc = q.match(/cap(?:itulo)?\s*([a-z0-9]+)/);
+  if(mc){
+    var c = aNumero(mc[1]);
+    if(c && mapa[c-1]) return mapa[c-1].temas[0].i;
+  }
+  /* "tema 5" / "parte 5" / solo un numero */
+  var mt = q.match(/(?:tema|parte|punto|leccion)\s*([a-z0-9]+)/) || q.match(/^([a-z0-9]+)$/);
+  if(mt){
+    var v = aNumero(mt[1]);
+    if(v && v >= 1 && v <= n) return v - 1;
+  }
+  /* por el titulo */
+  var grupos = expandir(q.replace(/^(lee|leer|lea|pon|poner|escuchar|escucha|abre|abrir|ir a|vamos a|dame|quiero)\s+(el|la|los|las)?\s*/,''));
+  if(grupos.length){
+    for(var j = 0; j < n; j++){
+      if(fraseCoincide(normal(libroActual.temas[j].titulo), grupos)) return j;
+    }
+  }
+  return null;
+}
+
+function ejecutarOrden(){
+  var c = $('cmd-q');
+  if(!c) return;
+  var orden = (c.value || '').trim();
+  var aviso = $('cmd-dice');
+  if(!orden){ if(aviso){ aviso.textContent = ''; aviso.className = 'cmd-dice'; } return; }
+  var i = entenderOrden(orden);
+  if(i === null || i < 0){
+    if(aviso){
+      aviso.className = 'cmd-dice malo';
+      aviso.textContent = 'No entendí "' + orden + '". Prueba: "capítulo 3", "tema 7", "3.2" o "el siguiente".';
+    }
+    return;
+  }
+  var p = partesDelTitulo(libroActual.temas[i]);
+  if(aviso){
+    aviso.className = 'cmd-dice';
+    aviso.textContent = '▶ ' + (p.cap ? p.cap + ' · ' : '') + p.sub;
+  }
+  c.value = '';
+  capsAbiertos = null;
+  temaActual = i;
+  inicializarCaps();
+  prepararEscuchar(true);
+  window.scrollTo({ top:0, behavior:'smooth' });
+  pintarPreparar();
+  if(!sonando) setTimeout(playPausa, 240);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    EL BUSCADOR DE VERDAD  (v2.9)
    Busca en el titulo, en el texto y en las frases importantes de cada tema.
    Perdona acentos y mayusculas, entiende raices de palabra y sinonimos,
@@ -2554,6 +2838,20 @@ var MANUAL = [
    l:['Si la app esta abierta y llega una version nueva, sale una franja que dice "Version nueva lista - toca aqui". No se actualiza sola: espera a que tu la toques, para no interrumpirte.',
       'Si te perdiste el letrero, abre el menu (☰) y hasta abajo dice "Version instalada" con el numero exacto que tienes.',
       'La primera vez que instalas la app no sale letrero. Es normal: no habia nada anterior con que comparar.'] },
+ { t:'Capitulos y sub-temas',
+   p:['Si tu libro trae capitulos, la lista los agrupa: tocas el capitulo y se abren sus sub-temas debajo. Tocas otra vez y se cierra.',
+      'En la cabecera de cada capitulo ves cuantos temas tiene, cuantos minutos son y cuantos llevas escuchados.'],
+   l:['Para partir un tema largo: abre el tema con el lapiz ✏️ y toca "✂️ Partir en sub-temas". Escoges el parrafo donde empieza la segunda parte.',
+      'Las frases importantes se reparten solas: cada una se va al pedazo al que pertenece.',
+      'Si un tema no tiene capitulo, aparece suelto en la lista como siempre.'] },
+ { t:'Pedirle que lea un capitulo',
+   p:['Debajo del reproductor hay una caja donde le escribes lo que quieres oir y tocas ▶.'],
+   l:['"lee el capitulo 5" o "capitulo 5" --> empieza por el primer sub-tema de ese capitulo',
+      '"tema 7" --> el tema numero 7 de la lista completa',
+      '"3.2" --> el sub-tema 2 del capitulo 3',
+      '"el siguiente" / "el anterior" / "el ultimo" / "el primero"',
+      '"el pendiente" --> el primero que no has escuchado',
+      'Tambien entiende un pedazo del titulo: "la doble porcion"'] },
  { t:'El boton ? de ayuda',
    p:['El circulo con el signo ? que ves abajo a la derecha abre este manual desde cualquier pantalla. Siempre esta ahi.'] },
  { t:'Agregar un libro', p:['Toca "+ Agregar un libro" y escoge el archivo.'],
@@ -2745,7 +3043,7 @@ var _accionBanner = null;   // que pasa si tocas el letrero
 function versionDeLaApp(){
   return (document.querySelector('meta[name="app-version"]') || {}).content || '';
 }
-/* De "20260823a-EFD-ADMIN-V2.9" saca "V2.9" para que se lea corto. */
+/* De "20260823b-EFD-ADMIN-V3.0" saca "V2.9" para que se lea corto. */
 function versionCorta(v){
   var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
   return m ? m[0].toUpperCase() : (v || '');
