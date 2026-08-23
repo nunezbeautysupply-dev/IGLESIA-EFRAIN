@@ -193,10 +193,19 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
   border:1px solid rgba(169,166,216,.28);color:var(--lavanda);font-size:14.5px;font-weight:700;cursor:pointer}
 .vel.on{background:rgba(212,175,55,.16);border-color:var(--oro);color:var(--oro-suave)}
 #modos-lectura .vel{font-size:11.5px;padding:9px 2px;line-height:1.25}
-.banner-act{position:fixed;top:0;left:0;right:0;z-index:99999;background:#2a2f4a;color:var(--oro-suave);
-  border-bottom:1px solid rgba(212,175,55,.4);text-align:center;font-size:14.5px;font-weight:700;
-  padding:10px 12px;transform:translateY(-100%);transition:transform .35s ease}
+.banner-act{position:fixed;top:0;left:0;right:0;z-index:99999;
+  background:linear-gradient(135deg,var(--oro),#B8952C);color:#1A1204;
+  border-bottom:1px solid rgba(0,0,0,.25);text-align:center;font-size:15.5px;font-weight:700;
+  padding:13px 40px 13px 14px;letter-spacing:.01em;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.45);
+  transform:translateY(-110%);transition:transform .38s cubic-bezier(.2,.9,.3,1.2)}
 .banner-act.mostrar{transform:translateY(0)}
+.banner-act .bx{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:19px;font-weight:700;opacity:.6}
+/* la version, siempre a la vista al final del menu */
+.menu-ver{padding:14px 18px 22px;margin-top:6px;border-top:1px solid var(--linea);
+  font-size:12.5px;color:var(--lavanda);line-height:1.5;letter-spacing:.04em}
+.menu-ver b{color:var(--oro-suave);letter-spacing:.02em}
 .ahora{font-family:var(--serif);font-size:18.5px;color:var(--oro-suave);font-weight:700;
   line-height:1.3;margin-bottom:10px;text-align:center}
 .dice{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--perg);
@@ -301,7 +310,8 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 </script>
 </head>
 <body>
-<div id="banner-actualizada" class="banner-act">La app se actualizó</div>
+<div id="banner-actualizada" class="banner-act" onclick="tocarBanner()"
+     role="status" aria-live="polite"><span id="banner-texto">La app se actualizó</span><span class="bx">✕</span></div>
 <div class="envoltura">
 
   <!-- ══════════ PRIMERA VEZ: CREAR LA CLAVE MAESTRA ══════════ -->
@@ -2539,6 +2549,11 @@ var MANUAL = [
       'Si escribes dos palabras, solo salen las frases que tengan las dos.',
       '📖 Ver te lleva al tema completo. ▶ Escuchar lo pone a sonar de una vez.',
       'La busqueda pasa dentro de tu telefono. No sale nada a internet.'] },
+ { t:'Como saber si la actualizacion llego',
+   p:['Cuando subes una version nueva y abres la app, sale una franja dorada arriba que dice "ACTUALIZADA" con el numero de version, y suena un tono corto. Se va sola a los 8 segundos, o antes si la tocas.'],
+   l:['Si la app esta abierta y llega una version nueva, sale una franja que dice "Version nueva lista - toca aqui". No se actualiza sola: espera a que tu la toques, para no interrumpirte.',
+      'Si te perdiste el letrero, abre el menu (☰) y hasta abajo dice "Version instalada" con el numero exacto que tienes.',
+      'La primera vez que instalas la app no sale letrero. Es normal: no habia nada anterior con que comparar.'] },
  { t:'El boton ? de ayuda',
    p:['El circulo con el signo ? que ves abajo a la derecha abre este manual desde cualquier pantalla. Siempre esta ahi.'] },
  { t:'Agregar un libro', p:['Toca "+ Agregar un libro" y escoge el archivo.'],
@@ -2627,7 +2642,9 @@ function abrirMenu(){
   var hayLibro = !!libroActual;
   var c = '';
   if(hayLibro){
-    c += '<div class="menu-sec">Escuchar</div>'
+    c += '<div class="menu-sec">En este libro</div>'
+      + '<div class="menu-it" onclick="abrirBuscar()"><span class="mi">🔍</span>Buscar en el libro</div>'
+      + '<div class="menu-sec">Escuchar</div>'
       + '<div class="menu-it" onclick="temaDelDia()"><span class="mi">📅</span>Tema del día</div>'
       + '<div class="menu-it" onclick="cerrarMenu();escucharDesdeElPrincipio()"><span class="mi">🔊</span>Escuchar el libro</div>'
       + '<div class="menu-it" onclick="cerrarMenu();abrirVoces()"><span class="mi">🗣️</span>Cambiar la voz</div>'
@@ -2638,7 +2655,6 @@ function abrirMenu(){
       + '<div class="menu-it" onclick="imprimirLibro()"><span class="mi">🖨️</span>Imprimir el libro</div>';
   }
   c += '<div class="menu-sec">Recordatorios</div>'
-    + '<div class="menu-it" onclick="abrirBuscar()"><span class="mi">🔍</span>Buscar en el libro</div>'
     + '<div class="menu-it" onclick="abrirRecordatorio()"><span class="mi">🔔</span>Recordarme estudiar</div>'
     + '<div class="menu-sec">Administrador</div>'
     + '<div class="menu-it" onclick="cerrarMenu();ir(\'p-biblioteca\')"><span class="mi">📚</span>Mis libros</div>'
@@ -2649,7 +2665,8 @@ function abrirMenu(){
     + '<div class="menu-sec">Ayuda</div>'
     + '<div class="menu-it" onclick="abrirManual()"><span class="mi">📘</span>Manual de la app</div>'
     + '<div class="menu-it" onclick="cerrarMenu();explicarSeguridad()"><span class="mi">🛡️</span>Cómo protege tu libro</div>'
-    + '<div class="menu-it" onclick="cerrarMenu();claveMaestra=null;ir(\'p-entrar\')"><span class="mi">🔒</span>Cerrar la app</div>';
+    + '<div class="menu-it" onclick="cerrarMenu();claveMaestra=null;ir(\'p-entrar\')"><span class="mi">🔒</span>Cerrar la app</div>'
+    + '<div class="menu-ver">Versión instalada<br><b>' + esc(versionDeLaApp()) + '</b></div>';
   $('menu-cuerpo').innerHTML = c;
   $('menu').classList.add('abierto');
   $('velo-men').classList.add('abierto');
@@ -2718,24 +2735,86 @@ function sonidoActualizacionEfd(){
   _pitidoEfd(880, 0.14, 0.22, 0.22);
 }
 
+/* ── EL LETRERO DE "YA SE ACTUALIZO" (v2.9) ──────────────────────────────
+   Sale cuando la version que abre es distinta a la ultima que viste.
+   Te dice CUAL version llego, se queda 8 segundos, y se va si la tocas.
+   ─────────────────────────────────────────────────────────────────────── */
+var _relojBanner = null;
+var _accionBanner = null;   // que pasa si tocas el letrero
+
+function versionDeLaApp(){
+  return (document.querySelector('meta[name="app-version"]') || {}).content || '';
+}
+/* De "20260823a-EFD-ADMIN-V2.9" saca "V2.9" para que se lea corto. */
+function versionCorta(v){
+  var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
+  return m ? m[0].toUpperCase() : (v || '');
+}
+function mostrarBannerAct(texto){
+  var b = $('banner-actualizada');
+  if(!b) return;
+  var t = $('banner-texto');
+  if(t) t.textContent = texto;
+  b.classList.add('mostrar');
+  if(_relojBanner) clearTimeout(_relojBanner);
+  /* si el letrero tiene algo que hacer al tocarlo, se queda hasta que lo toques */
+  _relojBanner = _accionBanner ? null : setTimeout(cerrarBannerAct, 8000);
+}
+function cerrarBannerAct(){
+  var b = $('banner-actualizada');
+  if(b) b.classList.remove('mostrar');
+  if(_relojBanner){ clearTimeout(_relojBanner); _relojBanner = null; }
+  _accionBanner = null;
+}
+function tocarBanner(){
+  var f = _accionBanner;
+  cerrarBannerAct();
+  if(f) f();
+}
+
 function revisarSiSeActualizo(){
   var VERSION_GUARDADA = 'efd_version_vista';
-  var actual = (document.querySelector('meta[name="app-version"]') || {}).content || '';
-  var vista = localStorage.getItem(VERSION_GUARDADA);
+  var actual = versionDeLaApp();
+  var vista  = localStorage.getItem(VERSION_GUARDADA);
   if(actual && vista && vista !== actual){
     sonidoActualizacionEfd();
-    var b = $('banner-actualizada');
-    b.classList.add('mostrar');
-    setTimeout(function(){ b.classList.remove('mostrar'); }, 4000);
+    mostrarBannerAct('✅ ACTUALIZADA · ' + versionCorta(actual));
   }
   if(actual) localStorage.setItem(VERSION_GUARDADA, actual);
 }
 
 </script>
 <script>
+/* ── Vigilar si llegó una versión nueva (v2.9) ─────────────────────────────
+   No recarga solo: te avisa con el letrero dorado y TÚ decides cuándo.
+   Así nunca te interrumpe en medio de algo.
+   ───────────────────────────────────────────────────────────────────────── */
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      if(!reg) return;
+      function avisar(sw){
+        if(!sw || !navigator.serviceWorker.controller) return;
+        _accionBanner = function(){
+          try { sw.postMessage({ tipo:'saltar' }); } catch(e){}
+          setTimeout(function(){ location.reload(); }, 260);
+        };
+        mostrarBannerAct('🔄 Versión nueva lista · toca aquí');
+      }
+      if(reg.waiting) avisar(reg.waiting);
+      reg.addEventListener('updatefound', function(){
+        var nuevo = reg.installing;
+        if(!nuevo) return;
+        nuevo.addEventListener('statechange', function(){
+          if(nuevo.state === 'installed') avisar(nuevo);
+        });
+      });
+      try { reg.update(); } catch(e){}
+      /* cada vez que vuelves a la app, revisa si hay algo nuevo */
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden){ try { reg.update(); } catch(e){} }
+      });
+    }).catch(function(){});
   });
 }
 </script>
