@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260823c-EFD-ADMIN-V3.1">
+<meta name="app-version" content="20260823d-EFD-ADMIN-V3.2">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -153,6 +153,13 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
   background:linear-gradient(135deg,var(--oro),#B8952C);color:#1A1204;font-weight:700}
 .cmd-dice{font-size:13px;color:var(--lavanda);margin:-4px 0 10px;line-height:1.45;min-height:1px}
 .cmd-dice.malo{color:var(--rojo)}
+.cap-barra{display:flex;align-items:center;gap:9px;margin:0 0 10px;padding:9px 12px;
+  background:rgba(212,175,55,.07);border:1px solid var(--linea);border-radius:11px;
+  font-size:13px;color:var(--lavanda)}
+.cap-barra button{flex-shrink:0;padding:6px 12px;border:1px solid var(--linea);
+  border-radius:9px;background:transparent;color:var(--oro-suave);font-size:12.5px;
+  font-weight:700;cursor:pointer;font-family:var(--sans)}
+.cap-barra button:active{background:var(--indigo2)}
 
 /* ── BUSCADOR (v2.9) ────────────────────────────────── */
 .busca-abre{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;
@@ -467,6 +474,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <button onclick="ejecutarOrden()" aria-label="Ejecutar la orden">▶</button>
     </div>
     <div class="cmd-dice" id="cmd-dice"></div>
+    <div class="cap-barra" id="prep-capbarra" style="display:none"></div>
     <button class="busca-abre" onclick="abrirBuscar()">
       <span style="font-size:18px">🔍</span><span>Buscar cualquier cosa en este libro...</span></button>
     <div class="chips" id="prep-chips"></div>
@@ -1521,6 +1529,19 @@ function pintarPreparar(){
       + '</div></div>';
   }
 
+  var conCap = mapa.filter(function(g){ return !!g.cap; }).length;
+  var barra = $('prep-capbarra');
+  if(barra){
+    if(conCap >= 2){
+      var abiertos = mapa.filter(function(g){ return g.cap && capsAbiertos[g.num]; }).length;
+      barra.style.display = '';
+      barra.innerHTML = '<span style="flex:1;min-width:0">📕 ' + conCap + ' capítulos · '
+        + libroActual.temas.length + ' temas</span>'
+        + '<button onclick="' + (abiertos >= conCap ? 'cerrarTodosLosCaps()' : 'abrirTodosLosCaps()') + '">'
+        + (abiertos >= conCap ? 'Cerrar todo' : 'Abrir todo') + '</button>';
+    } else barra.style.display = 'none';
+  }
+
   $('prep-temas').innerHTML = mapa.map(function(g){
     var dentro = g.temas.filter(function(x){ return visibles[x.i]; });
     if(!dentro.length) return '';
@@ -1574,6 +1595,8 @@ function verTema(i){
     + '<button class="btn btn-linea btn-chico" style="margin-top:12px" onclick="renombrarTema()">Cambiar el título</button>'
     + (i > 0 ? '<button class="btn btn-linea btn-chico" onclick="unirConAnterior()">Unir con el anterior</button>' : '')
     + ((t.texto||[]).length > 1 ? '<button class="btn btn-linea btn-chico" onclick="abrirPartir()">✂️ Partir en sub-temas</button>' : '')
+    + '<button class="btn btn-linea btn-chico" onclick="abrirMarcarCapitulo()">📑 '
+    + (t.capManual ? 'Capítulo: ' + esc(t.capManual) : 'Aquí empieza un capítulo') + '</button>'
     + '<button class="btn btn-rojo btn-chico" onclick="borrarTema()">Quitar este tema</button>'
     + '</div>';
 
@@ -2433,32 +2456,117 @@ function tarjetasDelLibro(soloDeHoy){
    guardado: asi el archivo sellado y la app de los hermanos siguen igual.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* De "Capitulo III — La doble porcion" saca { cap, sub }. */
-function partesDelTitulo(t){
-  var tit = String(t && t.titulo || '');
-  if(t && t.cap) return { cap: t.cap, sub: t.sub || tit };
-  var m = tit.match(/^\s*(Cap[ií]tulo\s+[^\u2014\u2013-]{1,40}?)\s*[\u2014\u2013]\s*(.+)$/i);
-  if(m) return { cap: m[1].trim(), sub: m[2].trim() };
-  m = tit.match(/^\s*(Parte\s+[^\u2014\u2013-]{1,30}?)\s*[\u2014\u2013]\s*(.+)$/i);
-  if(m) return { cap: m[1].trim(), sub: m[2].trim() };
-  return { cap: null, sub: tit };
+/* ── ¿Este titulo ABRE un capitulo? ───────────────────────────────────────
+   No se busca ninguna palabra ("Capitulo", "Trueno", "Develacion"...), porque
+   cambian de libro en libro. Lo que se busca es la marca que pone la app al
+   importar: el nombre del capitulo, un guion largo, y el nombre del tema.
+
+        "TRUENO 1 — El hombre, embrion de angel"
+         └─ cap ─┘   └────── sub ──────────────┘
+
+   Ese tema abre el capitulo. Los que vienen despues SIN guion largo son suyos,
+   hasta que aparezca otro con guion. Si tu lo marcaste a mano (campo .cap),
+   eso manda por encima de todo.
+   ───────────────────────────────────────────────────────────────────────── */
+function abreCapitulo(t){
+  if(t && t.capManual) return { cap: t.capManual, sub: t.sub || String(t.titulo || '') };
+  if(t && t.cap)       return { cap: t.cap,       sub: t.sub || String(t.titulo || '') };
+  var tit = String(t && t.titulo || '').trim();
+  var m = tit.match(/^([^\u2014\u2013]{1,70}?)\s*[\u2014\u2013]\s*(.+)$/);
+  if(!m) return null;
+  var izq = m[1].trim(), der = m[2].trim();
+  /* la parte de la izquierda tiene que parecer un encabezado, no media frase */
+  if(!izq || !der) return null;
+  if(/[.?!;:,]$/.test(izq)) return null;
+  if(izq.split(/\s+/).length > 8) return null;
+  return { cap: izq, sub: der };
 }
 
-/* Arma el mapa del libro: que capitulos hay y que temas tiene cada uno. */
+/* Para pintar un tema: de que capitulo es y como se llama el tema solo. */
+function partesDelTitulo(t){
+  var a = abreCapitulo(t);
+  if(a) return a;
+  return { cap: null, sub: String(t && t.titulo || '') };
+}
+
+/* ── Arma el mapa del libro ───────────────────────────────────────────────
+   Recorre los temas en orden. Cada vez que uno ABRE capitulo, empieza un
+   grupo nuevo; los siguientes se van metiendo ahi hasta el proximo.
+   ───────────────────────────────────────────────────────────────────────── */
 function mapaDelLibro(){
   if(!libroActual) return [];
-  var grupos = [], ultimo = null;
+  var grupos = [], actual = null;
   libroActual.temas.forEach(function(t, i){
-    var p = partesDelTitulo(t);
-    if(p.cap && ultimo && ultimo.cap === p.cap){
-      ultimo.temas.push({ i:i, t:t, sub:p.sub });
+    var a = abreCapitulo(t);
+    if(a){
+      /* Hay libros donde el capitulo va delante de CADA tema ("Capitulo I — X",
+         "Capitulo I — Y") y otros donde va solo delante del primero. Si el
+         nombre es el mismo que el del grupo abierto, se une a el en vez de
+         abrir uno nuevo: asi funcionan los dos casos. */
+      if(actual && actual.cap === a.cap){
+        actual.temas.push({ i:i, t:t, sub:a.sub });
+      } else {
+        actual = { cap: a.cap, temas: [] };
+        grupos.push(actual);
+        actual.temas.push({ i:i, t:t, sub:a.sub });
+      }
+    } else if(actual){
+      actual.temas.push({ i:i, t:t, sub: String(t.titulo || '') });
     } else {
-      ultimo = { cap:p.cap, temas:[{ i:i, t:t, sub:p.sub }] };
-      grupos.push(ultimo);
+      /* temas sueltos antes del primer capitulo: prologo, introduccion... */
+      grupos.push({ cap: null, temas: [{ i:i, t:t, sub: String(t.titulo || '') }] });
     }
   });
-  grupos.forEach(function(g, n){ g.num = n + 1; });
+  /* g.num identifica al grupo en la pantalla; g.capNum solo cuenta los
+     capitulos de verdad, para que "capitulo 3" sea el tercer capitulo y no
+     el tercer grupo (el prologo y la introduccion no son capitulos). */
+  var c = 0;
+  grupos.forEach(function(g, n){
+    g.num = n + 1;
+    g.capNum = g.cap ? ++c : 0;
+  });
   return grupos;
+}
+
+/* ── Marcar a mano donde empieza un capitulo ── */
+function abrirMarcarCapitulo(){
+  var t = libroActual.temas[temaActual];
+  var a = abreCapitulo(t);
+  var actual = t.capManual || (a ? a.cap : '');
+  modal('<h2>¿Aquí empieza un capítulo?</h2>'
+    + '<p style="font-size:15.5px;line-height:1.55;color:var(--lavanda);margin:0 0 12px">'
+    + 'Escribe el nombre del capítulo. Este tema y todos los que le siguen quedan '
+    + 'bajo ese nombre, hasta el próximo capítulo que marques.</p>'
+    + '<input class="campo" id="cap-nombre" type="text" placeholder="Ej: TRUENO 3" '
+    + 'value="' + esc(actual) + '" style="margin-bottom:12px">'
+    + '<button class="btn btn-oro" onclick="guardarCapitulo()">Guardar</button>'
+    + (t.capManual ? '<button class="btn btn-linea" onclick="quitarCapitulo()">Quitar la marca</button>' : '')
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>');
+  setTimeout(function(){ var c = $('cap-nombre'); if(c) c.focus(); }, 120);
+}
+async function guardarCapitulo(){
+  var c = $('cap-nombre');
+  var nombre = c ? c.value.trim() : '';
+  if(!nombre) return decir('Falta el nombre', 'Escribe cómo se llama el capítulo.');
+  var t = libroActual.temas[temaActual];
+  var a = abreCapitulo(t);
+  t.capManual = nombre;
+  if(!t.sub) t.sub = a ? a.sub : String(t.titulo || '');
+  libroActual.sellado = null;
+  await guardarLibro(libroActual);
+  cerrarModal();
+  capsAbiertos = null;
+  verTema(temaActual);
+  decir('Listo', 'Desde aquí empieza <b>' + esc(nombre) + '</b>.');
+}
+async function quitarCapitulo(){
+  var t = libroActual.temas[temaActual];
+  delete t.capManual;
+  libroActual.sellado = null;
+  await guardarLibro(libroActual);
+  cerrarModal();
+  capsAbiertos = null;
+  verTema(temaActual);
 }
 
 /* Que capitulos estan desplegados. Por defecto, solo donde estas parado. */
@@ -2480,6 +2588,10 @@ function alternarCap(n){
 function abrirTodosLosCaps(){
   capsAbiertos = {};
   mapaDelLibro().forEach(function(g){ capsAbiertos[g.num] = 1; });
+  pintarPreparar();
+}
+function cerrarTodosLosCaps(){
+  capsAbiertos = {};
   pintarPreparar();
 }
 
@@ -2724,11 +2836,39 @@ function entenderOrden(orden){
   if(!q || !libroActual || !libroActual.temas.length) return null;
   var mapa = mapaDelLibro(), n = libroActual.temas.length;
 
+  var caps = mapa.filter(function(g){ return !!g.cap; });
+  function porNumero(k){ return caps[k - 1] || null; }
+
   /* "3.2" = capitulo 3, sub-tema 2 */
   var mp = q.match(/(\d+)\s*[.\-]\s*(\d+)/);
   if(mp){
-    var g = mapa[parseInt(mp[1],10) - 1];
+    var g = porNumero(parseInt(mp[1],10));
     if(g){ var x = g.temas[parseInt(mp[2],10) - 1]; if(x) return x.i; }
+  }
+
+  /* Por el NOMBRE del capitulo: "trueno 2", "develacion 5", "lee el trueno 2".
+     Funciona con cualquier palabra, porque compara contra los nombres que tiene
+     ESTE libro, no contra una lista fija. */
+  var limpia = q.replace(/^(lee|leer|lea|pon|poner|escuchar|escucha|abre|abrir|ir a|vamos a|dame|quiero|ponme)\s+/,'')
+                .replace(/^(el|la|los|las)\s+/,'').trim();
+  if(limpia){
+    for(var ci = 0; ci < caps.length; ci++){
+      var nc = normal(caps[ci].cap);
+      if(nc === limpia || nc.indexOf(limpia) === 0) return caps[ci].temas[0].i;
+    }
+    /* "trueno dos" -> "trueno 2" */
+    var mn = limpia.match(/^(.+?)\s+([a-z0-9]+)$/);
+    if(mn){
+      var num = aNumero(mn[2]);
+      if(num){
+        var base = mn[1];
+        for(var cj = 0; cj < caps.length; cj++){
+          var nn = normal(caps[cj].cap);
+          if(nn.indexOf(base) === 0 && aNumero((nn.split(/\s+/).pop() || '')) === num)
+            return caps[cj].temas[0].i;
+        }
+      }
+    }
   }
   /* palabras sueltas */
   if(/\b(siguiente|proximo|proxima|que sigue)\b/.test(q))
@@ -2740,11 +2880,11 @@ function entenderOrden(orden){
     for(var k = 0; k < n; k++) if(!esHecho(k)) return k;
     return 0;
   }
-  /* "capitulo 5" */
+  /* "capitulo 5" — cuenta solo los capitulos de verdad */
   var mc = q.match(/cap(?:itulo)?\s*([a-z0-9]+)/);
   if(mc){
-    var c = aNumero(mc[1]);
-    if(c && mapa[c-1]) return mapa[c-1].temas[0].i;
+    var c = aNumero(mc[1]), g2 = c ? porNumero(c) : null;
+    if(g2) return g2.temas[0].i;
   }
   /* "tema 5" / "parte 5" / solo un numero */
   var mt = q.match(/(?:tema|parte|punto|leccion)\s*([a-z0-9]+)/) || q.match(/^([a-z0-9]+)$/);
@@ -3237,7 +3377,8 @@ var MANUAL = [
       'Si un tema no tiene capitulo, aparece suelto en la lista como siempre.'] },
  { t:'Pedirle que lea un capitulo',
    p:['Debajo del reproductor hay una caja donde le escribes lo que quieres oir y tocas ▶.'],
-   l:['"lee el capitulo 5" o "capitulo 5" --> empieza por el primer sub-tema de ese capitulo',
+   l:['"lee el capitulo 5" o "capitulo 5" --> empieza por ese capitulo',
+      'POR EL NOMBRE DEL CAPITULO: "trueno 2", "develacion 5", "lee el trueno dos". Reconoce los nombres que tiene TU libro, sea cual sea la palabra.',
       '"tema 7" --> el tema numero 7 de la lista completa',
       '"3.2" --> el sub-tema 2 del capitulo 3',
       '"el siguiente" / "el anterior" / "el ultimo" / "el primero"',
@@ -3464,7 +3605,7 @@ var _accionBanner = null;   // que pasa si tocas el letrero
 function versionDeLaApp(){
   return (document.querySelector('meta[name="app-version"]') || {}).content || '';
 }
-/* De "20260823c-EFD-ADMIN-V3.1" saca "V2.9" para que se lea corto. */
+/* De "20260823d-EFD-ADMIN-V3.2" saca "V2.9" para que se lea corto. */
 function versionCorta(v){
   var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
   return m ? m[0].toUpperCase() : (v || '');
