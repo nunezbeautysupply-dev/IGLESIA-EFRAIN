@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260823e-EFD-ADMIN-V3.3">
+<meta name="app-version" content="20260824a-EFD-ADMIN-V3.4">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -767,6 +767,7 @@ async function leerDocx(buf){
     if(mt) nivel = parseInt(mt[1]);
     // recorrer los pedazos de texto y ver cuales van resaltados
     var linea = '', marcados = [], r, re = /<w:r[ >][\s\S]*?<\/w:r>/g;
+    var letrasNegrita = 0, letrasTotal = 0;
     while((r = re.exec(p))){
       var run = r[0];
       var props = (run.match(/<w:rPr>[\s\S]*?<\/w:rPr>/) || [''])[0];
@@ -778,10 +779,18 @@ async function leerDocx(buf){
       if(/<w:tab\/>/.test(run)) t = ' ' + t;
       if(!t) continue;
       if((negrita || subray || resalte) && t.trim().length > 3) marcados.push(t.trim());
+      /* Cuanto de la linea va resaltado. Esto es lo que distingue un TITULO
+         (la linea entera en negrita) de una palabra resaltada dentro de un
+         parrafo (solo un pedazo). Buscar y Reemplazar de Word no ve esto. */
+      var soloLetras = t.replace(/\s/g,'').length;
+      letrasTotal += soloLetras;
+      if(negrita || subray) letrasNegrita += soloLetras;
       linea += t;
     }
     linea = linea.replace(/\s+/g,' ').trim();
-    if(linea || esTitulo) parrafos.push({ txt:linea, titulo:esTitulo, nivel:nivel, marcados:marcados });
+    var negritaTotal = letrasTotal > 0 && (letrasNegrita / letrasTotal) > 0.92;
+    if(linea || esTitulo) parrafos.push({ txt:linea, titulo:esTitulo, nivel:nivel,
+                                          marcados:marcados, todaNegrita:negritaTotal });
   }
   if(!parrafos.length) throw new Error('Ese Word no trae texto.');
   return parrafos;
@@ -1105,18 +1114,69 @@ function partirEnTemas(parrafos){
   var conEstilo = parrafos.filter(function(p){ return p.titulo; });
   var hayEstilos = conEstilo.length >= 5;
 
-  /* El nivel mas alto que se use de verdad es el de los capitulos. */
   var nivelCap = 0;
+
+  /* ── ¿Es un SUB-TITULO aunque el Word no lo diga? ──────────────────────
+     Caso real: un libro donde solo los capitulos estan marcados como Titulo 1
+     y los temas de adentro quedaron en "Normal", pero escritos en negrita.
+     No basta con "esta en negrita": dentro de los parrafos hay frases
+     resaltadas que NO son titulos. Un titulo de verdad cumple TODO esto:
+        · la linea ENTERA va en negrita (no un pedazo)
+        · es corta
+        · no termina en punto ni en coma
+        · no es una cita biblica
+        · y lo que viene despues es un parrafo largo de texto normal
+     ───────────────────────────────────────────────────────────────────── */
+  function pareceSubtitulo(p, sig){
+    if(!p || p.titulo) return false;
+    var t = (p.txt || '').trim();
+    if(!t || t.length > 90) return false;
+    if(!p.todaNegrita) return false;                    // negrita a medias = no
+    if(/[.,;]$/.test(t)) return false;                  // termina en punto = frase
+    if(!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(t)) return false;
+    if(t.split(/\s+/).length > 14) return false;        // demasiado largo
+    /* una cita biblica suelta no es un titulo */
+    if(new RegExp(RE_VERSICULO.source).test(t) && t.length < 40) return false;
+    /* lo que sigue tiene que ser texto de verdad, no otra linea en negrita */
+    if(!sig) return false;
+    var st = (sig.txt || '').trim();
+    if(sig.todaNegrita && st.length < 90) return false;  // dos titulos seguidos, sospechoso
+    return st.length > 90;
+  }
+
+  /* ── Decidir la estructura del libro ────────────────────────────────────
+     Hay dos formas de que un Word traiga capitulos:
+       CASO 1: usa DOS niveles de titulo — Titulo 1 = capitulo, Titulo 2 = tema
+       CASO 2: usa SOLO Titulo 1 para los capitulos, y los temas de adentro
+               quedaron en "Normal" pero escritos en negrita  ← el caso de
+               "El hombre, embrion de angel"
+     ───────────────────────────────────────────────────────────────────── */
+  var subtitulosVistos = 0;
+  if(hayEstilos){
+    for(var k = 0; k < parrafos.length; k++){
+      if(pareceSubtitulo(parrafos[k], parrafos[k+1])) subtitulosVistos++;
+    }
+  }
+  var usarNegrita = false;
   if(hayEstilos){
     var niveles = {};
     conEstilo.forEach(function(p){ if(p.nivel) niveles[p.nivel] = (niveles[p.nivel] || 0) + 1; });
     var usados = Object.keys(niveles).map(Number).sort(function(a,b){ return a - b; });
-    /* solo hay capitulos si hay DOS niveles distintos y el de arriba se repite poco */
-    if(usados.length >= 2 && niveles[usados[0]] >= 2) nivelCap = usados[0];
+    if(usados.length >= 2 && niveles[usados[0]] >= 2){
+      nivelCap = usados[0];                     // CASO 1
+      usarNegrita = subtitulosVistos >= 5;      // y si tambien hay negritas, mejor
+    } else if(usados.length === 1 && subtitulosVistos >= 5){
+      nivelCap = usados[0];                     // CASO 2
+      usarNegrita = true;
+    }
   }
 
   function esTitulo(p, sig){
-    if(hayEstilos) return !!p.titulo;
+    if(hayEstilos){
+      if(p.titulo) return true;
+      if(usarNegrita && pareceSubtitulo(p, sig)) return true;
+      return false;
+    }
     return pareceTitulo(p, sig);
   }
 
@@ -1163,7 +1223,8 @@ function partirEnTemas(parrafos){
     delete t.cap;
   });
 
-  ultimaLimpieza = { botadas: botadas, porEstilo: hayEstilos, capitulos: !!nivelCap };
+  ultimaLimpieza = { botadas: botadas, porEstilo: hayEstilos, capitulos: !!nivelCap,
+                     porNegrita: usarNegrita ? subtitulosVistos : 0 };
 
   // Si el libro no traia titulos claros, se parte por tamaño para que sea
   // manejable: pedazos de unas 700 palabras, cortando en un parrafo completo.
@@ -1571,6 +1632,10 @@ async function leerArchivo(input){
       + (lim.porEstilo
           ? '📑 Usé los <b>títulos del Word</b> para armarlo'
             + (lim.capitulos ? ', y los de nivel 1 como capítulos.' : '.') + '<br>'
+          : '')
+      + (lim.porNegrita
+          ? '🅱️ Además encontré <b>' + lim.porNegrita + ' temas escritos en negrita</b> '
+            + 'dentro de los capítulos y los separé.<br>'
           : '')
       + (lim.botadas
           ? '🧹 Dejé fuera <b>' + lim.botadas + ' líneas</b> que no son contenido: '
@@ -3540,6 +3605,11 @@ var MANUAL = [
       'Si el Word trae titulos de verdad, la app ignora la regla vieja de "esta en mayusculas, sera un titulo". Esa regla metia el ISBN y las lineas del indice como si fueran temas.',
       'Si tu Word no tiene titulos con estilo, la app se guia por las mayusculas como antes.',
       'Para poner titulos en Word: selecciona la linea y en la pestaña Inicio escoge "Titulo 1" o "Titulo 2".'] },
+ { t:'Si tu Word solo tiene los capitulos marcados',
+   p:['Pasa mucho: los capitulos estan como "Titulo 1" pero los temas de adentro quedaron en "Normal", escritos en negrita. La app los separa igual, sin que tengas que tocar el Word.'],
+   l:['Para saber si una linea en negrita es un titulo o solo una frase resaltada, la app mira que la negrita cubra la LINEA COMPLETA, que sea corta, que no termine en punto, que no sea una cita biblica, y que despues venga un parrafo largo.',
+      'Por eso NO confundas esto con Buscar y Reemplazar de Word: esa herramienta no puede ver si la negrita cubre toda la linea o solo un pedazo, y convierte en titulo cada palabra resaltada del libro.',
+      'Si algun tema queda mal cortado, en la app tienes "✂️ Partir en sub-temas" y "Unir con el anterior".'] },
  { t:'La basura que la app bota sola',
    p:['Al importar, la app deja fuera lo que no es contenido del libro, y te dice cuantas lineas boto.'],
    l:['Lineas del indice, esas que llevan puntitos y el numero de pagina al final',
@@ -3779,7 +3849,7 @@ var _accionBanner = null;   // que pasa si tocas el letrero
 function versionDeLaApp(){
   return (document.querySelector('meta[name="app-version"]') || {}).content || '';
 }
-/* De "20260823e-EFD-ADMIN-V3.3" saca "V2.9" para que se lea corto. */
+/* De "20260824a-EFD-ADMIN-V3.4" saca "V2.9" para que se lea corto. */
 function versionCorta(v){
   var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
   return m ? m[0].toUpperCase() : (v || '');
