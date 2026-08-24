@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260823d-EFD-ADMIN-V3.2">
+<meta name="app-version" content="20260823e-EFD-ADMIN-V3.3">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -971,6 +971,61 @@ var RE_CAPITULO = /^\s*(cap[ií]tulo|tema|lecci[oó]n|parte|secci[oó]n|estudio)
 var RE_SOLO_NUM = /^\s*([0-9]{1,3}|[IVXLCDM]{1,7})\s*[.\-:]?\s*(.{0,70})$/;
 var RE_VERSICULO = /\b([1-3]\s?)?[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,}\.?\s+\d{1,3}\s*[:,]\s*\d{1,3}(\s*[-–]\s*\d{1,3})?\b/g;
 
+/* ─────────────────────── BASURA DE LIBRO ───────────────────────
+   Lo que un libro trae y NO es contenido: lineas del indice con puntitos y
+   numero de pagina, ISBN, numeros de pagina sueltos, "Pagina 12 de 340".
+   Esto entraba como temas y ensuciaba la lista, el buscador y los minutos. */
+function esBasura(txt){
+  var t = String(txt || '').trim();
+  if(!t) return true;
+  /* linea de indice: "EL MISTERIO DE LA TRINIDAD ........... 69" */
+  if(/[.·]{4,}\s*\d{1,4}\s*$/.test(t)) return true;
+  /* lo mismo pero con espacios en vez de puntos y titulo en mayusculas */
+  if(/^[^a-z]{6,}\s{3,}\d{1,4}\s*$/.test(t)) return true;
+  if(/^ISBN\b/i.test(t)) return true;
+  if(/^(p[aá]g(ina)?\.?\s*)?\d{1,4}\s*(de\s*\d{1,4})?$/i.test(t)) return true;
+  if(/^\d{1,4}\s*\|\s*P\s*[aá]\s*g/i.test(t)) return true;
+  /* solo puntos, guiones o simbolos */
+  if(!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(t)) return true;
+  return false;
+}
+
+/* Quita de un texto la cola de puntitos y el numero de pagina, si quedo pegada. */
+function limpiarCola(txt){
+  return String(txt || '').replace(/\s*[.·]{4,}\s*\d{1,4}\s*$/, '').trim();
+}
+
+/* ─────────────────────── LA SECCION "INDICE" ───────────────────────
+   Un indice entero puede entrar como un tema de 48 parrafos. Se detecta por lo
+   que es: un titulo que dice INDICE/CONTENIDO seguido de muchas lineas de
+   indice. Se corta desde ahi hasta que vuelva a haber texto de verdad. */
+function quitarElIndice(parrafos){
+  var fuera = [], i = 0, quitadas = 0;
+  while(i < parrafos.length){
+    var t = (parrafos[i].txt || '').trim();
+    if(/^(indice|[ií]ndice|contenido|tabla de contenido|contenidos)\b/i.test(t) && t.length < 40){
+      /* mirar las 12 siguientes: si la mayoria son lineas de indice, es el indice */
+      var mira = 0, sonIndice = 0;
+      for(var k = i + 1; k < parrafos.length && mira < 12; k++, mira++){
+        if(esBasura(parrafos[k].txt)) sonIndice++;
+      }
+      if(mira >= 4 && sonIndice / mira > 0.5){
+        i++; quitadas++;
+        /* saltar todo lo que siga pareciendo indice */
+        var seguidas = 0;
+        while(i < parrafos.length && seguidas < 4){
+          if(esBasura(parrafos[i].txt)){ seguidas = 0; quitadas++; i++; }
+          else { seguidas++; i++; quitadas++; }
+        }
+        i -= seguidas; quitadas -= seguidas;
+        continue;
+      }
+    }
+    fuera.push(parrafos[i]); i++;
+  }
+  return { parrafos: fuera, quitadas: quitadas };
+}
+
 function pareceTitulo(p, siguiente){
   var t = (p.txt||'').trim();
   if(!t) return false;
@@ -1026,22 +1081,89 @@ function detectarImportante(parrafos){
   return limpio.slice(0, 14);
 }
 
+var ultimaLimpieza = null;   // para poder contarle al usuario que se boto
+
 function partirEnTemas(parrafos){
   var temas = [], actual = null, i;
+
+  /* ── 1. Sacar el indice y la basura ─────────────────────────────────── */
+  var sinIndice = quitarElIndice(parrafos);
+  var botadas = sinIndice.quitadas;
+  parrafos = sinIndice.parrafos.filter(function(p){
+    if(esBasura(p.txt) && !p.titulo){ botadas++; return false; }
+    return true;
+  }).map(function(p){
+    var limpio = limpiarCola(p.txt);
+    if(limpio !== p.txt) p = { txt:limpio, titulo:p.titulo, nivel:p.nivel, marcados:p.marcados };
+    return p;
+  }).filter(function(p){ return (p.txt || '').trim(); });
+
+  /* ── 2. ¿El Word trae titulos de verdad? ────────────────────────────────
+     Si el documento tiene titulos con estilo (Titulo 1, Titulo 2...), esos
+     mandan y se ignora la regla de "esta en mayusculas, sera un titulo".
+     Esa regla es la que metia el ISBN y las lineas del indice como temas. */
+  var conEstilo = parrafos.filter(function(p){ return p.titulo; });
+  var hayEstilos = conEstilo.length >= 5;
+
+  /* El nivel mas alto que se use de verdad es el de los capitulos. */
+  var nivelCap = 0;
+  if(hayEstilos){
+    var niveles = {};
+    conEstilo.forEach(function(p){ if(p.nivel) niveles[p.nivel] = (niveles[p.nivel] || 0) + 1; });
+    var usados = Object.keys(niveles).map(Number).sort(function(a,b){ return a - b; });
+    /* solo hay capitulos si hay DOS niveles distintos y el de arriba se repite poco */
+    if(usados.length >= 2 && niveles[usados[0]] >= 2) nivelCap = usados[0];
+  }
+
+  function esTitulo(p, sig){
+    if(hayEstilos) return !!p.titulo;
+    return pareceTitulo(p, sig);
+  }
+
+  /* ── 3. Recorrer y armar los temas ──────────────────────────────────── */
+  var capActual = null;
   for(i = 0; i < parrafos.length; i++){
     var p = parrafos[i];
-    if(pareceTitulo(p, parrafos[i+1])){
-      if(actual && actual.parrafos.length) temas.push(actual);
+    if(esTitulo(p, parrafos[i+1])){
       var tit = (p.txt || '').trim();
+      /* ¿es un CAPITULO? entonces no abre tema: abre grupo */
+      if(nivelCap && p.nivel === nivelCap){
+        if(actual && actual.parrafos.length) temas.push(actual);
+        actual = null;
+        capActual = tit;
+        continue;
+      }
+      if(actual && actual.parrafos.length) temas.push(actual);
       var mc = tit.match(RE_CAPITULO);
       if(mc && mc[3] && mc[3].trim()) tit = mc[3].trim();
-      actual = { titulo: tit || ('Tema ' + (temas.length + 1)), parrafos: [] };
+      actual = { titulo: tit || ('Tema ' + (temas.length + 1)), parrafos: [], cap: capActual };
     } else {
-      if(!actual) actual = { titulo:'Introducción', parrafos:[] };
+      if(!actual) actual = { titulo:'Introducción', parrafos:[], cap: capActual };
       if((p.txt||'').trim()) actual.parrafos.push(p);
     }
   }
   if(actual && actual.parrafos.length) temas.push(actual);
+
+  /* ── 4. El nombre del capitulo va delante del primero de cada tanda ────
+     Asi la lista lo agrupa sola, y la app de los hermanos sigue viendo el
+     titulo completo como siempre. */
+  var cuantosPorCap = {};
+  temas.forEach(function(t){ if(t.cap) cuantosPorCap[t.cap] = (cuantosPorCap[t.cap] || 0) + 1; });
+  var capPuesto = null;
+  temas.forEach(function(t){
+    if(!t.cap){ delete t.cap; return; }
+    /* Un capitulo con texto suelto y sin sub-titulo (un prologo, por ejemplo):
+       se llama como el capitulo, sin repetir el nombre dos veces. */
+    if(cuantosPorCap[t.cap] === 1 && /^(Introducci[oó]n|Tema \d+)$/.test(t.titulo)){
+      t.titulo = t.cap;
+    } else if(t.cap !== capPuesto){
+      t.titulo = t.cap + ' \u2014 ' + t.titulo;
+      capPuesto = t.cap;
+    }
+    delete t.cap;
+  });
+
+  ultimaLimpieza = { botadas: botadas, porEstilo: hayEstilos, capitulos: !!nivelCap };
 
   // Si el libro no traia titulos claros, se parte por tamaño para que sea
   // manejable: pedazos de unas 700 palabras, cortando en un parrafo completo.
@@ -1121,7 +1243,7 @@ function ir(p){
   }
   var fa = $('ayuda-flota');
   if(fa) fa.classList.toggle('se-ve', p !== 'p-inicial' && p !== 'p-entrar');
-  if(p === 'p-biblioteca'){ libroActual = null; capsAbiertos = null; pintarBiblioteca(); }
+  if(p === 'p-biblioteca'){ libroActual = null; capsAbiertos = null; cuantosSeVen = 20; pintarBiblioteca(); }
   if(p === 'p-usuarios')   pintarUsuarios();
   if(p === 'p-preparar')   pintarPreparar();
   if(p === 'p-entrar'){
@@ -1436,10 +1558,27 @@ async function leerArchivo(input){
     libroActual = libro;
     cerrarModal();
     var conMarcas = temas.reduce(function(s,t){ return s + t.importante.length; }, 0);
+    var lim = ultimaLimpieza || {};
+    var caps = 0, visto = {};
+    temas.forEach(function(t){
+      var a = abreCapitulo(t);
+      if(a && !visto[a.cap]){ visto[a.cap] = 1; caps++; }
+    });
     decir('Libro agregado',
-      'Encontré <b>' + temas.length + ' temas</b> y marqué <b>' + conMarcas + ' frases importantes</b>.<br><br>'
-      + 'Ahora revísalo: puedes cambiar los títulos, unir temas, partirlos, y quitar o agregar '
-      + 'lo que quieras marcar como importante. <b>Tú mandas</b> — la app solo hizo el primer trabajo.',
+      'Encontré <b>' + temas.length + ' temas</b>'
+      + (caps ? ' repartidos en <b>' + caps + ' capítulos</b>' : '')
+      + ' y marqué <b>' + conMarcas + ' frases importantes</b>.<br><br>'
+      + (lim.porEstilo
+          ? '📑 Usé los <b>títulos del Word</b> para armarlo'
+            + (lim.capitulos ? ', y los de nivel 1 como capítulos.' : '.') + '<br>'
+          : '')
+      + (lim.botadas
+          ? '🧹 Dejé fuera <b>' + lim.botadas + ' líneas</b> que no son contenido: '
+            + 'el índice, números de página, ISBN y códigos.<br>'
+          : '')
+      + '<br>Ahora revísalo: puedes cambiar los títulos, unir temas, partirlos, marcar dónde '
+      + 'empieza un capítulo, y quitar o agregar lo importante. <b>Tú mandas</b> — la app solo '
+      + 'hizo el primer trabajo.',
       function(){ ir('p-preparar'); });
   }catch(e){
     cerrarModal();
@@ -1511,6 +1650,15 @@ function pintarPreparar(){
   var filtrando = !!q || filtro !== 'todos';
   var mapa = mapaDelLibro();
 
+  /* Con libros de 100+ temas la lista se hace interminable. Se muestran de 20
+     en 20, con un boton al final. Al buscar o filtrar se muestran todos. */
+  if(typeof cuantosSeVen === 'undefined' || cuantosSeVen == null) cuantosSeVen = 20;
+  var limitando = !filtrando && salen.length > cuantosSeVen;
+  if(limitando){
+    visibles = {};
+    salen.slice(0, cuantosSeVen).forEach(function(x){ visibles[x.i] = 1; });
+  }
+
   function pintarUnTema(i, subNum){
     var t = libroActual.temas[i], nota = notaDe(i);
     var p = partesDelTitulo(t);
@@ -1566,7 +1714,17 @@ function pintarPreparar(){
         }).join('')
       + '</div>';
   }).join('');
+
+  if(limitando){
+    var faltan = salen.length - cuantosSeVen;
+    $('prep-temas').innerHTML += '<button class="btn btn-linea" style="margin-top:4px" '
+      + 'onclick="verMasTemas()">Mostrar 20 más &nbsp;·&nbsp; '
+      + '<span style="color:var(--lavanda);font-weight:400">van ' + cuantosSeVen
+      + ' de ' + salen.length + '</span></button>';
+  }
 }
+var cuantosSeVen = 20;
+function verMasTemas(){ cuantosSeVen += 20; pintarPreparar(); }
 function renombrarLibro(){
   pedirTexto('Nombre del libro', 'Como quieres que se llame', libroActual.titulo, async function(v){
     if(!v) return errorEn('merr','Ponle un nombre.');
@@ -3375,6 +3533,22 @@ var MANUAL = [
    l:['Para partir un tema largo: abre el tema con el lapiz ✏️ y toca "✂️ Partir en sub-temas". Escoges el parrafo donde empieza la segunda parte.',
       'Las frases importantes se reparten solas: cada una se va al pedazo al que pertenece.',
       'Si un tema no tiene capitulo, aparece suelto en la lista como siempre.'] },
+ { t:'Como leer bien un libro de Word',
+   p:['La app usa los TITULOS del Word para armar el libro. Si tu documento tiene titulos con estilo (Titulo 1, Titulo 2), los usa y hace un trabajo mucho mejor.'],
+   l:['TITULO 1 --> capitulo (TRUENO 1, DEVELACION 3...)',
+      'TITULO 2 --> tema dentro de ese capitulo',
+      'Si el Word trae titulos de verdad, la app ignora la regla vieja de "esta en mayusculas, sera un titulo". Esa regla metia el ISBN y las lineas del indice como si fueran temas.',
+      'Si tu Word no tiene titulos con estilo, la app se guia por las mayusculas como antes.',
+      'Para poner titulos en Word: selecciona la linea y en la pestaña Inicio escoge "Titulo 1" o "Titulo 2".'] },
+ { t:'La basura que la app bota sola',
+   p:['Al importar, la app deja fuera lo que no es contenido del libro, y te dice cuantas lineas boto.'],
+   l:['Lineas del indice, esas que llevan puntitos y el numero de pagina al final',
+      'La seccion INDICE completa',
+      'ISBN y codigos',
+      'Numeros de pagina sueltos y "142 | Pagina"'] },
+ { t:'Libros con muchos temas',
+   p:['Si un libro tiene mas de 20 temas, la lista los muestra de 20 en 20 con un boton "Mostrar 20 mas" al final. Asi no tienes que bajar sin parar.',
+      'Cuando buscas o filtras, se muestran todos los que coinciden.'] },
  { t:'Pedirle que lea un capitulo',
    p:['Debajo del reproductor hay una caja donde le escribes lo que quieres oir y tocas ▶.'],
    l:['"lee el capitulo 5" o "capitulo 5" --> empieza por ese capitulo',
@@ -3605,7 +3779,7 @@ var _accionBanner = null;   // que pasa si tocas el letrero
 function versionDeLaApp(){
   return (document.querySelector('meta[name="app-version"]') || {}).content || '';
 }
-/* De "20260823d-EFD-ADMIN-V3.2" saca "V2.9" para que se lea corto. */
+/* De "20260823e-EFD-ADMIN-V3.3" saca "V2.9" para que se lea corto. */
 function versionCorta(v){
   var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
   return m ? m[0].toUpperCase() : (v || '');
