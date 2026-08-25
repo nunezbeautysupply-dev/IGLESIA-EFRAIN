@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260824b-EFD-ADMIN-V3.5">
+<meta name="app-version" content="20260825a-EFD-ADMIN-V3.6">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -181,6 +181,13 @@ textarea.campo{min-height:130px;font-family:var(--serif);font-size:17px;line-hei
 .res-oir{background:linear-gradient(135deg,var(--oro),#B8952C);color:#1A1204}
 .res-mas{font-size:13px;color:var(--lavanda);text-align:center;padding:4px 0 10px}
 .res-toca{cursor:pointer;color:var(--oro-suave);font-weight:700;padding:8px 0 10px}
+.res-diana{border-color:rgba(212,175,55,.55);background:linear-gradient(135deg,
+  rgba(212,175,55,.10),var(--indigo))}
+.res-cap{font-size:11.5px;color:var(--lavanda);letter-spacing:.06em;
+  text-transform:uppercase;margin:-3px 0 7px}
+.res-corte{font-size:12px;color:var(--lavanda);text-align:center;letter-spacing:.08em;
+  text-transform:uppercase;margin:16px 0 10px;padding-top:12px;
+  border-top:1px solid rgba(169,166,216,.16)}
 .res-toca:active{opacity:.6}
 .busca-info{font-size:13.5px;color:var(--lavanda);margin:2px 0 12px;line-height:1.5}
 .busca-info b{color:var(--oro-suave)}
@@ -3117,7 +3124,12 @@ function entenderOrden(orden){
     var v = aNumero(mt[1]);
     if(v && v >= 1 && v <= n) return v - 1;
   }
-  /* por el titulo */
+  /* Por el titulo. OJO: si pediste "capitulo 99" y ese capitulo no existe, la
+     orden NO debe caer aqui y llevarte a un tema cualquiera que tenga un 99.
+     Cuando escribiste capitulo/trueno + numero, o se encontro o no se hizo nada. */
+  if(/\b(cap(itulo)?|trueno|develacion|sello|rollo|parte|tema|leccion)\b/.test(q)
+     && /\d/.test(q)) return null;
+
   var grupos = expandir(q.replace(/^(lee|leer|lea|pon|poner|escuchar|escucha|abre|abrir|ir a|vamos a|dame|quiero)\s+(el|la|los|las)?\s*/,''));
   if(grupos.length){
     for(var j = 0; j < n; j++){
@@ -3210,12 +3222,43 @@ function regexDe(formas){
   return new RegExp('(^|[^' + LETRA + '])(' + partes.join('|') + ')(?=[^' + LETRA + ']|$)', 'g');
 }
 
-function expandir(q){
-  var palabras = normal(q).split(/\s+/).filter(function(x){ return x.length > 1; });
-  return palabras.map(function(p){
+/* Palabras que no aportan nada al buscar: si escribes "¿Que es el alma?", lo
+   que de verdad estas buscando es "alma". Estas se apartan, pero NO se botan:
+   se siguen usando para la busqueda de la frase completa. */
+var HUECAS = {};
+('que qué es el la los las un una unos unas de del al en y o a con por para sin sobre '
+ + 'como cual cuales cuando donde quien quienes cuanto cuanta cuantos cuantas su sus mi '
+ + 'mis tu tus se lo le les me te nos ni pero mas más si sí no ya muy tan tanto todo toda '
+ + 'todos todas otro otra este esta esto ese esa eso aquel aquella hay ser son fue eran '
+ + 'era esta están estan haber hacer significa quiere decir').split(' ')
+ .forEach(function(w){ HUECAS[normal(w)] = 1; });
+
+/* Analiza lo que escribiste y devuelve las tres formas de buscarlo. */
+function analizarBusqueda(q){
+  var limpia = normal(q).replace(/[¿?¡!.,;:"«»]/g, ' ').replace(/\s+/g, ' ').trim();
+  var todas  = limpia.split(' ').filter(function(x){ return x.length > 1; });
+  var claves = todas.filter(function(x){ return !HUECAS[x] && x.length > 2; });
+  /* si TODO lo que escribiste son palabras huecas, se usan tal cual */
+  if(!claves.length) claves = todas;
+
+  var grupos = claves.map(function(p){
     var formas = formasDe(p);
     return { escrita:p, formas:formas, re: regexDe(formas) };
   });
+
+  /* la frase entera, para la coincidencia exacta — solo si escribiste varias */
+  var frase = null;
+  if(todas.length >= 2 && limpia.length >= 6){
+    frase = new RegExp(limpia.split(' ').map(function(w){
+      return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('[^a-z0-9ñ]+'), 'g');
+  }
+  return { grupos: grupos, frase: frase, texto: limpia };
+}
+
+/* Se conserva para las ordenes ("lee el trueno 2"), que usan solo los grupos. */
+function expandir(q){
+  return analizarBusqueda(q).grupos;
 }
 
 /* Una frase coincide si tiene TODAS las palabras buscadas, cada una como
@@ -3225,6 +3268,21 @@ function fraseCoincide(txtNorm, grupos){
     g.re.lastIndex = 0;
     return g.re.test(txtNorm);
   });
+}
+/* Cuantas de las palabras buscadas aparecen en esta frase (0 si ninguna). */
+function cuantasCoinciden(txtNorm, grupos){
+  var n = 0;
+  grupos.forEach(function(g){
+    g.re.lastIndex = 0;
+    if(g.re.test(txtNorm)) n++;
+  });
+  return n;
+}
+/* ¿Esta la frase COMPLETA, tal cual la escribio? */
+function tieneLaFrase(txtNorm, reFrase){
+  if(!reFrase) return false;
+  reFrase.lastIndex = 0;
+  return reFrase.test(txtNorm);
 }
 
 /* Recorta la frase alrededor de lo encontrado y pinta la palabra de oro.
@@ -3244,9 +3302,20 @@ function dondeEsta(txtNorm, grupos){
   return puntos.sort(function(a, b){ return a[0] - b[0]; });
 }
 
-function recorte(frase, grupos){
+function recorte(frase, grupos, reFrase){
   var n = normal(frase);
-  var puntos = dondeEsta(n, grupos);
+  var puntos;
+  /* Si la frase entera que escribiste esta aqui, se pinta ENTERA. */
+  if(reFrase){
+    reFrase.lastIndex = 0;
+    var m, exactos = [];
+    while((m = reFrase.exec(n))){
+      exactos.push([m.index, m.index + m[0].length]);
+      if(reFrase.lastIndex <= m.index) reFrase.lastIndex = m.index + 1;
+    }
+    if(exactos.length) puntos = exactos;
+  }
+  if(!puntos) puntos = dondeEsta(n, grupos);
   var pos = puntos.length ? puntos[0][0] : 0;
 
   var ini = Math.max(0, pos - 70), fin = Math.min(frase.length, pos + 150);
@@ -3287,37 +3356,71 @@ function pintarBuscar(){
   if(!libroActual) return;
   if(q.length < 2){
     $('bus-info').innerHTML = '';
-    $('bus-res').innerHTML = '<div class="vacio">Escribe lo que buscas.<br><br>'
-      + 'Busca <b>la palabra exacta</b> en todo el libro: en los títulos, en el texto '
-      + 'y en lo marcado como importante.<br><br>'
-      + 'No importan los acentos ni las mayúsculas, y el plural cuenta '
-      + '(alma encuentra almas).<br><br>'
+    $('bus-res').innerHTML = '<div class="vacio">Escribe una palabra o una pregunta.<br><br>'
+      + 'Si la frase está tal cual en el libro, te sale <b>de primera</b>.<br><br>'
+      + 'Busca <b>la palabra exacta</b>: no importan acentos ni mayúsculas, y el plural '
+      + 'cuenta (alma encuentra almas).<br><br>'
       + 'No inventa parecidos: si buscas <b>alma</b>, no te sale <b>espíritu</b>.</div>';
     return;
   }
-  var grupos = expandir(q);
+
+  var a = analizarBusqueda(q);
+  var grupos = a.grupos;
   if(q !== busUltima){ busAbiertos = {}; busUltima = q; }
   busGrupos = grupos;
   if(!grupos.length){ $('bus-res').innerHTML = '<div class="vacio">Escribe algo más largo.</div>'; return; }
 
-  var hallazgos = [], temasCon = 0;
+  /* ── Recoger todo lo que coincide, con su puntaje ──────────────────────
+     3 = la frase completa, tal cual la escribiste
+     2 = tiene TODAS las palabras que importan
+     1 = tiene algunas
+     Y dentro de cada nivel, primero lo que marcaste como importante. */
+  var hallazgos = [], exactos = 0, total = 0;
   libroActual.temas.forEach(function(t, i){
-    var aqui = [];
-    if(fraseCoincide(normal(t.titulo), grupos)) aqui.push({ tipo:'tit', txt:t.titulo });
-    (t.importante || []).forEach(function(f){
-      if(fraseCoincide(normal(f.t), grupos)) aqui.push({ tipo:'imp', txt:f.t });
-    });
-    (t.texto || []).forEach(function(p){
-      if(fraseCoincide(normal(p), grupos)) aqui.push({ tipo:'txt', txt:p });
-    });
-    if(aqui.length){ temasCon++; hallazgos.push({ i:i, t:t, frases:aqui }); }
+    var aqui = [], mejor = 0;
+
+    function mirar(txt, tipo){
+      if(!txt) return;
+      var n = normal(txt);
+      var cuantas = cuantasCoinciden(n, grupos);
+      if(!cuantas) return;
+      var nivel = tieneLaFrase(n, a.frase) ? 3 : (cuantas === grupos.length ? 2 : 1);
+      if(nivel > mejor) mejor = nivel;
+      if(nivel === 3) exactos++;
+      aqui.push({ tipo:tipo, txt:txt, nivel:nivel, cuantas:cuantas });
+    }
+
+    mirar(t.titulo, 'tit');
+    (t.importante || []).forEach(function(f){ mirar(f.t, 'imp'); });
+    (t.texto || []).forEach(function(p){ mirar(p, 'txt'); });
+
+    if(aqui.length){
+      aqui.sort(function(x, y){
+        if(y.nivel !== x.nivel) return y.nivel - x.nivel;
+        if(y.cuantas !== x.cuantas) return y.cuantas - x.cuantas;
+        var peso = { tit:0, imp:1, txt:2 };
+        return peso[x.tipo] - peso[y.tipo];
+      });
+      total += aqui.length;
+      hallazgos.push({ i:i, t:t, frases:aqui, mejor:mejor });
+    }
   });
 
-  var total = hallazgos.reduce(function(a,h){ return a + h.frases.length; }, 0);
+  /* los temas con mejor coincidencia, arriba */
+  hallazgos.sort(function(x, y){
+    if(y.mejor !== x.mejor) return y.mejor - x.mejor;
+    return x.i - y.i;
+  });
 
   $('bus-info').innerHTML =
-      '<b>' + total + '</b> ' + (total === 1 ? 'resultado' : 'resultados')
-    + ' en <b>' + temasCon + '</b> ' + (temasCon === 1 ? 'tema' : 'temas');
+      (exactos
+        ? '<b>' + exactos + '</b> ' + (exactos === 1 ? 'coincidencia exacta' : 'coincidencias exactas') + ' · '
+        : '')
+    + '<b>' + total + '</b> ' + (total === 1 ? 'resultado' : 'resultados')
+    + ' en <b>' + hallazgos.length + '</b> ' + (hallazgos.length === 1 ? 'tema' : 'temas')
+    + (grupos.length < a.texto.split(' ').length
+        ? '<br>buscó por: ' + esc(grupos.map(function(g){ return g.escrita; }).join(' · '))
+        : '');
 
   if(!total){
     $('bus-res').innerHTML = '<div class="vacio">No encontré nada con eso.<br><br>'
@@ -3325,18 +3428,27 @@ function pintarBuscar(){
     return;
   }
 
+  var yaSepare = false;
   $('bus-res').innerHTML = hallazgos.map(function(h){
+    var separador = '';
+    if(exactos && h.mejor < 3 && !yaSepare){
+      yaSepare = true;
+      separador = '<div class="res-corte">lo demás del libro</div>';
+    }
     var abierto = !!busAbiertos[h.i];
     var muestra = abierto ? h.frases : h.frases.slice(0, 3);
     var extra   = h.frases.length - muestra.length;
-    return '<div class="res">'
-      + '<div class="res-tit">' + (h.i + 1) + ' · ' + esc(h.t.titulo)
+    var p = partesDelTitulo(h.t);
+    return separador
+      + '<div class="res' + (h.mejor === 3 ? ' res-diana' : '') + '">'
+      + '<div class="res-tit">' + (h.mejor === 3 ? '🎯 ' : '') + (h.i + 1) + ' · ' + esc(p.sub)
       + (esFav(h.i) ? ' <span style="color:var(--oro)">★</span>' : '')
       + (esHecho(h.i) ? ' <span style="color:var(--verde)">✓</span>' : '') + '</div>'
+      + (p.cap ? '<div class="res-cap">' + esc(p.cap) + '</div>' : '')
       + muestra.map(function(f){
           return '<p class="res-frase">'
             + (f.tipo === 'imp' ? '<span style="color:var(--oro)">★</span> ' : '')
-            + recorte(f.txt, grupos) + '</p>';
+            + recorte(f.txt, grupos, a.frase) + '</p>';
         }).join('')
       + (extra > 0
           ? '<div class="res-mas res-toca" onclick="verTodoElTema(' + h.i + ')">▾ ver las otras '
@@ -3544,7 +3656,9 @@ var MANUAL = [
    'El libro nunca sale de tu teléfono. No sube a internet ni queda en ningún servidor.'] },
  { t:'Buscar cualquier cosa en el libro',
    p:['Abre el libro y toca la barra "Buscar cualquier cosa en este libro", o entra por el menu (☰) a "Buscar en el libro".',
-      'Escribe una palabra o una frase. La app te muestra el pedazo de texto donde aparece, con la palabra resaltada en dorado, y de que tema es.'],
+      'Puedes escribir una palabra suelta O UNA PREGUNTA COMPLETA. Si la frase esta tal cual en el libro, sale de primera, marcada con una diana 🎯 y con la frase entera resaltada.',
+      'Ejemplo: escribes "¿Que es el alma?" y como esa pregunta esta en el libro, ese tema sale arriba de todo. Debajo, separado, sale el resto del libro donde se habla de "alma".',
+      'De una pregunta, la app se queda con las palabras que importan. De "¿Que es el alma?" se queda con "alma" y tira "que", "es" y "el". Debajo del contador te dice por que palabras busco.'],
    l:['Busca LA PALABRA EXACTA en todo el libro. No inventa parecidos: si buscas "alma", NO te sale "espiritu".',
       'No importan los acentos ni las mayusculas: "angel" encuentra "Angel", "ANGEL" y "ángel".',
       'El plural cuenta: "alma" encuentra "almas", "angel" encuentra "angeles", "luz" encuentra "luces". Y al reves tambien.',
@@ -3815,7 +3929,7 @@ var _accionBanner = null;   // que pasa si tocas el letrero
 function versionDeLaApp(){
   return (document.querySelector('meta[name="app-version"]') || {}).content || '';
 }
-/* De "20260824b-EFD-ADMIN-V3.5" saca "V2.9" para que se lea corto. */
+/* De "20260825a-EFD-ADMIN-V3.6" saca "V2.9" para que se lea corto. */
 function versionCorta(v){
   var m = String(v || '').match(/V[\d.]+[a-z]?$/i);
   return m ? m[0].toUpperCase() : (v || '');
