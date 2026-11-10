@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20260825a-EFD-ADMIN-V3.6">
+<meta name="app-version" content="20261110a-EFD-ADMIN-V3.7">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -326,6 +326,29 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
   #imp .pie{font-size:9pt;color:#555;margin-top:3mm}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ── la voz nueva (v3.7): compacto ─────────────────── */
+.voz-estado{font-size:12.5px;color:var(--oro-suave);text-align:center;margin:-6px 0 9px;line-height:1.4}
+.voz-estado:empty{display:none}
+.voz-estado.malo{color:#E8A093}
+.voz-sec{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--oro-suave);
+  font-weight:700;margin:14px 0 7px}
+.vrow{display:flex;align-items:center;gap:7px;padding:8px 9px;margin-bottom:6px;
+  background:rgba(169,166,216,.07);border:1px solid transparent;border-radius:11px}
+.vrow.on{border-color:var(--oro)}
+.vrow .vtx{flex:1;min-width:0}
+.vrow .vtx b{display:block;font-size:15px;color:var(--perg);line-height:1.25}
+.vrow .vtx span{font-size:12px;color:var(--lavanda)}
+.vrow .btn-chico{margin:0;padding:7px 10px;font-size:13px}
+.diag-p{font-size:14.5px;line-height:1.45;padding:7px 9px;margin-bottom:5px;border-radius:9px;
+  background:rgba(169,166,216,.07)}
+.diag-p b{display:inline-block;width:18px}
+.diag-p.bien b{color:var(--verde)}
+.diag-p.mal{background:rgba(199,97,79,.12)}
+.diag-p.mal b{color:var(--rojo)}
+.diag-p span{display:block;font-size:12.5px;color:var(--lavanda);margin-left:18px}
+.diag-reg{font-family:monospace;font-size:10.5px;line-height:1.35;white-space:pre-wrap;
+  color:var(--lavanda);background:#0E1533;border-radius:8px;padding:7px;margin:6px 0 12px;
+  max-height:110px;overflow:auto}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -443,6 +466,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div class="repro" id="repro">
       <div class="ahora" id="esc-cual">Toca un tema para empezar</div>
       <div class="dice" id="esc-dice">Toca ▶ para escuchar.</div>
+      <div class="voz-estado" id="voz-estado"></div>
       <input type="range" id="esc-pos" min="0" max="0" value="0"
              oninput="irAPedazo(+this.value)" aria-label="Posición">
       <div class="linea-t"><span id="esc-t1">0:00</span><span id="esc-t2">0:00</span></div>
@@ -474,7 +498,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
         <button class="btn btn-linea" style="margin:0;padding:11px;font-size:14.5px"
                 onclick="abrirVoces()">🔊 La voz</button>
       </div>
-      <p class="voznota">Deja la pantalla encendida mientras escuchas.</p>
+      <p class="voznota" id="voznota">Deja la pantalla encendida mientras escuchas.</p>
     </div>
     <div class="tarj" id="prep-progreso"></div>
     <div class="cmd-caja">
@@ -1307,7 +1331,8 @@ function ir(p){
   window.scrollTo(0,0);
   // si se sale del libro, la voz se calla
   if(p !== 'p-preparar' && typeof sonando !== 'undefined' && sonando){
-    pareYo = true; if(voz) voz.cancel(); sonando = false;
+    detenerVoz(); sonando = false;   // calla las DOS voces (v3.7)
+    if(typeof estadoSesion === 'function') estadoSesion('paused');
     var bp = $('esc-play'); if(bp) bp.textContent = '▶';
     if(typeof soltarPantalla === 'function') soltarPantalla();
   }
@@ -2000,6 +2025,17 @@ function marcarDesdeParrafo(j){
    Play/pausa · tema anterior y siguiente · retroceder y adelantar 10 seg ·
    barra para moverse · velocidad · escoger la voz · avanza solo al terminar ·
    mantiene la pantalla encendida.
+   ──────────────────────────────────────────────────────────────────────────
+   v3.7 (10 nov 2026, pedido por Sensei): "que siga sonando aunque este en
+   cualquier otra ventana del celular". Ahora hay DOS VOCES:
+     · LA VOZ NUEVA: un motor de voz (Piper) que trabaja DENTRO del telefono
+       convierte cada pedazo del tema en AUDIO DE VERDAD y lo toca como musica.
+       Por eso sigue sonando con la pantalla apagada o en otra app, y salen los
+       botones en la pantalla bloqueada. EL TEXTO DEL LIBRO NUNCA SALE DEL
+       TELEFONO: lo unico que se baja de internet, una sola vez, es la voz.
+     · LA VOZ DEL TELEFONO: la de siempre, sin cambios. Se calla si sales de
+       la app. Queda de respaldo: si la voz nueva falla, la app lo DICE en el
+       reproductor y sigue con esta. Nunca se cambia a escondidas.
    ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
 var pedazos = [];        // el tema partido en frases cortas
@@ -2009,7 +2045,7 @@ var pareYo = false;      // para distinguir una pausa mia del final de una frase
 var velocidad = 1;
 var vozElegida = null;
 var modoLectura = 'completo'; // 'completo' | 'aclaraciones' | 'esencial'
-var candado = null;      // Wake Lock: que no se apague la pantalla
+var candado = null;      // Wake Lock: que no se apague la pantalla (solo voz del telefono)
 
 /* — partir en frases: la voz del telefono se corta sola pasados unos 15 seg,
      asi que se le va dando de a poco — */
@@ -2031,16 +2067,18 @@ function partirEnPedazos(texto){
      aparece mencionado por primera vez (sin acentos y sin mayusculas,
      para no fallar por una tilde), y devuelve cual — */
 function quitarAcentos(s){
-  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 }
-function armarPedazos(){
-  var t = libroActual.temas[temaActual];
+/* Los pedazos de CUALQUIER tema, sin tocar el reproductor. La voz nueva lo
+   usa para ir preparando el tema siguiente mientras suena el actual. */
+function pedazosDelTema(i, modo){
+  var t = libroActual.temas[i];
   var partes;
-  if(modoLectura === 'esencial'){
+  if(modo === 'esencial'){
     partes = ['Lo mas importante de: ' + t.titulo]
       .concat((t.importante || []).map(function(f){ return f.t; }));
     if(partes.length === 1) partes.push('Este tema todavia no tiene nada marcado como importante.');
-  } else if(modoLectura === 'aclaraciones'){
+  } else if(modo === 'aclaraciones'){
     var aclaraciones = (t.aclaraciones || []).slice();
     var dichas = {};
     partes = [t.titulo];
@@ -2063,9 +2101,17 @@ function armarPedazos(){
   } else {
     partes = [t.titulo].concat(t.texto || []);
   }
-  pedazos = [];
-  partes.forEach(function(p){ pedazos = pedazos.concat(partirEnPedazos(String(p))); });
+  var fuera = [];
+  partes.forEach(function(p){ fuera = fuera.concat(partirEnPedazos(String(p))); });
+  return fuera;
+}
+function armarPedazos(){
+  pedazos = pedazosDelTema(temaActual, modoLectura);
   pedazoAhora = 0;
+  bloques = juntarEnBloques(pedazos);
+  bloqueAhora = 0;
+  nuevaPosMovida = true;
+  limpiarAudiosViejos();
   var barra = $('esc-pos');
   barra.max = Math.max(0, pedazos.length - 1);
   barra.value = 0;
@@ -2125,6 +2171,10 @@ function hablarPedazo(){
   voz.speak(u);
 }
 function playPausa(){
+  // la voz nueva, si esta escogida y funcionando
+  if(usandoNueva()) return playPausaNueva();
+  // la primera vez que toca ▶ se le ofrece la voz nueva (una sola vez)
+  if(motorGuardado() === null && nuevaPosible() && !nuevaFallo) return ofrecerVozNueva();
   if(!voz) return decir('Sin voz', 'Este telefono no puede leer en voz alta.');
   if(sonando){
     pareYo = true; voz.cancel(); sonando = false;
@@ -2141,6 +2191,7 @@ function playPausa(){
 function terminoElTema(){
   sonando = false; $('esc-play').textContent = '▶';
   soltarPantalla();
+  if(_audio) estadoSesion('paused');
   // queda marcado como escuchado y se suman los minutos (el modo Esencial es
   // solo un repaso corto, no cuenta como haber terminado el tema completo)
   if(modoLectura !== 'esencial'){
@@ -2166,10 +2217,17 @@ function irAPedazo(i){
   pedazoAhora = Math.max(0, Math.min(pedazos.length - 1, i));
   pintarTiempos();
   $('esc-dice').textContent = pedazos[pedazoAhora] || '';
+  if(usandoNueva()){
+    nuevaPosMovida = true;
+    if(sonando){ detenerAudio(); reproducirBloque(bloqueDePedazo(pedazoAhora), { pedazo: pedazoAhora }); }
+    return;
+  }
   if(sonando){ pareYo = true; voz.cancel();
     setTimeout(function(){ pareYo = false; hablarPedazo(); }, 90); }
 }
 function saltar(seg){
+  // con la voz nueva sonando, el salto es de 10 segundos DE VERDAD
+  if(usandoNueva() && sonando && _audio && _urlSonando) return saltarNueva(seg);
   var i = pedazoAhora, resto = Math.abs(seg);
   if(seg < 0){
     while(i > 0 && resto > 0){ i--; resto -= segundosDe(pedazos[i]); }
@@ -2181,12 +2239,12 @@ function saltar(seg){
 function temaAnterior(){
   if(temaActual <= 0) return;
   temaActual--; prepararEscuchar(true);
-  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
+  if(sonando){ detenerVoz(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
 }
 function temaSiguiente(){
   if(temaActual >= libroActual.temas.length - 1) return;
   temaActual++; prepararEscuchar(true);
-  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
+  if(sonando){ detenerVoz(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
 }
 // Deslizador de velocidad AJUSTABLE (25 jul, pedido por Sensei: mismo cambio que en
 // NBS Academia). Antes eran 3 botones -Lento 0.85x, Normal 1x, Rapido 1.25x- y la
@@ -2198,6 +2256,11 @@ function ponerVelocidad(v){
   if(lbl) lbl.textContent = v.toFixed(2).replace(/0$/,'').replace(/\.$/,'.0') + 'x';
   localStorage.setItem('efd_vel', String(v));
   pintarTiempos();
+  if(usandoNueva()){
+    // la voz nueva cambia de velocidad al momento, sin volver a empezar la frase
+    if(_audio){ _audio.defaultPlaybackRate = v; _audio.playbackRate = v; }
+    return;
+  }
   if(sonando){ pareYo = true; voz.cancel();
     setTimeout(function(){ pareYo = false; hablarPedazo(); }, 90); }
 }
@@ -2206,11 +2269,12 @@ function ponerModoLectura(modo){
   ['m-completo','m-aclaraciones','m-esencial'].forEach(function(id){ $(id).classList.remove('on'); });
   $('m-' + modo).classList.add('on');
   var iba = sonando;
-  if(sonando){ pareYo = true; voz.cancel(); sonando = false; $('esc-play').textContent='▶'; }
+  if(sonando){ detenerVoz(); sonando = false; $('esc-play').textContent='▶'; }
   armarPedazos();
   if(iba) setTimeout(playPausa, 220);
 }
-/* — que no se apague la pantalla mientras escucha — */
+/* — que no se apague la pantalla mientras escucha (solo hace falta con la
+     voz del telefono: la voz nueva sigue sonando con la pantalla apagada) — */
 async function pedirPantalla(){
   try{ if('wakeLock' in navigator && !candado) candado = await navigator.wakeLock.request('screen'); }catch(e){}
 }
@@ -2218,10 +2282,662 @@ function soltarPantalla(){
   try{ if(candado){ candado.release(); candado = null; } }catch(e){}
 }
 document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'visible' && sonando) pedirPantalla();
+  if(document.visibilityState === 'visible' && sonando && !usandoNueva()) pedirPantalla();
 });
 
-/* — escoger la voz del telefono — */
+/* ══════════════════════════════════════════════════════════════════════════
+   LA VOZ NUEVA (v3.7)
+   ══════════════════════════════════════════════════════════════════════════ */
+/* El motor, con la version EXACTA fija (no cambia sola). Se usa el armado
+   "+esm" de jsdelivr porque el archivo crudo del paquete no carga en un
+   navegador (pide piezas por un nombre que el navegador no entiende). */
+var PIPER_URL = 'https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.5/+esm';
+/* ⚠ Trampa conocida de ese armado (la documento otro proyecto en sep 2026): trae
+   escrita una direccion vieja para las piezas del motor que ya no existe, y la voz
+   nunca suena. Aqui se lee del propio motor que version usa de verdad y se le
+   da la direccion correcta. Si no se puede leer, se usa esta. */
+var ORT_VERSION_RESPALDO = '1.27.0';
+var VOZ_NUEVA_DEFECTO = 'es_MX-ald-medium';
+var BLOQUE_MIN = 110, BLOQUE_MAX = 420;   // letras por pedazo de audio (≈ 7 a 28 segundos)
+
+var bloques = [], bloqueAhora = 0, nuevaPosMovida = true;
+var nuevaFallo = null;                    // si fallo en esta sesion: el motivo
+var _audio = null, _turno = 0, _pausaMia = false, _urlSonando = null, _claveSonando = null;
+var _cacheAudio = {}, _cola = [], _generando = false, _urgente = null;
+var _piper = null, _piperProm = null, _ortWasm = null;
+var _sesion = null, _sesionVoz = null, _sesionProm = null, _sesionPromVoz = null;
+var _registroVoz = [], _manejadores = false, _desbloqueado = false;
+
+function motorGuardado(){
+  var m = null; try{ m = localStorage.getItem('efd_motor'); }catch(e){}
+  return (m === 'nueva' || m === 'telefono') ? m : null;
+}
+function ponerMotor(m){ try{ localStorage.setItem('efd_motor', m); }catch(e){} pintarNotaVoz(); }
+function vozNuevaId(){
+  var v = null; try{ v = localStorage.getItem('efd_voz_nueva'); }catch(e){}
+  return v || VOZ_NUEVA_DEFECTO;
+}
+function nuevaPosible(){
+  try{
+    return typeof WebAssembly === 'object' && !!(navigator.storage && navigator.storage.getDirectory)
+        && typeof Audio !== 'undefined' && typeof fetch === 'function' && typeof Promise === 'function';
+  }catch(e){ return false; }
+}
+function usandoNueva(){ return motorGuardado() === 'nueva' && !nuevaFallo && nuevaPosible(); }
+
+function anotarVoz(t){
+  var l = new Date().toTimeString().slice(0, 8) + ' ' + String(t).slice(0, 160);
+  _registroVoz.push(l); if(_registroVoz.length > 60) _registroVoz.shift();
+  try{ console.log('[voz] ' + l); }catch(e){}
+}
+function conTiempo(prom, ms, msg){
+  return new Promise(function(ok, mal){
+    var r = setTimeout(function(){ mal(new Error(msg)); }, ms);
+    Promise.resolve(prom).then(function(v){ clearTimeout(r); ok(v); }, function(e){ clearTimeout(r); mal(e); });
+  });
+}
+function mensajeDe(e){
+  var m = (e && (e.message || e.name)) ? String(e.message || e.name) : String(e || 'error');
+  if(/failed to fetch|networkerror|load failed|importing a module script failed|dynamically imported/i.test(m))
+    return 'no hay internet o no se pudo bajar la voz';
+  return m.slice(0, 140);
+}
+function mb(n){ return (Math.round((n || 0) / 100000) / 10).toFixed(1); }   // MB como los cuenta la pagina de la voz (63.2 MB)
+
+/* ── cargar el motor de voz (una sola vez) ── */
+function cargarPiper(){
+  if(_piper) return Promise.resolve(_piper);
+  if(_piperProm) return _piperProm;
+  _piperProm = (async function(){
+    anotarVoz('cargando el motor de voz');
+    var ver = ORT_VERSION_RESPALDO;
+    try{
+      var r = await conTiempo(fetch(PIPER_URL), 25000, 'el motor de voz no respondio');
+      if(r && r.ok){
+        var txt = await r.text();
+        var m = txt.match(/onnxruntime-web@(\d+\.\d+\.\d+)/);
+        if(m) ver = m[1];
+      }
+    }catch(e){ anotarVoz('no se pudo leer la version: ' + mensajeDe(e)); }
+    var mod = await conTiempo(import(PIPER_URL), 40000, 'el motor de voz tardo demasiado en cargar');
+    if(!mod || !mod.TtsSession) throw new Error('el motor de voz llego incompleto');
+    _ortWasm = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@' + ver + '/dist/';
+    _piper = mod;
+    anotarVoz('motor cargado (piezas ' + ver + ')');
+    return mod;
+  })();
+  _piperProm.catch(function(){ _piperProm = null; });   // si fallo, se puede volver a intentar
+  return _piperProm;
+}
+
+/* ── la lista de voces nuevas en espanol ── */
+var PAIS_VOZ = { MX:'México', ES:'España', AR:'Argentina', CO:'Colombia', US:'Estados Unidos' };
+var CALIDAD_VOZ = { x_low:'muy liviana', low:'liviana', medium:'calidad media', high:'calidad alta' };
+var ORDEN_VOZ = ['es_MX-ald-medium','es_MX-claude-high','es_ES-davefx-medium','es_ES-sharvard-medium'];
+async function vocesNuevas(){
+  var m = await cargarPiper();
+  var todas = {}, guardadas = [];
+  try{ todas = await m.voices(); }catch(e){ todas = {}; }
+  try{ guardadas = await m.stored(); }catch(e){ guardadas = []; }
+  var lista = [];
+  function meter(id, v){
+    if(!/^es_/.test(id)) return;
+    v = v || {};
+    var tam = 0;
+    try{ Object.keys(v.files || {}).forEach(function(f){
+      if(/\.onnx$/.test(f)) tam += (v.files[f].size_bytes || 0); }); }catch(e){}
+    var reg = id.split('-')[0].split('_')[1] || '';
+    var cal = id.split('-').pop();
+    lista.push({ id:id, pais: PAIS_VOZ[reg] || reg, nombre: v.name || id.split('-')[1] || id,
+                 calidad: CALIDAD_VOZ[cal] || cal, tam: tam, bajada: guardadas.indexOf(id) >= 0 });
+  }
+  if(Array.isArray(todas)) todas.forEach(function(v){ meter(v.key || v.id || v.voiceId || '', v); });
+  else Object.keys(todas || {}).forEach(function(k){ meter(k, todas[k]); });
+  lista.sort(function(a, b){
+    var x = ORDEN_VOZ.indexOf(a.id), y = ORDEN_VOZ.indexOf(b.id);
+    if(x < 0) x = 99; if(y < 0) y = 99;
+    return x - y || a.id.localeCompare(b.id);
+  });
+  /* numerar las de cada pais: "México 1", "México 2"... */
+  var cuenta = {};
+  lista.forEach(function(v){ cuenta[v.pais] = (cuenta[v.pais] || 0) + 1; v.etiqueta = v.pais + ' ' + cuenta[v.pais]; });
+  return lista;
+}
+function etiquetaVozNueva(id){
+  var reg = (id.split('-')[0].split('_')[1]) || '';
+  return (PAIS_VOZ[reg] || 'Español') + ' · ' + (id.split('-')[1] || id);
+}
+
+/* ── bajar la voz (si hace falta) y dejarla lista para hablar ── */
+function prepararVozNueva(vozId, alProgreso){
+  if(_sesion && _sesionVoz === vozId) return Promise.resolve(_sesion);
+  if(_sesionProm && _sesionPromVoz === vozId) return _sesionProm;
+  _sesionPromVoz = vozId;
+  _sesionProm = (async function(){
+    var m = await cargarPiper();
+    try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+    var ya = [];
+    try{ ya = await m.stored(); }catch(e){ ya = []; }
+    if(ya.indexOf(vozId) < 0){
+      anotarVoz('bajando la voz ' + vozId);
+      await m.download(vozId, function(p){ if(alProgreso) alProgreso(p); });
+      anotarVoz('voz bajada');
+    }
+    var TS = m.TtsSession;
+    var lugares = {};
+    try{ Object.keys(TS.WASM_LOCATIONS || {}).forEach(function(k){ lugares[k] = TS.WASM_LOCATIONS[k]; }); }catch(e){}
+    lugares.onnxWasm = _ortWasm;
+    try{ TS._instance = null; }catch(e){}
+    anotarVoz('abriendo la voz ' + vozId);
+    var s = await TS.create({ voiceId: vozId, wasmPaths: lugares,
+      progress: function(p){ if(alProgreso) alProgreso(p); },
+      logger: function(t){ anotarVoz(t); } });
+    _sesion = s; _sesionVoz = vozId;
+    anotarVoz('voz lista');
+    return s;
+  })();
+  _sesionProm.then(function(){ _sesionProm = null; }, function(){ _sesionProm = null; });
+  return _sesionProm;
+}
+
+/* ── convertir texto en audio ── */
+async function duracionWav(b){
+  try{
+    var buf = await b.slice(0, Math.min(b.size, 65536)).arrayBuffer();
+    var d = new DataView(buf);
+    function id4(p){ return String.fromCharCode(d.getUint8(p), d.getUint8(p+1), d.getUint8(p+2), d.getUint8(p+3)); }
+    if(id4(0) !== 'RIFF') throw 0;
+    var p = 12, porSeg = 0, largo = 0;
+    while(p + 8 <= buf.byteLength){
+      var id = id4(p), len = d.getUint32(p + 4, true);
+      if(id === 'fmt ') porSeg = d.getUint32(p + 16, true);
+      if(id === 'data'){ largo = (len && len !== 0xFFFFFFFF) ? len : (b.size - p - 8); break; }
+      p += 8 + len + (len % 2);
+    }
+    if(porSeg > 0 && largo > 0) return largo / porSeg;
+  }catch(e){}
+  return Math.max(0.5, b.size / 44100);
+}
+async function generarAudio(texto){
+  var s = await prepararVozNueva(vozNuevaId());
+  var t0 = Date.now();
+  var wav = await s.predict(texto);
+  if(!wav || !wav.size) throw new Error('la voz no devolvio audio');
+  var dur = await duracionWav(wav);
+  return { url: URL.createObjectURL(wav), dur: dur, ms: Date.now() - t0 };
+}
+
+/* ── la fila de trabajo: un pedazo a la vez, lo que hace falta YA primero ── */
+function pedirAudio(clave, texto, prio){
+  var e = _cacheAudio[clave];
+  if(e){ if(e.pend && prio < e.prio) e.prio = prio; return e.prom; }
+  e = { prio: prio, pend: true, texto: texto, res: null };
+  e.prom = new Promise(function(ok, mal){ e.ok = ok; e.mal = mal; });
+  e.prom.catch(function(){});
+  _cacheAudio[clave] = e;
+  _cola.push(clave);
+  correrCola();
+  return e.prom;
+}
+function estaListo(clave){ var e = _cacheAudio[clave]; return !!(e && e.res); }
+function resueltoDe(clave){ var e = _cacheAudio[clave]; return e && e.res; }
+async function correrCola(){
+  if(_generando) return;
+  _generando = true;
+  try{
+    while(_cola.length){
+      _cola = _cola.filter(function(c){ return _cacheAudio[c] && _cacheAudio[c].pend; });
+      if(!_cola.length) break;
+      _cola.sort(function(x, y){
+        if(x === _urgente) return -1; if(y === _urgente) return 1;
+        return _cacheAudio[x].prio - _cacheAudio[y].prio;
+      });
+      var clave = _cola.shift(), e = _cacheAudio[clave];
+      if(!e || !e.pend) continue;
+      try{
+        var r = await generarAudio(e.texto);
+        if(_cacheAudio[clave] !== e){ URL.revokeObjectURL(r.url); continue; }   // ya no hacia falta
+        e.res = r; e.pend = false; e.ok(r);
+      }catch(err){
+        e.pend = false;
+        if(_cacheAudio[clave] === e) delete _cacheAudio[clave];
+        e.mal(err);
+      }
+    }
+  } finally { _generando = false; }
+}
+function soltarAudio(clave){
+  var e = _cacheAudio[clave]; if(!e) return;
+  delete _cacheAudio[clave];
+  if(e.res){ if(e.res.url !== _urlSonando) try{ URL.revokeObjectURL(e.res.url); }catch(x){} }
+  else if(e.pend){ e.pend = false; var err = new Error('descartado'); err.descartado = true; e.mal(err); }
+}
+
+/* ── los pedazos de audio: frases juntas hasta unos 7-28 segundos.
+     Chrome solo pone los botones en la pantalla bloqueada si lo que suena
+     dura 5 segundos o mas; por eso no se toca frase por frase. ── */
+function juntarEnBloques(lista){
+  var fuera = [], cur = null;
+  lista.forEach(function(p, i){
+    var n = p.length + 1;
+    if(cur && cur.letras >= BLOQUE_MIN && cur.letras + n > BLOQUE_MAX){ fuera.push(cur); cur = null; }
+    if(!cur) cur = { a:i, b:i, letras:0 };
+    cur.b = i; cur.letras += n;
+  });
+  if(cur){
+    var ult = fuera[fuera.length - 1];
+    if(ult && cur.letras < BLOQUE_MIN && ult.letras + cur.letras <= BLOQUE_MAX + BLOQUE_MIN){
+      ult.b = cur.b; ult.letras += cur.letras;
+    } else fuera.push(cur);
+  }
+  return fuera;
+}
+function textoDeBloque(lista, b){ return lista.slice(b.a, b.b + 1).join(' '); }
+function bloqueDePedazo(i){
+  for(var k = 0; k < bloques.length; k++) if(i >= bloques[k].a && i <= bloques[k].b) return k;
+  return Math.max(0, bloques.length - 1);
+}
+function fraccionDe(k, i){                 // donde empieza el pedazo i dentro del bloque k (0 a 1)
+  var b = bloques[k], antes = 0, total = 0;
+  for(var j = b.a; j <= b.b; j++){ var n = pedazos[j].length + 1; if(j < i) antes += n; total += n; }
+  return total ? antes / total : 0;
+}
+function pedazoEnFraccion(k, f){
+  var b = bloques[k], total = 0, j;
+  for(j = b.a; j <= b.b; j++) total += pedazos[j].length + 1;
+  var va = 0;
+  for(j = b.a; j <= b.b; j++){ va += pedazos[j].length + 1; if(va / total > f) return j; }
+  return b.b;
+}
+function huellaTexto(s){                    // para que el audio guardado SIEMPRE sea del texto exacto
+  var h = 5381; for(var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function claveDeTema(i){
+  return (libroActual ? libroActual.id : '?') + '::' + i + '::' + modoLectura + '::' + vozNuevaId();
+}
+function claveBloque(i, lista, bl, k){ return claveDeTema(i) + '|' + k + '|' + huellaTexto(textoDeBloque(lista, bl[k])); }
+/* Se guardan pocos audios a la vez (el actual, unos de atras y los que vienen),
+   para no llenar la memoria del telefono: si se llena, Android cierra la app. */
+function limpiarAudiosViejos(){
+  var cerca = {}; cerca[claveDeTema(temaActual)] = 1; cerca[claveDeTema(temaActual + 1)] = 1;
+  Object.keys(_cacheAudio).forEach(function(c){ if(!cerca[c.split('|')[0]]) soltarAudio(c); });
+}
+function limpiarDentroDelTema(k){
+  var yo = claveDeTema(temaActual);
+  Object.keys(_cacheAudio).forEach(function(c){
+    var p = c.split('|');
+    if(p[0] !== yo) return;
+    var n = +p[1];
+    if(n < k - 2 || n > k + 5) soltarAudio(c);
+  });
+}
+
+/* ── el elemento de audio, uno solo para todo ── */
+var SILENCIO = 'data:audio/wav;base64,UklGRgQCAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YeABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=';
+function audioEl(){
+  if(_audio) return _audio;
+  var a = document.createElement('audio');
+  a.id = 'efd-audio'; a.preload = 'auto';
+  a.setAttribute('playsinline', ''); a.style.display = 'none';
+  document.body.appendChild(a);
+  a.addEventListener('ended', function(){ if(a.src === _urlSonando) alTerminarBloque(); });
+  a.addEventListener('timeupdate', alAvanzarAudio);
+  a.addEventListener('pause', function(){
+    if(_pausaMia){ _pausaMia = false; return; }
+    if(a.ended || a.src !== _urlSonando) return;
+    // lo pauso el telefono: una llamada, otro audio, se desconectaron los audifonos
+    if(sonando && usandoNueva()){ sonando = false; marcarBoton(); estadoSesion('paused'); anotarVoz('pausado por el telefono'); }
+  });
+  a.addEventListener('play', function(){
+    if(a.src === _urlSonando && !sonando && usandoNueva()){ sonando = true; marcarBoton(); estadoSesion('playing'); }
+  });
+  _audio = a;
+  return a;
+}
+/* En el iPhone el audio tiene que "despertarse" con el dedo; en Android no hace daño. */
+function desbloquearAudio(){
+  if(_desbloqueado) return;
+  _desbloqueado = true;
+  try{
+    var a = audioEl();
+    if(_urlSonando) return;
+    a.src = SILENCIO;
+    var p = a.play();
+    if(p && p.then) p.then(function(){ if(a.src === SILENCIO){ _pausaMia = !a.paused; a.pause(); } }).catch(function(){});
+  }catch(e){}
+}
+function detenerAudio(){
+  _turno++;
+  var a = _audio;
+  if(a && !a.paused){ _pausaMia = true; a.pause(); }
+}
+function detenerVoz(){
+  pareYo = true;
+  try{ if(voz) voz.cancel(); }catch(e){}
+  detenerAudio();
+}
+function marcarBoton(){ var b = $('esc-play'); if(b) b.textContent = sonando ? '⏸' : '▶'; }
+function estadoVoz(txt, malo){
+  var e = $('voz-estado'); if(!e) return;
+  e.textContent = txt || '';
+  e.className = 'voz-estado' + (malo ? ' malo' : '');
+}
+function pintarNotaVoz(){
+  var n = $('voznota'); if(!n) return;
+  if(usandoNueva()) n.textContent = '🔊 Voz nueva: puedes apagar la pantalla o usar otra app.';
+  else if(!nuevaPosible()) n.textContent = 'Deja la pantalla encendida mientras escuchas.';
+  else if(motorGuardado() === null) n.textContent = 'Toca ▶ y escoge la voz nueva: sigue sonando con la pantalla apagada.';
+  else n.textContent = 'Con la voz del teléfono deja la pantalla encendida. En 🔊 La voz está la voz nueva, que sigue con la pantalla apagada.';
+}
+
+/* ── la pantalla bloqueada y la barra de notificaciones ── */
+function estadoSesion(s){ try{ if('mediaSession' in navigator) navigator.mediaSession.playbackState = s; }catch(e){} }
+function ponerMetadatos(){
+  if(!('mediaSession' in navigator) || !libroActual) return;
+  var t = libroActual.temas[temaActual];
+  try{
+    if(typeof MediaMetadata !== 'undefined'){
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: (temaActual + 1) + '. ' + (t ? t.titulo : ''),
+        artist: 'Iglesia Efraín para Dios',
+        album: libroActual.titulo,
+        artwork: [{ src:'icon-192.png', sizes:'192x192', type:'image/png' },
+                  { src:'icon-512.png', sizes:'512x512', type:'image/png' }]
+      });
+    }
+  }catch(e){}
+  if(_manejadores) return;
+  _manejadores = true;
+  function h(n, f){ try{ navigator.mediaSession.setActionHandler(n, f); }catch(e){} }
+  h('play',          function(){ if(!sonando) playPausa(); });
+  h('pause',         function(){ if(sonando) playPausa(); });
+  h('stop',          function(){ if(sonando) playPausa(); });
+  h('previoustrack', function(){ temaAnterior(); });
+  h('nexttrack',     function(){ temaSiguiente(); });
+  h('seekbackward',  function(){ saltar(-10); });
+  h('seekforward',   function(){ saltar(10); });
+}
+
+/* ── tocar con la voz nueva ── */
+function playPausaNueva(){
+  var a = audioEl();
+  if(sonando){
+    sonando = false; marcarBoton();
+    detenerAudio();
+    estadoSesion('paused'); estadoVoz('');
+    return;
+  }
+  sonando = true; marcarBoton();
+  desbloquearAudio();
+  var k = bloqueDePedazo(pedazoAhora);
+  var clave = claveBloque(temaActual, pedazos, bloques, k);
+  // si se pauso a mitad y no se movio nada, sigue EXACTO donde iba
+  if(!nuevaPosMovida && _claveSonando === clave && a.src === _urlSonando && !a.ended && a.currentTime > 0){
+    _turno++;
+    ponerMetadatos();
+    a.playbackRate = velocidad;
+    var p = a.play();
+    if(p && p.then) p.then(function(){ estadoSesion('playing'); }).catch(noDejoSonar);
+    return;
+  }
+  reproducirBloque(k, { pedazo: pedazoAhora });
+}
+async function reproducirBloque(k, desde){
+  var mio = ++_turno;
+  if(k < 0 || k >= bloques.length) return;
+  bloqueAhora = k;
+  var b = bloques[k];
+  pedazoAhora = (desde && desde.pedazo != null) ? desde.pedazo : b.a;
+  $('esc-dice').textContent = pedazos[pedazoAhora] || '';
+  pintarTiempos();
+  var clave = claveBloque(temaActual, pedazos, bloques, k);
+  _urgente = clave;
+  if(!estaListo(clave)) estadoVoz('⏳ Preparando la voz…');
+  var r;
+  try{ r = await pedirAudio(clave, textoDeBloque(pedazos, b), 0); }
+  catch(e){
+    if(mio !== _turno || (e && e.descartado)) return;
+    return fallaVozNueva(e);
+  }
+  if(mio !== _turno || !sonando) return;
+  estadoVoz('');
+  var a = audioEl();
+  _urlSonando = r.url; _claveSonando = clave;
+  a.src = r.url;
+  a.defaultPlaybackRate = velocidad; a.playbackRate = velocidad;
+  try{ a.preservesPitch = true; }catch(e){}
+  var seg = 0;
+  if(desde && desde.seg != null) seg = desde.seg;
+  else if(desde && desde.pedazo != null) seg = fraccionDe(k, desde.pedazo) * r.dur;
+  if(seg > 0){ try{ a.currentTime = Math.min(seg, Math.max(0, r.dur - 0.3)); }catch(e){} }
+  nuevaPosMovida = false;
+  ponerMetadatos();
+  var pr;
+  try{ pr = a.play(); }catch(e){ pr = Promise.reject(e); }
+  Promise.resolve(pr).then(function(){ if(mio === _turno) estadoSesion('playing'); })
+    .catch(function(e){ if(mio === _turno) noDejoSonar(e); });
+  limpiarDentroDelTema(k);
+  adelantarBloques(k);
+}
+/* mientras suena un pedazo, se preparan los que vienen (y el tema siguiente,
+   para que al pasar de tema no haya silencio con la pantalla apagada) */
+function adelantarBloques(k){
+  for(var j = k + 1; j <= k + 3 && j < bloques.length; j++)
+    pedirAudio(claveBloque(temaActual, pedazos, bloques, j), textoDeBloque(pedazos, bloques[j]), j - k);
+  if(k >= bloques.length - 2 && libroActual && temaActual < libroActual.temas.length - 1){
+    try{
+      var sig = temaActual + 1, ps = pedazosDelTema(sig, modoLectura), bl = juntarEnBloques(ps);
+      if(bl.length) pedirAudio(claveBloque(sig, ps, bl, 0), textoDeBloque(ps, bl[0]), 5);
+    }catch(e){}
+  }
+}
+function alTerminarBloque(){
+  if(!sonando || !usandoNueva()) return;
+  var k = bloqueAhora + 1;
+  if(k < bloques.length){ reproducirBloque(k, null); return; }
+  pedazoAhora = Math.max(0, pedazos.length - 1);
+  pintarTiempos();
+  terminoElTema();
+}
+function alAvanzarAudio(){
+  var a = _audio;
+  if(!a || a.src !== _urlSonando || !a.duration || !isFinite(a.duration) || !bloques[bloqueAhora]) return;
+  var p = pedazoEnFraccion(bloqueAhora, a.currentTime / a.duration);
+  if(p !== pedazoAhora){
+    pedazoAhora = p;
+    $('esc-dice').textContent = pedazos[p] || '';
+    pintarTiempos();
+  }
+}
+function saltarNueva(seg){
+  var a = audioEl(), k = bloqueAhora;
+  var r = resueltoDe(claveBloque(temaActual, pedazos, bloques, k));
+  var dur = (r && r.dur) || a.duration || 0;
+  var t = (a.currentTime || 0) + seg;
+  if(t < 0){
+    if(k === 0){ a.currentTime = 0; return; }
+    var rp = resueltoDe(claveBloque(temaActual, pedazos, bloques, k - 1));
+    detenerAudio();
+    return reproducirBloque(k - 1, { seg: rp ? Math.max(0, rp.dur + t) : 0 });
+  }
+  if(dur && t >= dur - 0.2){
+    if(k + 1 >= bloques.length){ a.currentTime = Math.max(0, dur - 0.3); return; }
+    detenerAudio();
+    return reproducirBloque(k + 1, { seg: Math.max(0, t - dur) });
+  }
+  a.currentTime = t;
+}
+function noDejoSonar(e){
+  if(e && e.name === 'AbortError') return;     // se cambio de pedazo a proposito
+  if(e && e.name === 'NotAllowedError'){
+    sonando = false; marcarBoton(); estadoSesion('paused');
+    estadoVoz('▶ Toca play para seguir escuchando.');
+    anotarVoz('el telefono no dejo arrancar el audio solo');
+    return;
+  }
+  fallaVozNueva(e);
+}
+/* Si la voz nueva falla: se DICE en el reproductor y sigue la voz del telefono
+   desde el mismo pedazo. Nunca se cambia a escondidas. */
+function fallaVozNueva(e){
+  var motivo = mensajeDe(e);
+  nuevaFallo = motivo;
+  anotarVoz('FALLO: ' + motivo);
+  try{ localStorage.setItem('efd_voz_error', new Date().toISOString().slice(0, 16).replace('T', ' ') + ' · ' + motivo); }catch(x){}
+  detenerAudio();
+  estadoVoz('⚠ La voz nueva no funcionó (' + motivo + '). Sigue la voz del teléfono: deja la pantalla encendida.', true);
+  pintarNotaVoz();
+  if(sonando){ sonando = false; playPausa(); }
+}
+
+/* ── la primera vez que toca ▶: se le ofrece la voz nueva ── */
+function ofrecerVozNueva(){
+  modal('<h2>🔊 Voz nueva para escuchar</h2>'
+    + '<p style="font-size:16px;line-height:1.55;margin:0 0 12px">Con la voz nueva puedes <b>apagar la pantalla</b> '
+    + 'o usar otra app, y <b>sigue sonando</b>. Los botones salen en la pantalla bloqueada.</p>'
+    + '<div class="aviso av-oro">Se baja <b>una sola vez</b>: unos 63 MB. Mejor con wifi.<br>'
+    + 'Es solo la voz: <b>tu libro no sale del teléfono</b>.</div>'
+    + '<button class="btn btn-oro" id="voz-si">⬇ Bajar la voz nueva</button>'
+    + '<button class="btn btn-linea" id="voz-no">Por ahora, la voz del teléfono</button>');
+  $('voz-si').onclick = function(){ desbloquearAudio(); usarVozNueva(vozNuevaId(), true); };
+  $('voz-no').onclick = function(){ ponerMotor('telefono'); cerrarModal(); playPausa(); };
+}
+function conProgreso(titulo, fn){
+  modal('<h2>' + esc(titulo) + '</h2>'
+    + '<p id="prog-txt" style="font-size:15.5px;margin:0 0 6px">Conectando…</p>'
+    + '<div class="progreso"><i id="prog-bar" style="width:3%"></i></div>'
+    + '<p class="mini" style="margin:0">Es solo la voz: tu libro no sale del teléfono. Se baja una sola vez.</p>');
+  return fn(function(p){
+    var t = $('prog-txt'), b = $('prog-bar');
+    if(!t || !b || !p) return;
+    if(p.total){
+      b.style.width = Math.max(3, Math.min(100, Math.round(p.loaded / p.total * 100))) + '%';
+      t.textContent = 'Bajando la voz… ' + mb(p.loaded) + ' de ' + mb(p.total) + ' MB';
+    }
+  });
+}
+/* Escoger una voz nueva: la baja si hace falta, la deja lista y la pone. */
+async function usarVozNueva(id, tocarAlFinal){
+  if(!nuevaPosible()) return decir('No se puede', 'Este teléfono no puede usar la voz nueva. Sigue con la voz del teléfono.');
+  var iba = sonando || tocarAlFinal;
+  if(sonando){ detenerVoz(); sonando = false; marcarBoton(); }
+  try{
+    await conProgreso('Preparando la voz nueva', function(cb){ return prepararVozNueva(id, cb); });
+  }catch(e){
+    var motivo = mensajeDe(e);
+    anotarVoz('FALLO al preparar: ' + motivo);
+    try{ localStorage.setItem('efd_voz_error', new Date().toISOString().slice(0, 16).replace('T', ' ') + ' · ' + motivo); }catch(x){}
+    if(motorGuardado() === null) ponerMotor('telefono');
+    return decir('La voz nueva no se pudo preparar',
+      'Motivo: <b>' + esc(motivo) + '</b>.<br><br>Sigue la voz del teléfono. Puedes volver a intentarlo en '
+      + '<b>🔊 La voz</b>, o tocar <b>🔧 Probar si funciona</b> para ver dónde falla.',
+      function(){ if(iba) playPausa(); });
+  }
+  try{ localStorage.setItem('efd_voz_nueva', id); }catch(e){}
+  nuevaFallo = null;
+  ponerMotor('nueva');
+  limpiarAudiosViejos();
+  nuevaPosMovida = true;
+  estadoVoz('');
+  cerrarModal();
+  if(iba) playPausa();
+  else decir('Voz nueva lista', 'Ahora lee con la <b>voz nueva</b> (' + esc(etiquetaVozNueva(id)) + ').<br><br>'
+    + 'Puedes apagar la pantalla o usar otra app: sigue sonando.');
+}
+/* Oir como suena una voz nueva antes de escogerla */
+var _audioPrueba = null;
+async function probarVozNueva(id, bajada){
+  if(!bajada){
+    return preguntar('Para oírla hay que bajarla',
+      'Esta voz se baja una sola vez (unos ' + (id.indexOf('-high') > 0 ? '110' : (id.indexOf('x_low') > 0 ? '28' : '63')) + ' MB). Mejor con wifi.',
+      function(){ probarVozNueva(id, true); });
+  }
+  if(sonando) playPausa();
+  try{
+    await conProgreso('Preparando la voz', function(cb){ return prepararVozNueva(id, cb); });
+    var s = await prepararVozNueva(id);
+    var wav = await s.predict('El Señor es mi pastor, nada me faltará. Así suena esta voz.');
+    if(!_audioPrueba){ _audioPrueba = new Audio(); }
+    _audioPrueba.src = URL.createObjectURL(wav);
+    _audioPrueba.playbackRate = velocidad;
+    await _audioPrueba.play();
+    cerrarModal();
+    abrirVoces();
+  }catch(e){
+    decir('No se pudo probar', 'Motivo: <b>' + esc(mensajeDe(e)) + '</b>.');
+  }
+}
+
+/* ── 🔧 PROBAR SI LA VOZ NUEVA FUNCIONA EN ESTE TELEFONO ──
+   Revisa paso por paso y dice EXACTAMENTE donde falla. Pensado para mandarle
+   una foto a quien arregla la app. */
+async function diagnosticoVozNueva(){
+  if(sonando) playPausa();
+  var pasos = [];
+  function pintar(fin){
+    var h = '<h2>🔧 Prueba de la voz nueva</h2><div class="diag">'
+      + pasos.map(function(p){
+          return '<div class="diag-p ' + (p.ok === true ? 'bien' : (p.ok === false ? 'mal' : 'va')) + '">'
+            + '<b>' + (p.ok === true ? '✓' : (p.ok === false ? '✗' : '…')) + '</b> ' + esc(p.t)
+            + (p.d ? '<span>' + esc(p.d) + '</span>' : '') + '</div>';
+        }).join('') + '</div>';
+    if(fin){
+      var err = ''; try{ err = localStorage.getItem('efd_voz_error') || ''; }catch(e){}
+      h += '<p class="mini" style="margin:10px 0 4px">Versión: ' + esc(versionDeEstaApp()) + ' · voz: ' + esc(vozNuevaId()) + '</p>'
+        + (err ? '<p class="mini" style="margin:0 0 4px">Último fallo guardado: ' + esc(err) + '</p>' : '')
+        + '<div class="diag-reg">' + esc(_registroVoz.slice(-8).join('\n')) + '</div>'
+        + (fin === 'bien' ? '<button class="btn btn-oro" id="diag-usar">Usar la voz nueva</button>' : '')
+        + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
+    }
+    modal(h);
+    var u = $('diag-usar');
+    if(u) u.onclick = function(){ nuevaFallo = null; ponerMotor('nueva'); limpiarAudiosViejos(); nuevaPosMovida = true; estadoVoz(''); cerrarModal();
+      decir('Listo', 'Quedó puesta la <b>voz nueva</b>. Toca ▶ para escuchar.'); };
+  }
+  function paso(t){ var p = { t:t, ok:null, d:'' }; pasos.push(p); pintar(); return p; }
+  var p1 = paso('El teléfono puede usar la voz nueva');
+  if(!nuevaPosible()){
+    p1.ok = false;
+    p1.d = 'Falta: ' + [typeof WebAssembly !== 'object' ? 'WebAssembly' : '',
+      !(navigator.storage && navigator.storage.getDirectory) ? 'almacén de archivos' : ''].filter(Boolean).join(', ');
+    return pintar('mal');
+  }
+  p1.ok = true;
+  var p2 = paso('Cargar el motor de voz'), t0 = Date.now();
+  try{ await cargarPiper(); p2.ok = true; p2.d = ((Date.now() - t0) / 1000).toFixed(1) + ' seg'; }
+  catch(e){ p2.ok = false; p2.d = mensajeDe(e); return pintar('mal'); }
+  var p3 = paso('La voz en el teléfono (' + etiquetaVozNueva(vozNuevaId()) + ')');
+  try{
+    await prepararVozNueva(vozNuevaId(), function(pr){
+      if(pr && pr.total){ p3.d = 'bajando ' + mb(pr.loaded) + ' de ' + mb(pr.total) + ' MB'; pintar(); }
+    });
+    p3.ok = true; p3.d = 'lista';
+  }catch(e){ p3.ok = false; p3.d = mensajeDe(e); return pintar('mal'); }
+  var p4 = paso('Convertir una frase en audio'), r;
+  try{
+    r = await generarAudio('El Señor es mi pastor, nada me faltará. Así suena esta voz.');
+    var veces = r.ms ? (r.dur * 1000 / r.ms) : 0;
+    p4.ok = true;
+    p4.d = r.dur.toFixed(1) + ' seg de audio en ' + (r.ms / 1000).toFixed(1) + ' seg'
+      + (veces ? ' · ' + veces.toFixed(1) + ' veces más rápido que hablarla' : '')
+      + (veces && veces < 1.2 ? ' · ⚠ despacio: puede haber pausas' : '');
+  }catch(e){ p4.ok = false; p4.d = mensajeDe(e); return pintar('mal'); }
+  var p5 = paso('Que suene');
+  try{
+    if(!_audioPrueba) _audioPrueba = new Audio();
+    _audioPrueba.src = r.url;
+    await conTiempo(_audioPrueba.play(), 8000, 'no arrancó');
+    p5.ok = true; p5.d = 'debió oírse la frase';
+  }catch(e){ p5.ok = false; p5.d = mensajeDe(e); return pintar('mal'); }
+  anotarVoz('prueba completa: todo bien');
+  pintar('bien');
+}
+function versionDeEstaApp(){
+  return (document.querySelector('meta[name="app-version"]') || {}).content || '';
+}
+
+/* — escoger la voz: la nueva (sigue con la pantalla apagada) o la del telefono — */
 var PAISES = {
   'es-DO':'República Dominicana','es-ES':'España','es-US':'Estados Unidos','es-MX':'México',
   'es-PR':'Puerto Rico','es-CO':'Colombia','es-AR':'Argentina','es-CL':'Chile','es-PE':'Perú',
@@ -2231,18 +2947,28 @@ var PAISES = {
 };
 function abrirVoces(todas){
   var lista = voz ? voz.getVoices() : [];
-  if(!lista.length) return decir('Sin voces', 'Este telefono todavia no reporta ninguna voz. Cierra y vuelve a abrir la app.');
   var usar = todas ? lista : lista.filter(function(v){ return /^es/i.test(v.lang || ''); });
   if(!usar.length) usar = lista;
   var actual = escogerVoz();
   var html = '<h2>La voz que lee</h2>';
-  if(actual){
+  if(usandoNueva()){
+    html += '<div class="aviso av-verde"><b>Sonando ahora:</b> voz nueva · ' + esc(etiquetaVozNueva(vozNuevaId()))
+          + '<br>Sigue sonando con la pantalla apagada.</div>';
+  } else if(actual){
     var pais = PAISES[actual.lang] || actual.lang || '';
     html += '<div class="aviso ' + (/^es/i.test(actual.lang||'') ? 'av-oro' : 'av-rojo') + '">'
-          + '<b>Sonando ahora:</b> ' + esc(actual.name) + (pais ? ' · ' + esc(pais) : '')
+          + '<b>Sonando ahora:</b> ' + esc(actual.name) + (pais ? ' · ' + esc(pais) : '') + ' (voz del teléfono)'
           + (/^es/i.test(actual.lang||'') ? '' : '<br>Esta voz no es de español: por eso no pronuncia bien la ñ ni los acentos.')
           + '</div>';
   }
+  if(nuevaFallo) html += '<div class="aviso av-rojo">La voz nueva falló: ' + esc(nuevaFallo) + '</div>';
+  html += '<div class="voz-sec">🔊 Voz nueva · sigue con la pantalla apagada</div>'
+        + '<div id="voces-nuevas">' + (nuevaPosible()
+            ? '<p class="mini" style="margin:0 0 8px">Buscando las voces nuevas…</p>'
+            : '<p class="mini" style="margin:0 0 8px">Este teléfono no puede usar la voz nueva.</p>') + '</div>'
+        + (nuevaPosible() ? '<button class="btn btn-linea btn-chico" style="margin:2px 0 4px" onclick="diagnosticoVozNueva()">🔧 Probar si funciona en este teléfono</button>' : '');
+  html += '<div class="voz-sec">📱 Voz del teléfono · se calla si sales de la app</div>';
+  if(!lista.length) html += '<p class="mini" style="margin:0 0 8px">Este teléfono todavía no reporta ninguna voz. Cierra y vuelve a abrir la app.</p>';
   html += usar.map(function(v, i){
     var p = PAISES[v.lang] || v.lang || '';
     return '<div class="tarj" style="padding:13px"><div class="libro-tit" style="font-size:16.5px">'
@@ -2252,9 +2978,31 @@ function abrirVoces(todas){
       + '<button class="btn btn-oro btn-chico" onclick="usarVoz(' + i + ',' + (todas?1:0) + ')">Usar esta</button>'
       + '</div></div>';
   }).join('');
-  if(!todas) html += '<button class="btn btn-linea" onclick="abrirVoces(true)">Ver todos los idiomas</button>';
+  if(!todas && lista.length) html += '<button class="btn btn-linea" onclick="abrirVoces(true)">Ver todos los idiomas</button>';
   html += '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
   modal(html);
+  if(nuevaPosible()) llenarVocesNuevas();
+}
+async function llenarVocesNuevas(){
+  var caja = $('voces-nuevas');
+  try{
+    var lista = await conTiempo(vocesNuevas(), 30000, 'tardó demasiado');
+    caja = $('voces-nuevas'); if(!caja) return;      // ya cerro la ventana
+    if(!lista.length){ caja.innerHTML = '<p class="mini" style="margin:0 0 8px">No llegó ninguna voz en español.</p>'; return; }
+    var yo = usandoNueva() ? vozNuevaId() : '';
+    caja.innerHTML = lista.map(function(v){
+      return '<div class="vrow' + (v.id === yo ? ' on' : '') + '"><div class="vtx"><b>' + esc(v.etiqueta)
+        + (v.id === yo ? ' ✓' : '') + '</b><span>' + esc(v.calidad) + (v.tam ? ' · ' + mb(v.tam) + ' MB' : '')
+        + (v.bajada ? ' · en el teléfono' : '') + '</span></div>'
+        + '<button class="btn btn-linea btn-chico" onclick="probarVozNueva(\'' + v.id + '\',' + (v.bajada ? 1 : 0) + ')">Probar</button>'
+        + '<button class="btn btn-oro btn-chico" onclick="usarVozNueva(\'' + v.id + '\')">Usar</button></div>';
+    }).join('');
+  }catch(e){
+    caja = $('voces-nuevas'); if(!caja) return;
+    var err = ''; try{ err = localStorage.getItem('efd_voz_error') || ''; }catch(x){}
+    caja.innerHTML = '<p class="mini" style="margin:0 0 8px">No se pudo cargar la lista (' + esc(mensajeDe(e))
+      + '). La primera vez hace falta internet.' + (err ? '<br>Último fallo: ' + esc(err) : '') + '</p>';
+  }
 }
 function vozNumero(i, todas){
   var lista = voz.getVoices();
@@ -2264,6 +3012,7 @@ function vozNumero(i, todas){
 }
 function probarVoz(i, todas){
   var v = vozNumero(i, !!todas); if(!v) return;
+  if(sonando && usandoNueva()) playPausa();
   voz.cancel();
   var u = new SpeechSynthesisUtterance('El Señor es mi pastor, nada me faltará. Así suena esta voz.');
   u.voice = v; u.lang = v.lang || 'es-US'; u.rate = velocidad;
@@ -2271,12 +3020,18 @@ function probarVoz(i, todas){
 }
 function usarVoz(i, todas){
   var v = vozNumero(i, !!todas); if(!v) return;
+  var eraNueva = usandoNueva();
   vozElegida = v.voiceURI;
   localStorage.setItem('efd_voz', v.voiceURI);
+  ponerMotor('telefono');
   cerrarModal();
-  decir('Voz cambiada', 'Ahora lee con <b>' + esc(v.name) + '</b>.');
-  if(sonando){ pareYo = true; voz.cancel();
-    setTimeout(function(){ pareYo = false; hablarPedazo(); }, 120); }
+  decir('Voz cambiada', 'Ahora lee con <b>' + esc(v.name) + '</b>.'
+    + (eraNueva ? '<br><br>Con la voz del teléfono hay que dejar la pantalla encendida.' : ''));
+  if(sonando){
+    if(eraNueva){ detenerAudio(); sonando = false; setTimeout(playPausa, 120); }
+    else { pareYo = true; voz.cancel();
+      setTimeout(function(){ pareYo = false; hablarPedazo(); }, 120); }
+  }
 }
 if(voz) voz.onvoiceschanged = function(){};
 
@@ -2292,12 +3047,13 @@ function prepararEscuchar(soloRefrescar){
   armarPedazos();
   var bp = $('esc-play'); if(bp) bp.textContent = sonando ? '⏸' : '▶';
   localStorage.setItem('efd_ultimo', libroActual.id + '::' + temaActual);
+  pintarNotaVoz();
 }
 /* Tocar un tema de la lista lo pone en el reproductor y sube la pantalla */
 function cargarEnReproductor(i){
   temaActual = i;
   var iba = sonando;
-  if(sonando){ pareYo = true; if(voz) voz.cancel(); sonando = false; }
+  if(sonando){ detenerVoz(); sonando = false; }
   prepararEscuchar(true);
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if(iba) setTimeout(playPausa, 260);
@@ -3758,7 +4514,16 @@ var MANUAL = [
  { t:'Los botones del reproductor', l:['⏮ tema anterior','↺10 retroceder diez segundos',
       '▶ empezar o pausar','10↻ adelantar diez segundos','⏭ tema siguiente',
       'La barra te lleva a cualquier parte','Lento / Normal / Rápido'] },
- { t:'Importante al escuchar', p:['La pantalla tiene que quedarse encendida. Si la apagas o cambias de app, la voz se detiene. Es así en todos los teléfonos, no es la app.'] },
+ { t:'Importante al escuchar', p:['Con la VOZ NUEVA puedes apagar la pantalla, bloquear el teléfono o usar otra app: sigue sonando. Los botones (pausa, tema anterior y siguiente, adelantar y retroceder) salen en la pantalla bloqueada y en la barra de notificaciones.',
+   'Con la VOZ DEL TELÉFONO la pantalla tiene que quedarse encendida: si la apagas o cambias de app, se calla.'] },
+ { t:'La voz nueva', p:['La primera vez que tocas ▶ la app te ofrece bajarla. Se baja una sola vez (unos 63 MB, mejor con wifi) y después funciona sin internet.',
+   'Es un motor de voz que trabaja dentro del teléfono: convierte el texto en audio de verdad, como una grabación. El texto del libro no sale del teléfono; lo único que se baja de internet es la voz.'],
+   l:['Para cambiarla: 🔊 La voz → Voz nueva → Usar',
+      'Para volver a la de antes: 🔊 La voz → Voz del teléfono → Usar esta',
+      'Si la voz nueva falla, la app lo dice arriba de los botones y sigue con la voz del teléfono',
+      '🔧 Probar si funciona en este teléfono: revisa paso por paso y dice dónde falla',
+      'Al tocar ▶ puede tardar unos segundos en arrancar mientras prepara el audio',
+      'En la pantalla bloqueada se ve el nombre del tema que está sonando'] },
  { t:'Las 3 formas de escuchar un tema', l:[
       '📖 Completo: lee el texto tal cual está en el libro, sin agregar nada',
       '💡 Con aclaraciones: lee el texto completo, y cuando llega a un término difícil se detiene y dice "Aclaración" antes de explicarlo en palabras sencillas — la explicación nunca se mezcla con el texto original',
