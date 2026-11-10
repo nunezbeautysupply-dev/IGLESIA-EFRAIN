@@ -187,3 +187,4 @@ sube a internet.
 La app de los hermanos (la que solo escucha y lee, sin botón de
 subir). Cuando pruebes esta con tu libro real y me digas si los
 temas salieron bien, la construyo.
+10 nov 2026: V3.7 voz en segundo plano
