@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261110a-EFD-ADMIN-V3.7">
+<meta name="app-version" content="20261111a-EFD-ADMIN-V3.8">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -2036,6 +2036,10 @@ function marcarDesdeParrafo(j){
      · LA VOZ DEL TELEFONO: la de siempre, sin cambios. Se calla si sales de
        la app. Queda de respaldo: si la voz nueva falla, la app lo DICE en el
        reproductor y sigue con esta. Nunca se cambia a escondidas.
+   v3.8 (10-11 nov 2026, noche): la voz no bajaba porque Hugging Face contestaba
+   "no encontrado" cuando la peticion decia de que pagina venia. Ahora, solo
+   a Hugging Face, se le pide sin decirlo (ver pedirVocesSinDecirDeDonde).
+   Y los avisos de error dicen el error REAL, no "no hay internet".
    ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
 var pedazos = [];        // el tema partido en frases cortas
@@ -2336,18 +2340,48 @@ function conTiempo(prom, ms, msg){
     Promise.resolve(prom).then(function(v){ clearTimeout(r); ok(v); }, function(e){ clearTimeout(r); mal(e); });
   });
 }
+/* El aviso dice el error REAL, tal como lo dio el telefono (v3.8). Antes decia
+   "no hay internet" para cualquier fallo de descarga, y el 10 nov resulto falso:
+   habia internet, era Hugging Face el que contestaba "no encontrado".
+   Ahora solo dice "sin internet" cuando el telefono de verdad no tiene. */
 function mensajeDe(e){
-  var m = (e && (e.message || e.name)) ? String(e.message || e.name) : String(e || 'error');
-  if(/failed to fetch|networkerror|load failed|importing a module script failed|dynamically imported/i.test(m))
-    return 'no hay internet o no se pudo bajar la voz';
-  return m.slice(0, 140);
+  var det = (e && e.message) ? ((e.name && e.name !== 'Error' ? e.name + ': ' : '') + e.message)
+          : (e && e.name) ? String(e.name) : String(e || 'error desconocido');
+  det = det.slice(0, 160);
+  var sinRed = false; try{ sinRed = navigator.onLine === false; }catch(x){}
+  if(sinRed) return 'el teléfono está sin internet (detalle: ' + det + ')';
+  if(/failed to fetch|networkerror|load failed|importing a module script failed|dynamically imported/i.test(det))
+    return 'no se pudo bajar (detalle: ' + det + ')';
+  return det;
 }
 function mb(n){ return (Math.round((n || 0) / 100000) / 10).toFixed(1); }   // MB como los cuenta la pagina de la voz (63.2 MB)
+
+/* ── LA CAUSA DEL 10 NOV 2026 (v3.8) ──────────────────────────────────────
+   Comprobado en el Chrome de Sensei: Hugging Face (donde viven las voces)
+   contesta 404 "no encontrado" cuando la peticion dice que viene de la
+   direccion de esta app, y entrega la voz normal cuando no lo dice.
+   Por eso, SOLO a Hugging Face, la app le pide sin decir de donde viene.
+   Firebase, el motor y la propia app siguen pidiendo igual que siempre. */
+var HF_SITIO = 'https://huggingface.co/';
+var _sinDeDonde = false;
+function pedirVocesSinDecirDeDonde(){
+  if(_sinDeDonde || typeof window.fetch !== 'function') return;
+  var original = window.fetch;
+  window.fetch = function(u, o){
+    try{
+      var s = (typeof u === 'string') ? u : ((u && u.url) || String(u));
+      if(s.indexOf(HF_SITIO) === 0) o = Object.assign({}, o || {}, { referrerPolicy: 'no-referrer' });
+    }catch(x){}
+    return original.call(this, u, o);
+  };
+  _sinDeDonde = true;
+}
 
 /* ── cargar el motor de voz (una sola vez) ── */
 function cargarPiper(){
   if(_piper) return Promise.resolve(_piper);
   if(_piperProm) return _piperProm;
+  pedirVocesSinDecirDeDonde();
   _piperProm = (async function(){
     anotarVoz('cargando el motor de voz');
     var ver = ORT_VERSION_RESPALDO;
