@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261111a-EFD-ADMIN-V3.8">
+<meta name="app-version" content="20261111b-EFD-ADMIN-V3.9">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -2040,6 +2040,16 @@ function marcarDesdeParrafo(j){
    "no encontrado" cuando la peticion decia de que pagina venia. Ahora, solo
    a Hugging Face, se le pide sin decirlo (ver pedirVocesSinDecirDeDonde).
    Y los avisos de error dicen el error REAL, no "no hay internet".
+   v3.9 (11 nov 2026): con la pantalla apagada la voz se cortaba al minuto o dos.
+   Causa (documentada en reportes de Android de oct-nov 2026): si por un instante
+   NADA suena, Chrome suelta el permiso de sonar en segundo plano y, con la
+   pantalla apagada, Android ya no lo deja recuperarlo. Habia tres huecos:
+   entre pedazo y pedazo, al pasar de tema, y mientras se preparaba un pedazo
+   que no estaba listo. Ahora: dos elementos de audio que se turnan (el
+   siguiente arranca ANTES de parar el actual), silencio de relleno mientras
+   se prepara, 3 seg de silencio al final de cada pedazo como colchon, se
+   prepara por adelantado todo lo que cabe (unos 13 min), y queda un registro
+   guardado de lo que paso, que se ve en la prueba 🔧.
    ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
 var pedazos = [];        // el tema partido en frases cortas
@@ -2193,9 +2203,13 @@ function playPausa(){
   }
 }
 function terminoElTema(){
-  sonando = false; $('esc-play').textContent = '▶';
-  soltarPantalla();
-  if(_audio) estadoSesion('paused');
+  var seguir = usandoNueva() && sonando;    // v3.9: con la voz nueva no se calla entre tema y tema
+  function parar(){ sonando = false; $('esc-play').textContent = '▶'; if(seguir){ detenerAudio(); estadoSesion('paused'); } }
+  if(!seguir){
+    sonando = false; $('esc-play').textContent = '▶';
+    soltarPantalla();
+    if(_audio) estadoSesion('paused');
+  }
   // queda marcado como escuchado y se suman los minutos (el modo Esencial es
   // solo un repaso corto, no cuenta como haber terminado el tema completo)
   if(modoLectura !== 'esencial'){
@@ -2206,6 +2220,7 @@ function terminoElTema(){
   if(tempQuedan > 0){
     tempQuedan--;
     if(tempQuedan === 0){
+      if(seguir){ parar(); anotarVoz('se acabó el temporizador'); }
       decir('Hasta aquí', 'Se acabó el temporizador. Que Dios te bendiga.');
       return;
     }
@@ -2214,8 +2229,9 @@ function terminoElTema(){
   if(temaActual < libroActual.temas.length - 1){
     temaActual++;
     prepararEscuchar(true);
+    if(seguir){ anotarVoz('pasa solo al tema ' + (temaActual + 1)); reproducirBloque(0, null); return; }
     setTimeout(function(){ if(!sonando) playPausa(); }, 500);
-  }
+  } else if(seguir){ parar(); anotarVoz('terminó el libro'); }
 }
 function irAPedazo(i){
   pedazoAhora = Math.max(0, Math.min(pedazos.length - 1, i));
@@ -2223,7 +2239,7 @@ function irAPedazo(i){
   $('esc-dice').textContent = pedazos[pedazoAhora] || '';
   if(usandoNueva()){
     nuevaPosMovida = true;
-    if(sonando){ detenerAudio(); reproducirBloque(bloqueDePedazo(pedazoAhora), { pedazo: pedazoAhora }); }
+    if(sonando) reproducirBloque(bloqueDePedazo(pedazoAhora), { pedazo: pedazoAhora }, true);
     return;
   }
   if(sonando){ pareYo = true; voz.cancel();
@@ -2243,11 +2259,13 @@ function saltar(seg){
 function temaAnterior(){
   if(temaActual <= 0) return;
   temaActual--; prepararEscuchar(true);
+  if(sonando && usandoNueva()) return reproducirBloque(0, null, true);   // v3.9: sin dejar de sonar
   if(sonando){ detenerVoz(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
 }
 function temaSiguiente(){
   if(temaActual >= libroActual.temas.length - 1) return;
   temaActual++; prepararEscuchar(true);
+  if(sonando && usandoNueva()) return reproducirBloque(0, null, true);   // v3.9: sin dejar de sonar
   if(sonando){ detenerVoz(); sonando = false; $('esc-play').textContent='▶'; setTimeout(playPausa, 260); }
 }
 // Deslizador de velocidad AJUSTABLE (25 jul, pedido por Sensei: mismo cambio que en
@@ -2262,7 +2280,8 @@ function ponerVelocidad(v){
   pintarTiempos();
   if(usandoNueva()){
     // la voz nueva cambia de velocidad al momento, sin volver a empezar la frase
-    if(_audio){ _audio.defaultPlaybackRate = v; _audio.playbackRate = v; }
+    [_audA, _audB].forEach(function(x){ if(x) x.defaultPlaybackRate = v; });
+    if(_audio && !_relleno) _audio.playbackRate = v;
     return;
   }
   if(sonando){ pareYo = true; voz.cancel();
@@ -2303,6 +2322,12 @@ var PIPER_URL = 'https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.5
 var ORT_VERSION_RESPALDO = '1.27.0';
 var VOZ_NUEVA_DEFECTO = 'es_MX-ald-medium';
 var BLOQUE_MIN = 110, BLOQUE_MAX = 420;   // letras por pedazo de audio (≈ 7 a 28 segundos)
+/* v3.9 — que NUNCA haya un instante sin nada sonando */
+var COLA_SEG = 3;            // silencio que se le pega al final de cada pedazo (colchon)
+var ANTES_DEL_FIN = 0.12;    // el siguiente arranca cuando a este le quedan 0.12 seg de voz
+var ADELANTE_LETRAS = 12000; // cuanto texto se prepara por adelantado: unas 12.000 letras ≈ 13 minutos
+var _audA = null, _audB = null, _relleno = false, _avanceDe = null, _urlRelleno = null;
+var _msPorLetra = null, _alCambiar = [], _genCambio = 0, _cambiando = false, _cambiandoDesde = 0;
 
 var bloques = [], bloqueAhora = 0, nuevaPosMovida = true;
 var nuevaFallo = null;                    // si fallo en esta sesion: el motivo
@@ -2333,6 +2358,25 @@ function anotarVoz(t){
   var l = new Date().toTimeString().slice(0, 8) + ' ' + String(t).slice(0, 160);
   _registroVoz.push(l); if(_registroVoz.length > 60) _registroVoz.shift();
   try{ console.log('[voz] ' + l); }catch(e){}
+  guardarEnRegistro(l);
+}
+/* v3.9: el registro queda GUARDADO en el telefono (los ultimos 250 sucesos),
+   para que la prueba 🔧 muestre que paso la ultima vez que se corto la voz. */
+var _regGuardado = null;
+function registroGuardado(){
+  if(!_regGuardado){
+    try{ _regGuardado = JSON.parse(localStorage.getItem('efd_voz_registro') || '[]'); }catch(e){ _regGuardado = null; }
+    if(!Array.isArray(_regGuardado)) _regGuardado = [];
+  }
+  return _regGuardado;
+}
+function guardarEnRegistro(l){
+  try{
+    var r = registroGuardado(), d = new Date();
+    r.push((d.getMonth() + 1) + '/' + d.getDate() + ' ' + l);
+    if(r.length > 250) r.splice(0, r.length - 250);
+    localStorage.setItem('efd_voz_registro', JSON.stringify(r));
+  }catch(e){}
 }
 function conTiempo(prom, ms, msg){
   return new Promise(function(ok, mal){
@@ -2494,11 +2538,48 @@ async function duracionWav(b){
 }
 async function generarAudio(texto){
   var s = await prepararVozNueva(vozNuevaId());
-  var t0 = Date.now();
+  var t0 = Date.now(), atras = !!document.hidden;
   var wav = await s.predict(texto);
+  var ms = Date.now() - t0;
   if(!wav || !wav.size) throw new Error('la voz no devolvio audio');
-  var dur = await duracionWav(wav);
-  return { url: URL.createObjectURL(wav), dur: dur, ms: Date.now() - t0 };
+  var durVoz = await duracionWav(wav);
+  var largo = await alargarConSilencio(wav, COLA_SEG);
+  var dur = largo ? await duracionWav(largo) : durVoz;
+  if(texto && texto.length > 20){
+    var porLetra = ms / texto.length;
+    _msPorLetra = _msPorLetra ? (_msPorLetra * 0.6 + porLetra * 0.4) : porLetra;
+  }
+  return { url: URL.createObjectURL(largo || wav), dur: dur, durVoz: durVoz, ms: ms, atras: atras };
+}
+/* v3.9: le pega silencio al final del audio. Si el telefono se tarda en arrancar
+   el pedazo siguiente, este sigue "sonando" (en silencio) y Android no le quita
+   a la app el permiso de sonar con la pantalla apagada. */
+async function alargarConSilencio(b, seg){
+  try{
+    var buf = await b.arrayBuffer(), d = new DataView(buf);
+    function id4(q){ return String.fromCharCode(d.getUint8(q), d.getUint8(q+1), d.getUint8(q+2), d.getUint8(q+3)); }
+    if(buf.byteLength < 44 || id4(0) !== 'RIFF' || id4(8) !== 'WAVE') return null;
+    var p = 12, f = null, ini = -1, largo = 0;
+    while(p + 8 <= buf.byteLength){
+      var id = id4(p), len = d.getUint32(p + 4, true);
+      if(id === 'fmt ') f = { formato: d.getUint16(p + 8, true), canales: d.getUint16(p + 10, true), hz: d.getUint32(p + 12, true),
+                              porSeg: d.getUint32(p + 16, true), bloque: d.getUint16(p + 20, true), bits: d.getUint16(p + 22, true) };
+      if(id === 'data'){ ini = p + 8; largo = (len && len !== 0xFFFFFFFF && ini + len <= buf.byteLength) ? len : (buf.byteLength - ini); break; }
+      p += 8 + len + (len % 2);
+    }
+    if(!f || ini < 0 || !f.porSeg || !f.bloque) return null;
+    var formato = f.formato === 0xFFFE ? (f.bits === 32 ? 3 : 1) : f.formato;
+    var extra = Math.round(f.porSeg * seg / f.bloque) * f.bloque;
+    var nuevo = new ArrayBuffer(44 + largo + extra), o = new DataView(nuevo), u8 = new Uint8Array(nuevo);
+    function e4(q, t){ for(var i = 0; i < 4; i++) o.setUint8(q + i, t.charCodeAt(i)); }
+    e4(0, 'RIFF'); o.setUint32(4, 36 + largo + extra, true); e4(8, 'WAVE');
+    e4(12, 'fmt '); o.setUint32(16, 16, true); o.setUint16(20, formato, true); o.setUint16(22, f.canales, true);
+    o.setUint32(24, f.hz, true); o.setUint32(28, f.porSeg, true); o.setUint16(32, f.bloque, true); o.setUint16(34, f.bits, true);
+    e4(36, 'data'); o.setUint32(40, largo + extra, true);
+    u8.set(new Uint8Array(buf, ini, largo), 44);
+    if(formato === 1 && f.bits === 8) u8.fill(0x80, 44 + largo);    // en 8 bits el silencio es 128
+    return new Blob([nuevo], { type: 'audio/wav' });
+  }catch(e){ return null; }
 }
 
 /* ── la fila de trabajo: un pedazo a la vez, lo que hace falta YA primero ── */
@@ -2511,6 +2592,7 @@ function pedirAudio(clave, texto, prio){
   _cacheAudio[clave] = e;
   _cola.push(clave);
   correrCola();
+  if(prio === 0 || clave === _urgente) despertarCola();
   return e.prom;
 }
 function estaListo(clave){ var e = _cacheAudio[clave]; return !!(e && e.res); }
@@ -2526,12 +2608,18 @@ async function correrCola(){
         if(x === _urgente) return -1; if(y === _urgente) return 1;
         return _cacheAudio[x].prio - _cacheAudio[y].prio;
       });
-      var clave = _cola.shift(), e = _cacheAudio[clave];
+      var clave = _cola[0], e = _cacheAudio[clave];
+      if(cambioAMedias()){ await esperarCambio(); continue; }
+      if(clave !== _urgente && !hayTiempoPara(e.texto)){ await esperarCambio(); continue; }
+      _cola.shift();
       if(!e || !e.pend) continue;
       try{
         var r = await generarAudio(e.texto);
         if(_cacheAudio[clave] !== e){ URL.revokeObjectURL(r.url); continue; }   // ya no hacia falta
         e.res = r; e.pend = false; e.ok(r);
+        anotarVoz('listo ' + nombreClave(clave) + ': ' + (r.durVoz || r.dur).toFixed(1) + ' s de voz en '
+          + (r.ms / 1000).toFixed(1) + ' s' + (r.atras ? ' [app atrás]' : ''));
+        await ceder();     // deja respirar al telefono entre pedazo y pedazo
       }catch(err){
         e.pend = false;
         if(_cacheAudio[clave] === e) delete _cacheAudio[clave];
@@ -2540,6 +2628,41 @@ async function correrCola(){
     }
   } finally { _generando = false; }
 }
+function nombreClave(c){
+  var p = c.split('|'), t = p[0].split('::');
+  return 'T' + ((+t[1]) + 1) + '·P' + ((+p[1]) + 1);
+}
+/* cuantos segundos de VOZ le quedan al pedazo que suena (Infinity si no suena nada) */
+function tiempoQuedaVoz(){
+  var a = _audio;
+  if(!sonando || !a || a.paused || _relleno || a.src !== _urlSonando) return Infinity;
+  var r = resueltoDe(_claveSonando), d = (r && r.durVoz) || a.duration;
+  if(!d || !isFinite(d)) return Infinity;
+  return Math.max(0, (d - a.currentTime) / (a.playbackRate || 1));
+}
+/* v3.9: preparar audio puede ocupar al telefono unos segundos. Si justo en ese
+   rato tocaba arrancar el pedazo siguiente, arrancaria tarde. Por eso no se
+   empieza a preparar algo que no alcanza a terminar antes del cambio: se espera
+   a que arranque el pedazo siguiente. Lo que hace falta YA no espera nunca. */
+/* un cambio de audio a medias (el nuevo todavia no suena): mientras tanto no se
+   prepara nada, porque ocuparia al telefono justo cuando tiene que arrancarlo */
+function cambioAMedias(){ return _cambiando && sonando && (Date.now() - _cambiandoDesde) < 3000; }
+function ceder(){ return new Promise(function(ok){ try{ var c = new MessageChannel(); c.port1.onmessage = function(){ ok(); }; c.port2.postMessage(0); }catch(e){ setTimeout(ok, 0); } }); }
+function hayTiempoPara(texto){
+  var estima = (texto || '').length * (_msPorLetra || 45) / 1000;
+  return estima * 1.25 + 0.5 <= tiempoQuedaVoz();
+}
+function esperarCambio(){
+  return new Promise(function(ok){
+    var listo = false;
+    function fin(){ if(listo) return; listo = true; ok(); }
+    _alCambiar.push(fin);
+    var q = tiempoQuedaVoz();
+    setTimeout(fin, Math.min(isFinite(q) ? q * 1000 + 400 : 1000, 30000));
+  });
+}
+function avisarCambio(){ var l = _alCambiar; _alCambiar = []; l.forEach(function(f){ try{ f(); }catch(e){} }); }
+function despertarCola(){ avisarCambio(); }
 function soltarAudio(clave){
   var e = _cacheAudio[clave]; if(!e) return;
   delete _cacheAudio[clave];
@@ -2591,8 +2714,8 @@ function claveDeTema(i){
   return (libroActual ? libroActual.id : '?') + '::' + i + '::' + modoLectura + '::' + vozNuevaId();
 }
 function claveBloque(i, lista, bl, k){ return claveDeTema(i) + '|' + k + '|' + huellaTexto(textoDeBloque(lista, bl[k])); }
-/* Se guardan pocos audios a la vez (el actual, unos de atras y los que vienen),
-   para no llenar la memoria del telefono: si se llena, Android cierra la app. */
+/* Se guarda solo lo necesario (el actual, 2 de atras y hasta unos 13 minutos
+   por adelantado), para no llenar la memoria: si se llena, Android cierra la app. */
 function limpiarAudiosViejos(){
   var cerca = {}; cerca[claveDeTema(temaActual)] = 1; cerca[claveDeTema(temaActual + 1)] = 1;
   Object.keys(_cacheAudio).forEach(function(c){ if(!cerca[c.split('|')[0]]) soltarAudio(c); });
@@ -2603,48 +2726,141 @@ function limpiarDentroDelTema(k){
     var p = c.split('|');
     if(p[0] !== yo) return;
     var n = +p[1];
-    if(n < k - 2 || n > k + 5) soltarAudio(c);
+    if(n < k - 2 || n > limiteAdelante(k)) soltarAudio(c);
   });
 }
+/* hasta que pedazo llega el tope de lo que se prepara por adelantado */
+function limiteAdelante(k){
+  var letras = 0, j = k + 1;
+  for(; j < bloques.length; j++){
+    letras += textoDeBloque(pedazos, bloques[j]).length;
+    if(letras >= ADELANTE_LETRAS) break;
+  }
+  return Math.min(j, bloques.length - 1);
+}
 
-/* ── el elemento de audio, uno solo para todo ── */
+/* ── los elementos de audio: DOS, que se turnan (v3.9) ──
+   Antes habia uno solo y, al pasar de un pedazo al otro, quedaba un instante
+   sin nada sonando. En Android, en ese instante Chrome suelta el permiso de
+   sonar en segundo plano y, con la pantalla apagada, ya no lo puede recuperar:
+   la voz se corta. Ahora el siguiente arranca en el OTRO elemento, y el que
+   sonaba se para solo cuando el nuevo YA esta sonando. ── */
 var SILENCIO = 'data:audio/wav;base64,UklGRgQCAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YeABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=';
-function audioEl(){
-  if(_audio) return _audio;
+function crearAudio(id){
   var a = document.createElement('audio');
-  a.id = 'efd-audio'; a.preload = 'auto';
+  a.id = id; a.preload = 'auto';
   a.setAttribute('playsinline', ''); a.style.display = 'none';
   document.body.appendChild(a);
-  a.addEventListener('ended', function(){ if(a.src === _urlSonando) alTerminarBloque(); });
-  a.addEventListener('timeupdate', alAvanzarAudio);
+  a._pausaMia = false;
+  a.addEventListener('ended', function(){
+    if(a !== _audio || _relleno || a.src !== _urlSonando || _avanceDe === _claveSonando) return;
+    anotarVoz('el pedazo se acabó antes de arrancar el siguiente' + (document.hidden ? ' [app atrás]' : ''));
+    _avanceDe = _claveSonando;
+    alTerminarBloque();
+  });
+  a.addEventListener('timeupdate', function(){ if(a === _audio){ alAvanzarAudio(); finCerca(a); } });
   a.addEventListener('pause', function(){
-    if(_pausaMia){ _pausaMia = false; return; }
-    if(a.ended || a.src !== _urlSonando) return;
+    if(a._pausaMia){ a._pausaMia = false; return; }
+    if(a !== _audio || a.ended) return;
+    if(!_relleno && a.src !== _urlSonando) return;
     // lo pauso el telefono: una llamada, otro audio, se desconectaron los audifonos
-    if(sonando && usandoNueva()){ sonando = false; marcarBoton(); estadoSesion('paused'); anotarVoz('pausado por el telefono'); }
+    if(sonando && usandoNueva()){ sonando = false; marcarBoton(); estadoSesion('paused'); anotarVoz('pausado por el telefono' + (document.hidden ? ' [app atrás]' : '')); }
   });
   a.addEventListener('play', function(){
-    if(a.src === _urlSonando && !sonando && usandoNueva()){ sonando = true; marcarBoton(); estadoSesion('playing'); }
+    if(a === _audio && !_relleno && a.src === _urlSonando && !sonando && usandoNueva()){ sonando = true; marcarBoton(); estadoSesion('playing'); }
   });
-  _audio = a;
+  a.addEventListener('error', function(){
+    if(a === _audio && sonando) anotarVoz('error del audio: ' + ((a.error && a.error.code) || '?'));
+  });
   return a;
+}
+function audioEl(){
+  if(!_audA){ _audA = crearAudio('efd-audio'); _audB = crearAudio('efd-audio-2'); }
+  if(!_audio) _audio = _audA;
+  return _audio;
+}
+function otroAudio(){ audioEl(); return _audio === _audA ? _audB : _audA; }
+function pausarMio(a){ if(a && !a.paused){ a._pausaMia = true; a.pause(); } }
+/* 6 segundos de silencio de verdad, que se repiten mientras se prepara el audio */
+function urlRelleno(){
+  if(_urlRelleno) return _urlRelleno;
+  var hz = 8000, n = hz * 6, b = new ArrayBuffer(44 + n), d = new DataView(b);
+  function e4(q, t){ for(var i = 0; i < 4; i++) d.setUint8(q + i, t.charCodeAt(i)); }
+  e4(0, 'RIFF'); d.setUint32(4, 36 + n, true); e4(8, 'WAVE'); e4(12, 'fmt '); d.setUint32(16, 16, true);
+  d.setUint16(20, 1, true); d.setUint16(22, 1, true); d.setUint32(24, hz, true); d.setUint32(28, hz, true);
+  d.setUint16(32, 1, true); d.setUint16(34, 8, true); e4(36, 'data'); d.setUint32(40, n, true);
+  new Uint8Array(b, 44).fill(0x80);
+  _urlRelleno = URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+  return _urlRelleno;
+}
+function urlEnUso(url){
+  if(!url || url === _urlSonando || url === _urlRelleno || url === SILENCIO) return true;
+  for(var c in _cacheAudio){ var e = _cacheAudio[c]; if(e && e.res && e.res.url === url) return true; }
+  return false;
+}
+/* Pone a sonar un audio en el OTRO elemento y SOLO cuando ya suena para el
+   anterior. cortar = el usuario se movio (salto, otro tema): el anterior se
+   silencia al instante, pero sigue "sonando" hasta que arranque el nuevo. */
+function suenaDeVerdad(a){ return !!a && !a.paused && !a.ended && a.readyState >= 2; }
+function cambiarA(url, seg, esRelleno, cortar){
+  audioEl();
+  var gen = ++_genCambio;
+  // el que se queda sonando mientras arranca el nuevo: el que suena DE VERDAD
+  // (si habia otro cambio a medias, el que todavia suena es el de antes)
+  var viejo = suenaDeVerdad(_audio) ? _audio : (suenaDeVerdad(otroAudio()) ? otroAudio() : _audio);
+  var nuevo = (viejo === _audA) ? _audB : _audA;
+  if(cortar && viejo && !viejo.paused){ try{ viejo.volume = 0; }catch(e){} }
+  _cambiando = true; _cambiandoDesde = Date.now();
+  pausarMio(nuevo);
+  nuevo.loop = !!esRelleno;
+  try{ nuevo.volume = 1; }catch(e){}
+  nuevo.src = url;
+  var vel = esRelleno ? 1 : velocidad;
+  nuevo.defaultPlaybackRate = vel; nuevo.playbackRate = vel;
+  try{ nuevo.preservesPitch = true; }catch(e){}
+  if(seg > 0){ try{ nuevo.currentTime = seg; }catch(e){} }
+  _audio = nuevo; _relleno = !!esRelleno;
+  var pr; try{ pr = nuevo.play(); }catch(e){ pr = Promise.reject(e); }
+  function soltarViejos(){
+    if(gen !== _genCambio) return;       // hubo otro cambio despues: ese se encarga
+    [_audA, _audB].forEach(function(x){
+      if(x === nuevo) return;
+      pausarMio(x);
+      try{ x.volume = 1; }catch(e){}
+      var vu = x.src;
+      if(vu && vu.indexOf('blob:') === 0 && !urlEnUso(vu)){ try{ URL.revokeObjectURL(vu); }catch(e){} }
+    });
+    _cambiando = false;
+    avisarCambio();
+  }
+  return Promise.resolve(pr).then(soltarViejos, function(e){ soltarViejos(); throw e; });
+}
+/* mientras se prepara un pedazo que no esta listo: silencio, para no perder el permiso */
+function ponerRelleno(cortar){
+  if(_relleno && _audio && !_audio.paused) return;
+  anotarVoz('esperando el audio: suena silencio para no perder el permiso' + (document.hidden ? ' [app atrás]' : ''));
+  cambiarA(urlRelleno(), 0, true, cortar).catch(function(e){ anotarVoz('el silencio no arrancó: ' + mensajeDe(e)); });
 }
 /* En el iPhone el audio tiene que "despertarse" con el dedo; en Android no hace daño. */
 function desbloquearAudio(){
   if(_desbloqueado) return;
   _desbloqueado = true;
   try{
-    var a = audioEl();
+    audioEl();
     if(_urlSonando) return;
-    a.src = SILENCIO;
-    var p = a.play();
-    if(p && p.then) p.then(function(){ if(a.src === SILENCIO){ _pausaMia = !a.paused; a.pause(); } }).catch(function(){});
+    [_audA, _audB].forEach(function(a){
+      if(!a.paused) return;
+      a.src = SILENCIO;
+      var p = a.play();
+      if(p && p.then) p.then(function(){ if(a.src === SILENCIO) pausarMio(a); }).catch(function(){});
+    });
   }catch(e){}
 }
 function detenerAudio(){
-  _turno++;
-  var a = _audio;
-  if(a && !a.paused){ _pausaMia = true; a.pause(); }
+  _turno++; _genCambio++;
+  pausarMio(_audA); pausarMio(_audB);
+  _relleno = false; _cambiando = false;
+  avisarCambio();
 }
 function detenerVoz(){
   pareYo = true;
@@ -2664,6 +2880,10 @@ function pintarNotaVoz(){
   else if(motorGuardado() === null) n.textContent = 'Toca ▶ y escoge la voz nueva: sigue sonando con la pantalla apagada.';
   else n.textContent = 'Con la voz del teléfono deja la pantalla encendida. En 🔊 La voz está la voz nueva, que sigue con la pantalla apagada.';
 }
+
+document.addEventListener('visibilitychange', function(){
+  if(usandoNueva() && sonando) anotarVoz(document.hidden ? 'la app pasó atrás (pantalla apagada u otra app)' : 'volvió a la app');
+});
 
 /* ── la pantalla bloqueada y la barra de notificaciones ── */
 function estadoSesion(s){ try{ if('mediaSession' in navigator) navigator.mediaSession.playbackState = s; }catch(e){} }
@@ -2717,9 +2937,10 @@ function playPausaNueva(){
   }
   reproducirBloque(k, { pedazo: pedazoAhora });
 }
-async function reproducirBloque(k, desde){
+async function reproducirBloque(k, desde, cortar){
   var mio = ++_turno;
   if(k < 0 || k >= bloques.length) return;
+  audioEl();
   bloqueAhora = k;
   var b = bloques[k];
   pedazoAhora = (desde && desde.pedazo != null) ? desde.pedazo : b.a;
@@ -2727,7 +2948,11 @@ async function reproducirBloque(k, desde){
   pintarTiempos();
   var clave = claveBloque(temaActual, pedazos, bloques, k);
   _urgente = clave;
-  if(!estaListo(clave)) estadoVoz('⏳ Preparando la voz…');
+  if(!estaListo(clave)){
+    estadoVoz('⏳ Preparando la voz…');
+    if(sonando) ponerRelleno(cortar);       // v3.9: mientras, suena silencio (nunca "nada")
+    despertarCola();
+  }
   var r;
   try{ r = await pedirAudio(clave, textoDeBloque(pedazos, b), 0); }
   catch(e){
@@ -2736,35 +2961,54 @@ async function reproducirBloque(k, desde){
   }
   if(mio !== _turno || !sonando) return;
   estadoVoz('');
-  var a = audioEl();
-  _urlSonando = r.url; _claveSonando = clave;
-  a.src = r.url;
-  a.defaultPlaybackRate = velocidad; a.playbackRate = velocidad;
-  try{ a.preservesPitch = true; }catch(e){}
-  var seg = 0;
+  var dv = r.durVoz || r.dur, seg = 0;
   if(desde && desde.seg != null) seg = desde.seg;
-  else if(desde && desde.pedazo != null) seg = fraccionDe(k, desde.pedazo) * r.dur;
-  if(seg > 0){ try{ a.currentTime = Math.min(seg, Math.max(0, r.dur - 0.3)); }catch(e){} }
+  else if(desde && desde.pedazo != null) seg = fraccionDe(k, desde.pedazo) * dv;
+  if(seg > 0) seg = Math.min(seg, Math.max(0, dv - 0.3));
+  var anterior = _urlSonando;
+  _urlSonando = r.url; _claveSonando = clave; _avanceDe = null;
   nuevaPosMovida = false;
   ponerMetadatos();
-  var pr;
-  try{ pr = a.play(); }catch(e){ pr = Promise.reject(e); }
-  Promise.resolve(pr).then(function(){ if(mio === _turno) estadoSesion('playing'); })
+  anotarVoz('suena ' + nombreClave(clave) + ' de ' + bloques.length + (document.hidden ? ' [app atrás]' : ''));
+  cambiarA(r.url, seg, false, cortar && !_relleno)
+    .then(function(){
+      if(anterior && anterior !== r.url && anterior.indexOf('blob:') === 0 && !urlEnUso(anterior)){ try{ URL.revokeObjectURL(anterior); }catch(x){} }
+      if(mio === _turno) estadoSesion('playing');
+    })
     .catch(function(e){ if(mio === _turno) noDejoSonar(e); });
   limpiarDentroDelTema(k);
   adelantarBloques(k);
 }
-/* mientras suena un pedazo, se preparan los que vienen (y el tema siguiente,
-   para que al pasar de tema no haya silencio con la pantalla apagada) */
+/* mientras suena un pedazo, se prepara por adelantado TODO lo que cabe en el
+   tope (unos 13 minutos), y despues el tema siguiente: con la pantalla apagada
+   el telefono puede preparar mas despacio, y asi tiene de donde tirar. */
 function adelantarBloques(k){
-  for(var j = k + 1; j <= k + 3 && j < bloques.length; j++)
-    pedirAudio(claveBloque(temaActual, pedazos, bloques, j), textoDeBloque(pedazos, bloques[j]), j - k);
-  if(k >= bloques.length - 2 && libroActual && temaActual < libroActual.temas.length - 1){
+  var letras = 0, j;
+  for(j = k + 1; j < bloques.length && letras < ADELANTE_LETRAS; j++){
+    var tx = textoDeBloque(pedazos, bloques[j]);
+    letras += tx.length;
+    pedirAudio(claveBloque(temaActual, pedazos, bloques, j), tx, j - k);
+  }
+  if(j >= bloques.length && libroActual && temaActual < libroActual.temas.length - 1){
     try{
       var sig = temaActual + 1, ps = pedazosDelTema(sig, modoLectura), bl = juntarEnBloques(ps);
-      if(bl.length) pedirAudio(claveBloque(sig, ps, bl, 0), textoDeBloque(ps, bl[0]), 5);
+      for(var m = 0; m < bl.length && (m < 2 || letras < ADELANTE_LETRAS); m++){
+        var t2 = textoDeBloque(ps, bl[m]);
+        letras += t2.length;
+        pedirAudio(claveBloque(sig, ps, bl, m), t2, (bloques.length - k) + m + 1);
+      }
     }catch(e){}
   }
+}
+/* v3.9: el siguiente pedazo arranca cuando a este le quedan 0.12 seg de voz
+   (todavia suena su colchon de silencio): asi nunca hay un hueco. */
+function finCerca(a){
+  if(!sonando || _relleno || a.src !== _urlSonando || _avanceDe === _claveSonando || !usandoNueva()) return;
+  var r = resueltoDe(_claveSonando), dv = r && r.durVoz;
+  if(!dv) return;
+  if((dv - a.currentTime) / (a.playbackRate || 1) > ANTES_DEL_FIN) return;
+  _avanceDe = _claveSonando;
+  alTerminarBloque();
 }
 function alTerminarBloque(){
   if(!sonando || !usandoNueva()) return;
@@ -2776,8 +3020,10 @@ function alTerminarBloque(){
 }
 function alAvanzarAudio(){
   var a = _audio;
-  if(!a || a.src !== _urlSonando || !a.duration || !isFinite(a.duration) || !bloques[bloqueAhora]) return;
-  var p = pedazoEnFraccion(bloqueAhora, a.currentTime / a.duration);
+  if(!a || _relleno || a.src !== _urlSonando || !bloques[bloqueAhora]) return;
+  var r = resueltoDe(_claveSonando), d = (r && r.durVoz) || a.duration;
+  if(!d || !isFinite(d)) return;
+  var p = pedazoEnFraccion(bloqueAhora, Math.min(0.999, a.currentTime / d));
   if(p !== pedazoAhora){
     pedazoAhora = p;
     $('esc-dice').textContent = pedazos[p] || '';
@@ -2786,25 +3032,25 @@ function alAvanzarAudio(){
 }
 function saltarNueva(seg){
   var a = audioEl(), k = bloqueAhora;
+  if(_relleno) return;                          // todavia preparando: no hay donde saltar
   var r = resueltoDe(claveBloque(temaActual, pedazos, bloques, k));
-  var dur = (r && r.dur) || a.duration || 0;
+  var dur = (r && (r.durVoz || r.dur)) || a.duration || 0;
   var t = (a.currentTime || 0) + seg;
   if(t < 0){
     if(k === 0){ a.currentTime = 0; return; }
     var rp = resueltoDe(claveBloque(temaActual, pedazos, bloques, k - 1));
-    detenerAudio();
-    return reproducirBloque(k - 1, { seg: rp ? Math.max(0, rp.dur + t) : 0 });
+    return reproducirBloque(k - 1, { seg: rp ? Math.max(0, (rp.durVoz || rp.dur) + t) : 0 }, true);
   }
   if(dur && t >= dur - 0.2){
     if(k + 1 >= bloques.length){ a.currentTime = Math.max(0, dur - 0.3); return; }
-    detenerAudio();
-    return reproducirBloque(k + 1, { seg: Math.max(0, t - dur) });
+    return reproducirBloque(k + 1, { seg: Math.max(0, t - dur) }, true);
   }
   a.currentTime = t;
 }
 function noDejoSonar(e){
   if(e && e.name === 'AbortError') return;     // se cambio de pedazo a proposito
   if(e && e.name === 'NotAllowedError'){
+    _genCambio++; pausarMio(_audA); pausarMio(_audB); _relleno = false; _cambiando = false;
     sonando = false; marcarBoton(); estadoSesion('paused');
     estadoVoz('▶ Toca play para seguir escuchando.');
     anotarVoz('el telefono no dejo arrancar el audio solo');
@@ -2908,6 +3154,7 @@ async function probarVozNueva(id, bajada){
    una foto a quien arregla la app. */
 async function diagnosticoVozNueva(){
   if(sonando) playPausa();
+  var antes = registroGuardado().slice(-60).reverse();     // v3.9: lo que paso antes de esta prueba
   var pasos = [];
   function pintar(fin){
     var h = '<h2>🔧 Prueba de la voz nueva</h2><div class="diag">'
@@ -2920,6 +3167,9 @@ async function diagnosticoVozNueva(){
       var err = ''; try{ err = localStorage.getItem('efd_voz_error') || ''; }catch(e){}
       h += '<p class="mini" style="margin:10px 0 4px">Versión: ' + esc(versionDeEstaApp()) + ' · voz: ' + esc(vozNuevaId()) + '</p>'
         + (err ? '<p class="mini" style="margin:0 0 4px">Último fallo guardado: ' + esc(err) + '</p>' : '')
+        + '<p class="mini" style="margin:8px 0 2px">Lo último que pasó con la voz (lo más nuevo arriba):</p>'
+        + '<div class="diag-reg" style="max-height:200px">' + esc(antes.length ? antes.join('\n') : 'nada guardado todavía') + '</div>'
+        + '<p class="mini" style="margin:4px 0 2px">Esta prueba:</p>'
         + '<div class="diag-reg">' + esc(_registroVoz.slice(-8).join('\n')) + '</div>'
         + (fin === 'bien' ? '<button class="btn btn-oro" id="diag-usar">Usar la voz nueva</button>' : '')
         + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
@@ -2951,9 +3201,9 @@ async function diagnosticoVozNueva(){
   var p4 = paso('Convertir una frase en audio'), r;
   try{
     r = await generarAudio('El Señor es mi pastor, nada me faltará. Así suena esta voz.');
-    var veces = r.ms ? (r.dur * 1000 / r.ms) : 0;
+    var dvz = r.durVoz || r.dur, veces = r.ms ? (dvz * 1000 / r.ms) : 0;
     p4.ok = true;
-    p4.d = r.dur.toFixed(1) + ' seg de audio en ' + (r.ms / 1000).toFixed(1) + ' seg'
+    p4.d = dvz.toFixed(1) + ' seg de audio en ' + (r.ms / 1000).toFixed(1) + ' seg'
       + (veces ? ' · ' + veces.toFixed(1) + ' veces más rápido que hablarla' : '')
       + (veces && veces < 1.2 ? ' · ⚠ despacio: puede haber pausas' : '');
   }catch(e){ p4.ok = false; p4.d = mensajeDe(e); return pintar('mal'); }
