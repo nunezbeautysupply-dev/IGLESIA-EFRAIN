@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261111b-EFD-ADMIN-V3.9">
+<meta name="app-version" content="20261112a-EFD-ADMIN-V4.0">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -2050,6 +2050,15 @@ function marcarDesdeParrafo(j){
    se prepara, 3 seg de silencio al final de cada pedazo como colchon, se
    prepara por adelantado todo lo que cabe (unos 13 min), y queda un registro
    guardado de lo que paso, que se ve en la prueba 🔧.
+   v4.0 (11-12 nov 2026): (1) las letras iban atrasadas/adelantadas: la app
+   CALCULABA que frase iba por la cantidad de letras. Ahora la voz se prepara
+   FRASE POR FRASE y se sabe exactamente en que segundo empieza cada una.
+   (2) Preparar de a una frase (no un pedazo entero de golpe) deja respirar al
+   telefono entre frase y frase: la pantalla no se traba y los cambios llegan a
+   tiempo. (3) Una voz guardada danada se borra y se baja otra vez sola; si
+   viene danada de origen queda marcada "no funciona". (4) La prueba 🔧 trae un
+   resumen de la ultima vez que se escucho, y el registro ya no se llena con lo
+   que dice el motor por dentro.
    ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
 var pedazos = [];        // el tema partido en frases cortas
@@ -2328,6 +2337,10 @@ var ANTES_DEL_FIN = 0.12;    // el siguiente arranca cuando a este le quedan 0.1
 var ADELANTE_LETRAS = 12000; // cuanto texto se prepara por adelantado: unas 12.000 letras ≈ 13 minutos
 var _audA = null, _audB = null, _relleno = false, _avanceDe = null, _urlRelleno = null;
 var _msPorLetra = null, _alCambiar = [], _genCambio = 0, _cambiando = false, _cambiandoDesde = 0;
+/* v4.0 — la voz se prepara frase por frase: entre una y otra va esta pausa */
+var PAUSA_FRASE = 0.2;       // despues de punto, signo de pregunta, etc.
+var PAUSA_COMA  = 0.08;      // cuando una frase larga se partio en una coma
+var _esperaDesde = 0;
 
 var bloques = [], bloqueAhora = 0, nuevaPosMovida = true;
 var nuevaFallo = null;                    // si fallo en esta sesion: el motivo
@@ -2354,11 +2367,42 @@ function nuevaPosible(){
 }
 function usandoNueva(){ return motorGuardado() === 'nueva' && !nuevaFallo && nuevaPosible(); }
 
-function anotarVoz(t){
+function anotarVoz(t, soloMemoria){
   var l = new Date().toTimeString().slice(0, 8) + ' ' + String(t).slice(0, 160);
   _registroVoz.push(l); if(_registroVoz.length > 60) _registroVoz.shift();
   try{ console.log('[voz] ' + l); }catch(e){}
-  guardarEnRegistro(l);
+  if(!soloMemoria) guardarEnRegistro(l);
+}
+/* v4.0: un RESUMEN de la ultima vez que se escucho, para la prueba 🔧 */
+var _stats = null;
+function statsVoz(){
+  if(!_stats){
+    try{ _stats = JSON.parse(localStorage.getItem('efd_voz_stats') || 'null'); }catch(e){ _stats = null; }
+    if(!_stats || typeof _stats !== 'object') _stats = statsNuevos();
+  }
+  return _stats;
+}
+function statsNuevos(){
+  var d = new Date();
+  return { desde: (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.toTimeString().slice(0, 5), pedazos: 0, esperas: 0,
+           esperaSeg: 0, esperaMax: 0, rapPrendida: [], rapApagada: [], ocupadoMax: 0, tarde: 0, atras: 0 };
+}
+function reiniciarStats(){ _stats = statsNuevos(); guardarStats(); }
+function guardarStats(){ try{ localStorage.setItem('efd_voz_stats', JSON.stringify(_stats)); }catch(e){} }
+function mediana(l){ if(!l || !l.length) return 0; var c = l.slice().sort(function(a, b){ return a - b; }); return c[Math.floor(c.length / 2)]; }
+function resumenStats(){
+  var st = statsVoz(), h = [];
+  if(!st.pedazos) return 'Todavía no hay datos de la última vez que escuchaste.';
+  h.push('sonaron ' + st.pedazos + ' pedazos de audio');
+  h.push(st.esperas ? ('esperó a que el audio estuviera listo ' + st.esperas + ' ' + (st.esperas === 1 ? 'vez' : 'veces')
+           + ' (en total ' + st.esperaSeg.toFixed(1) + ' s; la más larga ' + st.esperaMax.toFixed(1) + ' s)')
+         : 'nunca tuvo que esperar a que el audio estuviera listo');
+  var p = mediana(st.rapPrendida), a = mediana(st.rapApagada);
+  h.push('preparaba la voz ' + (p ? p.toFixed(1) + ' veces más rápido que hablarla con la pantalla prendida' : '(sin datos con la pantalla prendida)')
+         + (a ? ', y ' + a.toFixed(1) + ' veces con la pantalla apagada' : ''));
+  h.push('el teléfono se quedó ocupado preparando hasta ' + st.ocupadoMax.toFixed(1) + ' s seguidos');
+  h.push('la app pasó atrás ' + st.atras + ' ' + (st.atras === 1 ? 'vez' : 'veces') + ' · arranques tarde: ' + st.tarde);
+  return 'La última vez que escuchaste (desde ' + st.desde + '):\n· ' + h.join('\n· ');
 }
 /* v3.9: el registro queda GUARDADO en el telefono (los ultimos 250 sucesos),
    para que la prueba 🔧 muestre que paso la ultima vez que se corto la voz. */
@@ -2487,11 +2531,21 @@ function etiquetaVozNueva(id){
 }
 
 /* ── bajar la voz (si hace falta) y dejarla lista para hablar ── */
+var VOZ_DANADA = /No graph was found|protobuf|invalid model|Load model.*fail/i;
+function vocesMalas(){
+  try{ var l = JSON.parse(localStorage.getItem('efd_voces_malas') || '[]'); return Array.isArray(l) ? l : []; }catch(e){ return []; }
+}
+function marcarMala(id){
+  var l = vocesMalas();
+  if(l.indexOf(id) < 0){ l.push(id); try{ localStorage.setItem('efd_voces_malas', JSON.stringify(l)); }catch(e){} }
+}
+function errorVozMala(){ return new Error('esta voz no funciona: su archivo viene dañado desde el sitio de las voces. Escoge otra'); }
 function prepararVozNueva(vozId, alProgreso){
   if(_sesion && _sesionVoz === vozId) return Promise.resolve(_sesion);
   if(_sesionProm && _sesionPromVoz === vozId) return _sesionProm;
   _sesionPromVoz = vozId;
   _sesionProm = (async function(){
+    if(vocesMalas().indexOf(vozId) >= 0) throw errorVozMala();
     var m = await cargarPiper();
     try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
     var ya = [];
@@ -2501,21 +2555,41 @@ function prepararVozNueva(vozId, alProgreso){
       await m.download(vozId, function(p){ if(alProgreso) alProgreso(p); });
       anotarVoz('voz bajada');
     }
-    var TS = m.TtsSession;
-    var lugares = {};
-    try{ Object.keys(TS.WASM_LOCATIONS || {}).forEach(function(k){ lugares[k] = TS.WASM_LOCATIONS[k]; }); }catch(e){}
-    lugares.onnxWasm = _ortWasm;
-    try{ TS._instance = null; }catch(e){}
-    anotarVoz('abriendo la voz ' + vozId);
-    var s = await TS.create({ voiceId: vozId, wasmPaths: lugares,
-      progress: function(p){ if(alProgreso) alProgreso(p); },
-      logger: function(t){ anotarVoz(t); } });
+    var s;
+    try{ s = await abrirSesion(m, vozId, alProgreso); }
+    catch(e){
+      if(!VOZ_DANADA.test((e && e.message) || String(e))) throw e;
+      // el archivo guardado de esta voz esta danado: se borra y se baja otra vez
+      anotarVoz('la voz guardada está dañada (' + vozId + '): se borra y se baja otra vez');
+      try{ if(typeof m.remove === 'function') await m.remove(vozId); }catch(x){}
+      await m.download(vozId, function(p){ if(alProgreso) alProgreso(p); });
+      try{ s = await abrirSesion(m, vozId, alProgreso); }
+      catch(e2){
+        if(!VOZ_DANADA.test((e2 && e2.message) || String(e2))) throw e2;
+        marcarMala(vozId);
+        anotarVoz('la voz ' + vozId + ' sigue dañada: queda marcada "no funciona"');
+        try{ if(typeof m.remove === 'function') await m.remove(vozId); }catch(x){}
+        throw errorVozMala();
+      }
+    }
     _sesion = s; _sesionVoz = vozId;
     anotarVoz('voz lista');
     return s;
   })();
   _sesionProm.then(function(){ _sesionProm = null; }, function(){ _sesionProm = null; });
   return _sesionProm;
+}
+
+async function abrirSesion(m, vozId, alProgreso){
+  var TS = m.TtsSession;
+  var lugares = {};
+  try{ Object.keys(TS.WASM_LOCATIONS || {}).forEach(function(k){ lugares[k] = TS.WASM_LOCATIONS[k]; }); }catch(e){}
+  lugares.onnxWasm = _ortWasm;
+  try{ TS._instance = null; }catch(e){}
+  anotarVoz('abriendo la voz ' + vozId);
+  return await TS.create({ voiceId: vozId, wasmPaths: lugares,
+    progress: function(p){ if(alProgreso) alProgreso(p); },
+    logger: function(t){ anotarVoz(t, true); } });       // lo del motor por dentro: solo en la memoria
 }
 
 /* ── convertir texto en audio ── */
@@ -2555,6 +2629,32 @@ async function generarAudio(texto){
    el pedazo siguiente, este sigue "sonando" (en silencio) y Android no le quita
    a la app el permiso de sonar con la pantalla apagada. */
 async function alargarConSilencio(b, seg){
+  var w = await leerWav(b);
+  return w ? armarWav(w, [w.pcm], seg) : null;
+}
+function bytesDeSilencio(f, seg){ return Math.max(0, Math.round(f.porSeg * seg / f.bloque) * f.bloque); }
+/* junta trozos de audio (o silencios, dados en segundos) en un solo WAV, con colchon al final */
+function armarWav(w0, trozos, colaSeg){
+  var f = w0.fmt, total = 0;
+  trozos.forEach(function(t){ total += (typeof t === 'number') ? bytesDeSilencio(f, t) : t.length; });
+  total += bytesDeSilencio(f, colaSeg);
+  var nuevo = new ArrayBuffer(44 + total), o = new DataView(nuevo), u8 = new Uint8Array(nuevo);
+  function e4(q, t){ for(var i = 0; i < 4; i++) o.setUint8(q + i, t.charCodeAt(i)); }
+  e4(0, 'RIFF'); o.setUint32(4, 36 + total, true); e4(8, 'WAVE');
+  e4(12, 'fmt '); o.setUint32(16, 16, true); o.setUint16(20, w0.formato, true); o.setUint16(22, f.canales, true);
+  o.setUint32(24, f.hz, true); o.setUint32(28, f.porSeg, true); o.setUint16(32, f.bloque, true); o.setUint16(34, f.bits, true);
+  e4(36, 'data'); o.setUint32(40, total, true);
+  var cero = (w0.formato === 1 && f.bits === 8) ? 0x80 : 0;    // en 8 bits el silencio es 128
+  if(cero) u8.fill(cero, 44);
+  var p = 44;
+  trozos.forEach(function(t){
+    if(typeof t === 'number'){ p += bytesDeSilencio(f, t); return; }
+    u8.set(t, p); p += t.length;
+  });
+  return new Blob([nuevo], { type: 'audio/wav' });
+}
+/* lee un WAV: su formato y el sonido en crudo */
+async function leerWav(b){
   try{
     var buf = await b.arrayBuffer(), d = new DataView(buf);
     function id4(q){ return String.fromCharCode(d.getUint8(q), d.getUint8(q+1), d.getUint8(q+2), d.getUint8(q+3)); }
@@ -2569,24 +2669,16 @@ async function alargarConSilencio(b, seg){
     }
     if(!f || ini < 0 || !f.porSeg || !f.bloque) return null;
     var formato = f.formato === 0xFFFE ? (f.bits === 32 ? 3 : 1) : f.formato;
-    var extra = Math.round(f.porSeg * seg / f.bloque) * f.bloque;
-    var nuevo = new ArrayBuffer(44 + largo + extra), o = new DataView(nuevo), u8 = new Uint8Array(nuevo);
-    function e4(q, t){ for(var i = 0; i < 4; i++) o.setUint8(q + i, t.charCodeAt(i)); }
-    e4(0, 'RIFF'); o.setUint32(4, 36 + largo + extra, true); e4(8, 'WAVE');
-    e4(12, 'fmt '); o.setUint32(16, 16, true); o.setUint16(20, formato, true); o.setUint16(22, f.canales, true);
-    o.setUint32(24, f.hz, true); o.setUint32(28, f.porSeg, true); o.setUint16(32, f.bloque, true); o.setUint16(34, f.bits, true);
-    e4(36, 'data'); o.setUint32(40, largo + extra, true);
-    u8.set(new Uint8Array(buf, ini, largo), 44);
-    if(formato === 1 && f.bits === 8) u8.fill(0x80, 44 + largo);    // en 8 bits el silencio es 128
-    return new Blob([nuevo], { type: 'audio/wav' });
+    return { fmt: f, formato: formato, pcm: new Uint8Array(buf, ini, largo) };
   }catch(e){ return null; }
 }
 
 /* ── la fila de trabajo: un pedazo a la vez, lo que hace falta YA primero ── */
-function pedirAudio(clave, texto, prio){
+function pedirAudio(clave, partes, prio){
   var e = _cacheAudio[clave];
   if(e){ if(e.pend && prio < e.prio) e.prio = prio; return e.prom; }
-  e = { prio: prio, pend: true, texto: texto, res: null };
+  if(!Array.isArray(partes)) partes = [String(partes || '')];
+  e = { prio: prio, pend: true, partes: partes, texto: partes.join(' '), hechas: [], res: null };
   e.prom = new Promise(function(ok, mal){ e.ok = ok; e.mal = mal; });
   e.prom.catch(function(){});
   _cacheAudio[clave] = e;
@@ -2610,23 +2702,73 @@ async function correrCola(){
       });
       var clave = _cola[0], e = _cacheAudio[clave];
       if(cambioAMedias()){ await esperarCambio(); continue; }
-      if(clave !== _urgente && !hayTiempoPara(e.texto)){ await esperarCambio(); continue; }
-      _cola.shift();
-      if(!e || !e.pend) continue;
+      if(clave !== _urgente && !hayTiempoPara(e.partes[e.hechas.length] || '')){ await esperarCambio(); continue; }
       try{
-        var r = await generarAudio(e.texto);
-        if(_cacheAudio[clave] !== e){ URL.revokeObjectURL(r.url); continue; }   // ya no hacia falta
-        e.res = r; e.pend = false; e.ok(r);
-        anotarVoz('listo ' + nombreClave(clave) + ': ' + (r.durVoz || r.dur).toFixed(1) + ' s de voz en '
-          + (r.ms / 1000).toFixed(1) + ' s' + (r.atras ? ' [app atrás]' : ''));
-        await ceder();     // deja respirar al telefono entre pedazo y pedazo
+        await generarParte(e);                                   // UNA frase
+        if(_cacheAudio[clave] !== e) continue;                   // ya no hacia falta
+        if(e.hechas.length >= e.partes.length){
+          var r = armarBloque(e);
+          e.hechas = null; e.res = r; e.pend = false; e.ok(r);
+          contarListo(r);
+          anotarVoz('listo ' + nombreClave(clave) + ': ' + r.durVoz.toFixed(1) + ' s de voz en '
+            + (r.ms / 1000).toFixed(1) + ' s' + (r.atras ? ' [app atrás]' : ''));
+        }
       }catch(err){
         e.pend = false;
         if(_cacheAudio[clave] === e) delete _cacheAudio[clave];
         e.mal(err);
       }
+      await ceder();                                             // deja respirar al telefono
+      if(!document.hidden) await new Promise(function(ok){ setTimeout(ok, 40); });   // y que la pantalla se pinte
     }
   } finally { _generando = false; }
+}
+/* prepara UNA frase del pedazo y la guarda aparte */
+async function generarParte(e){
+  var s = await prepararVozNueva(vozNuevaId());
+  var tx = e.partes[e.hechas.length];
+  var t0 = Date.now(), atras = !!document.hidden, vig = vigiaEmpezar();
+  var wav;
+  try{ wav = await s.predict(tx); } finally { var ocupado = vigiaTerminar(vig); }
+  var ms = Date.now() - t0;
+  if(!wav || !wav.size) throw new Error('la voz no devolvio audio');
+  var w = await leerWav(wav);
+  if(!w) throw new Error('la voz devolvio un audio que no se entiende');
+  if(e.hechas.length && w.fmt.porSeg !== e.hechas[0].fmt.porSeg) throw new Error('la voz cambio a medio pedazo');
+  e.hechas.push(w);
+  e.ms = (e.ms || 0) + ms; e.atras = e.atras || atras;
+  if(!atras) e.ocupado = Math.max(e.ocupado || 0, ocupado);
+  if(tx && tx.length > 15){
+    var pl = ms / tx.length;
+    _msPorLetra = _msPorLetra ? (_msPorLetra * 0.7 + pl * 0.3) : pl;
+  }
+}
+function pausaTrasFrase(t){ return /[.!?…:;]["»”')]*\s*$/.test(t || '') ? PAUSA_FRASE : PAUSA_COMA; }
+/* junta las frases en un solo audio y anota en que segundo EXACTO empieza cada una */
+function armarBloque(e){
+  var w0 = e.hechas[0], f = w0.fmt, trozos = [], marcas = [], t = 0;
+  for(var i = 0; i < e.hechas.length; i++){
+    marcas.push(t);
+    trozos.push(e.hechas[i].pcm); t += e.hechas[i].pcm.length / f.porSeg;
+    var pausa = pausaTrasFrase(e.partes[i]);
+    trozos.push(pausa); t += bytesDeSilencio(f, pausa) / f.porSeg;
+  }
+  var blob = armarWav(w0, trozos, COLA_SEG);
+  return { url: URL.createObjectURL(blob), durVoz: t, dur: t + bytesDeSilencio(f, COLA_SEG) / f.porSeg,
+           marcas: marcas, ms: e.ms || 0, atras: !!e.atras, ocupado: e.ocupado || 0 };
+}
+/* vigia: mide si el telefono se queda trabado mientras prepara (si se traba, no pinta la pantalla) */
+function vigiaEmpezar(){
+  var v = { ult: performance.now(), max: 0 };
+  v.id = setInterval(function(){ var a = performance.now(); v.max = Math.max(v.max, a - v.ult); v.ult = a; }, 50);
+  return v;
+}
+function vigiaTerminar(v){ clearInterval(v.id); var a = performance.now(); return Math.max(v.max, a - v.ult) / 1000; }
+function contarListo(r){
+  var st = statsVoz(), rap = r.ms ? r.durVoz * 1000 / r.ms : 0;
+  if(rap){ var l = r.atras ? st.rapApagada : st.rapPrendida; l.push(+rap.toFixed(2)); if(l.length > 40) l.shift(); }
+  if(!r.atras) st.ocupadoMax = Math.max(st.ocupadoMax, +r.ocupado.toFixed(2));
+  guardarStats();
 }
 function nombreClave(c){
   var p = c.split('|'), t = p[0].split('::');
@@ -2690,6 +2832,23 @@ function juntarEnBloques(lista){
   return fuera;
 }
 function textoDeBloque(lista, b){ return lista.slice(b.a, b.b + 1).join(' '); }
+function partesDeBloque(lista, b){ return lista.slice(b.a, b.b + 1); }
+/* v4.0: en que segundo EXACTO empieza la frase i del pedazo k (si el audio trae sus marcas) */
+function segundoDePedazo(k, i, r){
+  if(r && r.marcas){ var m = r.marcas[i - bloques[k].a]; if(m != null) return m; }
+  return fraccionDe(k, i) * ((r && (r.durVoz || r.dur)) || 0);
+}
+/* que frase se esta oyendo en el segundo t del pedazo k */
+function pedazoEnTiempo(k, t, r){
+  var b = bloques[k];
+  if(r && r.marcas){
+    var j = 0;
+    for(var x = 0; x < r.marcas.length; x++){ if(r.marcas[x] <= t + 0.05) j = x; else break; }
+    return Math.min(b.b, b.a + j);
+  }
+  var d = (r && r.durVoz) || 0;
+  return d ? pedazoEnFraccion(k, Math.min(0.999, t / d)) : b.a;
+}
 function bloqueDePedazo(i){
   for(var k = 0; k < bloques.length; k++) if(i >= bloques[k].a && i <= bloques[k].b) return k;
   return Math.max(0, bloques.length - 1);
@@ -2755,6 +2914,7 @@ function crearAudio(id){
   a.addEventListener('ended', function(){
     if(a !== _audio || _relleno || a.src !== _urlSonando || _avanceDe === _claveSonando) return;
     anotarVoz('el pedazo se acabó antes de arrancar el siguiente' + (document.hidden ? ' [app atrás]' : ''));
+    statsVoz().tarde++; guardarStats();
     _avanceDe = _claveSonando;
     alTerminarBloque();
   });
@@ -2839,6 +2999,7 @@ function cambiarA(url, seg, esRelleno, cortar){
 function ponerRelleno(cortar){
   if(_relleno && _audio && !_audio.paused) return;
   anotarVoz('esperando el audio: suena silencio para no perder el permiso' + (document.hidden ? ' [app atrás]' : ''));
+  var st = statsVoz(); if(st.pedazos > 0 && !_esperaDesde){ st.esperas++; _esperaDesde = Date.now(); guardarStats(); }
   cambiarA(urlRelleno(), 0, true, cortar).catch(function(e){ anotarVoz('el silencio no arrancó: ' + mensajeDe(e)); });
 }
 /* En el iPhone el audio tiene que "despertarse" con el dedo; en Android no hace daño. */
@@ -2882,7 +3043,10 @@ function pintarNotaVoz(){
 }
 
 document.addEventListener('visibilitychange', function(){
-  if(usandoNueva() && sonando) anotarVoz(document.hidden ? 'la app pasó atrás (pantalla apagada u otra app)' : 'volvió a la app');
+  if(usandoNueva() && sonando){
+    anotarVoz(document.hidden ? 'la app pasó atrás (pantalla apagada u otra app)' : 'volvió a la app');
+    if(document.hidden){ statsVoz().atras++; guardarStats(); }
+  }
 });
 
 /* ── la pantalla bloqueada y la barra de notificaciones ── */
@@ -2915,6 +3079,7 @@ function ponerMetadatos(){
 
 /* ── tocar con la voz nueva ── */
 function playPausaNueva(){
+  if(!sonando) reiniciarStats();
   var a = audioEl();
   if(sonando){
     sonando = false; marcarBoton();
@@ -2954,7 +3119,7 @@ async function reproducirBloque(k, desde, cortar){
     despertarCola();
   }
   var r;
-  try{ r = await pedirAudio(clave, textoDeBloque(pedazos, b), 0); }
+  try{ r = await pedirAudio(clave, partesDeBloque(pedazos, b), 0); }
   catch(e){
     if(mio !== _turno || (e && e.descartado)) return;
     return fallaVozNueva(e);
@@ -2963,13 +3128,16 @@ async function reproducirBloque(k, desde, cortar){
   estadoVoz('');
   var dv = r.durVoz || r.dur, seg = 0;
   if(desde && desde.seg != null) seg = desde.seg;
-  else if(desde && desde.pedazo != null) seg = fraccionDe(k, desde.pedazo) * dv;
+  else if(desde && desde.pedazo != null) seg = segundoDePedazo(k, desde.pedazo, r);
   if(seg > 0) seg = Math.min(seg, Math.max(0, dv - 0.3));
   var anterior = _urlSonando;
   _urlSonando = r.url; _claveSonando = clave; _avanceDe = null;
   nuevaPosMovida = false;
   ponerMetadatos();
   anotarVoz('suena ' + nombreClave(clave) + ' de ' + bloques.length + (document.hidden ? ' [app atrás]' : ''));
+  var st = statsVoz(); st.pedazos++;
+  if(_esperaDesde){ var es = (Date.now() - _esperaDesde) / 1000; st.esperaSeg += es; st.esperaMax = Math.max(st.esperaMax, es); _esperaDesde = 0; }
+  guardarStats();
   cambiarA(r.url, seg, false, cortar && !_relleno)
     .then(function(){
       if(anterior && anterior !== r.url && anterior.indexOf('blob:') === 0 && !urlEnUso(anterior)){ try{ URL.revokeObjectURL(anterior); }catch(x){} }
@@ -2985,17 +3153,15 @@ async function reproducirBloque(k, desde, cortar){
 function adelantarBloques(k){
   var letras = 0, j;
   for(j = k + 1; j < bloques.length && letras < ADELANTE_LETRAS; j++){
-    var tx = textoDeBloque(pedazos, bloques[j]);
-    letras += tx.length;
-    pedirAudio(claveBloque(temaActual, pedazos, bloques, j), tx, j - k);
+    letras += textoDeBloque(pedazos, bloques[j]).length;
+    pedirAudio(claveBloque(temaActual, pedazos, bloques, j), partesDeBloque(pedazos, bloques[j]), j - k);
   }
   if(j >= bloques.length && libroActual && temaActual < libroActual.temas.length - 1){
     try{
       var sig = temaActual + 1, ps = pedazosDelTema(sig, modoLectura), bl = juntarEnBloques(ps);
       for(var m = 0; m < bl.length && (m < 2 || letras < ADELANTE_LETRAS); m++){
-        var t2 = textoDeBloque(ps, bl[m]);
-        letras += t2.length;
-        pedirAudio(claveBloque(sig, ps, bl, m), t2, (bloques.length - k) + m + 1);
+        letras += textoDeBloque(ps, bl[m]).length;
+        pedirAudio(claveBloque(sig, ps, bl, m), partesDeBloque(ps, bl[m]), (bloques.length - k) + m + 1);
       }
     }catch(e){}
   }
@@ -3023,7 +3189,7 @@ function alAvanzarAudio(){
   if(!a || _relleno || a.src !== _urlSonando || !bloques[bloqueAhora]) return;
   var r = resueltoDe(_claveSonando), d = (r && r.durVoz) || a.duration;
   if(!d || !isFinite(d)) return;
-  var p = pedazoEnFraccion(bloqueAhora, Math.min(0.999, a.currentTime / d));
+  var p = pedazoEnTiempo(bloqueAhora, a.currentTime, r && r.durVoz ? r : { durVoz: d });
   if(p !== pedazoAhora){
     pedazoAhora = p;
     $('esc-dice').textContent = pedazos[p] || '';
@@ -3155,6 +3321,7 @@ async function probarVozNueva(id, bajada){
 async function diagnosticoVozNueva(){
   if(sonando) playPausa();
   var antes = registroGuardado().slice(-60).reverse();     // v3.9: lo que paso antes de esta prueba
+  var resumen = resumenStats();                            // v4.0: el resumen de la ultima vez
   var pasos = [];
   function pintar(fin){
     var h = '<h2>🔧 Prueba de la voz nueva</h2><div class="diag">'
@@ -3167,6 +3334,7 @@ async function diagnosticoVozNueva(){
       var err = ''; try{ err = localStorage.getItem('efd_voz_error') || ''; }catch(e){}
       h += '<p class="mini" style="margin:10px 0 4px">Versión: ' + esc(versionDeEstaApp()) + ' · voz: ' + esc(vozNuevaId()) + '</p>'
         + (err ? '<p class="mini" style="margin:0 0 4px">Último fallo guardado: ' + esc(err) + '</p>' : '')
+        + '<div class="diag-reg" style="max-height:none;white-space:pre-wrap;margin-top:8px">' + esc(resumen) + '</div>'
         + '<p class="mini" style="margin:8px 0 2px">Lo último que pasó con la voz (lo más nuevo arriba):</p>'
         + '<div class="diag-reg" style="max-height:200px">' + esc(antes.length ? antes.join('\n') : 'nada guardado todavía') + '</div>'
         + '<p class="mini" style="margin:4px 0 2px">Esta prueba:</p>'
@@ -3273,11 +3441,12 @@ async function llenarVocesNuevas(){
     var lista = await conTiempo(vocesNuevas(), 30000, 'tardó demasiado');
     caja = $('voces-nuevas'); if(!caja) return;      // ya cerro la ventana
     if(!lista.length){ caja.innerHTML = '<p class="mini" style="margin:0 0 8px">No llegó ninguna voz en español.</p>'; return; }
-    var yo = usandoNueva() ? vozNuevaId() : '';
+    var yo = usandoNueva() ? vozNuevaId() : '', malas = vocesMalas();
     caja.innerHTML = lista.map(function(v){
+      var mala = malas.indexOf(v.id) >= 0;
       return '<div class="vrow' + (v.id === yo ? ' on' : '') + '"><div class="vtx"><b>' + esc(v.etiqueta)
         + (v.id === yo ? ' ✓' : '') + '</b><span>' + esc(v.calidad) + (v.tam ? ' · ' + mb(v.tam) + ' MB' : '')
-        + (v.bajada ? ' · en el teléfono' : '') + '</span></div>'
+        + (mala ? ' · ⚠ no funciona' : (v.bajada ? ' · en el teléfono' : '')) + '</span></div>'
         + '<button class="btn btn-linea btn-chico" onclick="probarVozNueva(\'' + v.id + '\',' + (v.bajada ? 1 : 0) + ')">Probar</button>'
         + '<button class="btn btn-oro btn-chico" onclick="usarVozNueva(\'' + v.id + '\')">Usar</button></div>';
     }).join('');
