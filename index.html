@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261112a-EFD-ADMIN-V4.0">
+<meta name="app-version" content="20261112b-EFD-ADMIN-V4.1">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -349,6 +349,17 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 .diag-reg{font-family:monospace;font-size:10.5px;line-height:1.35;white-space:pre-wrap;
   color:var(--lavanda);background:#0E1533;border-radius:8px;padding:7px;margin:6px 0 12px;
   max-height:110px;overflow:auto}
+/* v4.1 el teleprompter: alto fijo, el texto sube por dentro al ritmo de la voz */
+.dice.tele{position:relative;height:9.6em;min-height:0;max-height:none;padding:0;overflow:hidden}
+.dice.tele::before,.dice.tele::after{content:"";position:absolute;left:0;right:0;height:13px;z-index:1;pointer-events:none}
+.dice.tele::before{top:0;background:linear-gradient(#242B51,rgba(36,43,81,0))}
+.dice.tele::after{bottom:0;background:linear-gradient(rgba(36,43,81,0),#242B51)}
+.tp-in{position:relative;padding:13px 14px;transition:transform .35s ease-out;will-change:transform}
+.tp-ahora,.tp-otra{border-left:3px solid transparent;padding:2px 0 2px 10px;margin:3px 0;overflow-wrap:anywhere}
+.tp-ahora{border-left-color:var(--oro);color:var(--perg)}
+.tp-otra{color:var(--lavanda);opacity:.5}
+.tp-otra:empty{display:none}
+@media (prefers-reduced-motion:reduce){.tp-in{transition:none}}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -465,7 +476,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div id="prep-resumen"></div>
     <div class="repro" id="repro">
       <div class="ahora" id="esc-cual">Toca un tema para empezar</div>
-      <div class="dice" id="esc-dice">Toca ▶ para escuchar.</div>
+      <div class="dice tele" id="esc-tele"><div class="tp-in" id="esc-tele-in"><div class="tp-otra" id="esc-antes"></div><div class="tp-ahora" id="esc-dice">Toca ▶ para escuchar.</div><div class="tp-otra" id="esc-despues"></div></div></div>
       <div class="voz-estado" id="voz-estado"></div>
       <input type="range" id="esc-pos" min="0" max="0" value="0"
              oninput="irAPedazo(+this.value)" aria-label="Posición">
@@ -2059,6 +2070,12 @@ function marcarDesdeParrafo(j){
    viene danada de origen queda marcada "no funciona". (4) La prueba 🔧 trae un
    resumen de la ultima vez que se escucho, y el registro ya no se llena con lo
    que dice el motor por dentro.
+   v4.1 (12 nov 2026, pedido por Sensei): las frases largas quedaban TAPADAS en
+   el cuadrito. "Que el escrito vaya subiendo de acuerdo a como se va leyendo".
+   Ahora el cuadro es como un TELEPROMPTER: alto fijo (los botones no brincan),
+   arriba se ve apagada la frase anterior, en el medio la que suena (con la raya
+   dorada) y abajo la que sigue. Si la frase no cabe, el texto va SUBIENDO
+   despacito al ritmo de la voz, hasta que se ve su ultima linea.
    ══════════════════════════════════════════════════════════════════════════ */
 var voz = window.speechSynthesis;
 var pedazos = [];        // el tema partido en frases cortas
@@ -2139,7 +2156,68 @@ function armarPedazos(){
   barra.max = Math.max(0, pedazos.length - 1);
   barra.value = 0;
   pintarTiempos();
-  $('esc-dice').textContent = pedazos[0] || 'Este tema esta vacio.';
+  ponerFrase(0, 'Este tema esta vacio.');
+}
+/* ── v4.1 EL TELEPROMPTER: el cuadro de la frase ──────────────────────────
+   Alto fijo. Arriba, apagada, la frase anterior; en el medio la que suena;
+   abajo, apagada, la que sigue. Si la que suena no cabe, el texto sube poco
+   a poco al ritmo de la voz: la linea que se esta oyendo siempre queda a la
+   vista, y al terminar la frase se ve su ultima linea.
+   Con la pantalla apagada no hace nada (no gasta bateria). */
+var _fraseIdx = -1, _inicioFrase = 0, _letraFrase = -1, _teleP = 0, _teleY = -1, _teleTimer = null, _teleCuadro = 0;
+function ponerFrase(i, siVacio){
+  var d = $('esc-dice'); if(!d) return;
+  var t = pedazos[i]; if(t == null) t = siVacio || '';
+  d.textContent = t;                 // siempre, como antes (la prueba de letras exactas lo vigila)
+  var a = $('esc-antes'), z = $('esc-despues');
+  if(a){ var ta = (i > 0 && pedazos[i - 1]) || ''; if(a.textContent !== ta) a.textContent = ta; }
+  if(z){ var tz = pedazos[i + 1] || ''; if(z.textContent !== tz) z.textContent = tz; }
+  _fraseIdx = i; _inicioFrase = Date.now(); _letraFrase = -1; _teleP = 0;
+  // mover el cuadro va en el proximo cuadro de la pantalla, no aqui: esto corre
+  // justo cuando cambia el audio y no se le quita ni un instante. Con la
+  // pantalla apagada no corre nunca.
+  if(!_teleCuadro && window.requestAnimationFrame)
+    _teleCuadro = requestAnimationFrame(function(){ _teleCuadro = 0; moverTele(_teleP); });
+  arrancarTele();
+}
+/* p = cuanto de la frase ya se dijo (0 al empezar, 1 al terminar) */
+function moverTele(p){
+  var c = $('esc-tele'), inn = $('esc-tele-in'), d = $('esc-dice');
+  if(!c || !inn || !d || document.hidden) return;
+  var H = c.clientHeight; if(!H) return;          // no se ve: nada que mover
+  var arriba = Math.round(H * 0.24), abajo = Math.round(H * 0.12);
+  var sobra = Math.max(0, d.offsetHeight - (H - arriba - abajo));
+  p = Math.max(0, Math.min(1, p || 0));
+  var y = Math.max(0, Math.round(d.offsetTop - arriba + p * sobra));
+  if(y !== _teleY){ _teleY = y; inn.style.transform = 'translateY(' + (-y) + 'px)'; }
+}
+/* cuanto de la frase que suena ya se dijo */
+function progresoFrase(){
+  if(!sonando) return _teleP;
+  if(usandoNueva()){
+    var a = _audio, b = bloques[bloqueAhora];
+    if(!a || _relleno || a.src !== _urlSonando || !b) return _teleP;
+    var r = resueltoDe(_claveSonando);
+    if(!r || !r.marcas) return _teleP;
+    var j = pedazoAhora - b.a, m0 = r.marcas[j], m1 = r.marcas[j + 1];
+    if(m1 == null) m1 = r.durVoz;
+    if(m0 == null || !(m1 > m0)) return _teleP;
+    return (a.currentTime - m0) / (m1 - m0);
+  }
+  var t = pedazos[_fraseIdx] || '';
+  if(_letraFrase >= 0 && t.length) return _letraFrase / t.length;
+  var est = segundosDe(t) * 1000 * 0.85;          // la cuenta es aproximada: mejor un poco antes que tarde
+  return est > 0 ? (Date.now() - _inicioFrase) / est : 0;
+}
+function arrancarTele(){
+  if(_teleTimer) return;
+  _teleTimer = setInterval(function(){
+    if(document.hidden) return;
+    var c = $('esc-tele'); if(!c || !c.clientHeight) return;
+    var p = progresoFrase();
+    _teleP = Math.max(0, Math.min(1, isFinite(p) ? p : 0));
+    moverTele(_teleP);
+  }, 150);
 }
 /* — cuanto dura mas o menos un pedazo, para poder saltar 10 segundos — */
 function segundosDe(t){ return t.split(/\s+/).length / (2.6 * velocidad); }
@@ -2184,13 +2262,17 @@ function hablarPedazo(){
     pedazoAhora++;
     pintarTiempos();
     if(pedazoAhora < pedazos.length){
-      $('esc-dice').textContent = pedazos[pedazoAhora];
+      ponerFrase(pedazoAhora);
       hablarPedazo();
     } else {
       terminoElTema();
     }
   };
-  $('esc-dice').textContent = pedazos[pedazoAhora];
+  // v4.1: el teleprompter sigue a la voz del telefono por el tiempo, o por las
+  // palabras si el telefono avisa en que palabra va
+  u.onstart = function(){ if(_fraseIdx === pedazoAhora) _inicioFrase = Date.now(); };
+  u.onboundary = function(e){ if(e && e.charIndex >= 0 && (!e.name || e.name === 'word')) _letraFrase = e.charIndex; };
+  ponerFrase(pedazoAhora);
   voz.speak(u);
 }
 function playPausa(){
@@ -2245,7 +2327,7 @@ function terminoElTema(){
 function irAPedazo(i){
   pedazoAhora = Math.max(0, Math.min(pedazos.length - 1, i));
   pintarTiempos();
-  $('esc-dice').textContent = pedazos[pedazoAhora] || '';
+  ponerFrase(pedazoAhora);
   if(usandoNueva()){
     nuevaPosMovida = true;
     if(sonando) reproducirBloque(bloqueDePedazo(pedazoAhora), { pedazo: pedazoAhora }, true);
@@ -3109,7 +3191,7 @@ async function reproducirBloque(k, desde, cortar){
   bloqueAhora = k;
   var b = bloques[k];
   pedazoAhora = (desde && desde.pedazo != null) ? desde.pedazo : b.a;
-  $('esc-dice').textContent = pedazos[pedazoAhora] || '';
+  ponerFrase(pedazoAhora);
   pintarTiempos();
   var clave = claveBloque(temaActual, pedazos, bloques, k);
   _urgente = clave;
@@ -3192,7 +3274,7 @@ function alAvanzarAudio(){
   var p = pedazoEnTiempo(bloqueAhora, a.currentTime, r && r.durVoz ? r : { durVoz: d });
   if(p !== pedazoAhora){
     pedazoAhora = p;
-    $('esc-dice').textContent = pedazos[p] || '';
+    ponerFrase(p);
     pintarTiempos();
   }
 }
