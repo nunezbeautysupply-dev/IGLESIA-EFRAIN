@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261112b-EFD-ADMIN-V4.1">
+<meta name="app-version" content="20261117b-EFD-ADMIN-V4.3">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -349,17 +349,21 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 .diag-reg{font-family:monospace;font-size:10.5px;line-height:1.35;white-space:pre-wrap;
   color:var(--lavanda);background:#0E1533;border-radius:8px;padding:7px;margin:6px 0 12px;
   max-height:110px;overflow:auto}
-/* v4.1 el teleprompter: alto fijo, el texto sube por dentro al ritmo de la voz */
-.dice.tele{position:relative;height:9.6em;min-height:0;max-height:none;padding:0;overflow:hidden}
+/* v4.2 el teleprompter continuo: el tema entero, corre solo al ritmo de la voz */
+.dice.tele{position:relative;height:14.5em;min-height:0;max-height:none;padding:0;overflow:hidden}
 .dice.tele::before,.dice.tele::after{content:"";position:absolute;left:0;right:0;height:13px;z-index:1;pointer-events:none}
 .dice.tele::before{top:0;background:linear-gradient(#242B51,rgba(36,43,81,0))}
 .dice.tele::after{bottom:0;background:linear-gradient(rgba(36,43,81,0),#242B51)}
-.tp-in{position:relative;padding:13px 14px;transition:transform .35s ease-out;will-change:transform}
-.tp-ahora,.tp-otra{border-left:3px solid transparent;padding:2px 0 2px 10px;margin:3px 0;overflow-wrap:anywhere}
-.tp-ahora{border-left-color:var(--oro);color:var(--perg)}
-.tp-otra{color:var(--lavanda);opacity:.5}
-.tp-otra:empty{display:none}
-@media (prefers-reduced-motion:reduce){.tp-in{transition:none}}
+.tp-in{position:relative;padding:13px 14px;will-change:transform}
+.tp-f{border-left:3px solid transparent;padding:2px 0 2px 10px;margin:3px 0;overflow-wrap:anywhere;
+  color:var(--lavanda);opacity:.5;transition:opacity .3s,color .3s}
+.tp-f.tp-ya{opacity:.32}
+.tp-f.tp-suena{border-left-color:var(--oro);color:var(--perg);opacity:1}
+.tp-oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.tp-f{transition:none}}
+/* v4.2 la version a la vista, chiquita, debajo de "Para Dios" */
+.ver-app{font-size:11.5px;color:var(--lavanda);opacity:.75;margin-top:6px;letter-spacing:.06em}
+.ver-app:empty{display:none}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -394,6 +398,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div class="cab">
       <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
       <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+      <div class="ver-app"></div>
     </div>
     <div class="regla"></div>
     <div class="tarj">
@@ -422,6 +427,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div class="cab">
       <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
       <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+      <div class="ver-app"></div>
     </div>
     <div class="regla"></div>
     <div class="tarj">
@@ -448,6 +454,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div class="cab" style="padding-bottom:10px">
       <img class="emblema" src="icon-192.png" alt="Iglesia Efraín para Dios">
       <div class="marca">Iglesia Efraín<small>Para Dios</small></div>
+      <div class="ver-app"></div>
     </div>
     <div class="regla"></div>
     <div class="barra">
@@ -455,12 +462,12 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <button class="volver" onclick="abrirMenu()">☰</button>
     </div>
     <div id="lista-libros"></div>
-    <button class="btn btn-oro" onclick="pedirArchivo()">+ Agregar un libro</button>
-    <input type="file" id="archivo" accept=".txt,.docx,.pdf" class="oculto" onchange="leerArchivo(this)">
+    <button class="btn btn-oro" onclick="pedirArchivo()">+ Agregar un libro o documento</button>
+    <input type="file" id="archivo" accept=".txt,.md,.docx,.pdf,.xlsx,.xlsm,.pptx,.odt,.ods,.odp,.epub,.doc,.xls,.ppt" class="oculto" onchange="leerArchivo(this)">
     <button class="btn btn-linea" onclick="pedirArchivoJSON()">+ Importar temas ya analizados (.json)</button>
     <input type="file" id="archivo-json" accept=".json" class="oculto" onchange="leerArchivoJSON(this)">
     <p class="mini" style="text-align:center;margin-top:14px">
-      Word (.docx) es lo que mejor se lee. También acepta texto (.txt) y PDF.<br>
+      Acepta Word, PDF, Excel, PowerPoint, LibreOffice, EPUB (libro electrónico) y texto. Word es lo que mejor se lee.<br>
       El botón de .json es para cuando ya tienes el libro dividido en temas,
       con sus aclaraciones y extractos ya preparados de antemano.
     </p>
@@ -476,7 +483,8 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
     <div id="prep-resumen"></div>
     <div class="repro" id="repro">
       <div class="ahora" id="esc-cual">Toca un tema para empezar</div>
-      <div class="dice tele" id="esc-tele"><div class="tp-in" id="esc-tele-in"><div class="tp-otra" id="esc-antes"></div><div class="tp-ahora" id="esc-dice">Toca ▶ para escuchar.</div><div class="tp-otra" id="esc-despues"></div></div></div>
+      <div class="dice tele" id="esc-tele"><div class="tp-in" id="esc-tele-in"></div></div>
+      <div class="tp-oculto" id="esc-dice">Toca ▶ para escuchar.</div>
       <div class="voz-estado" id="voz-estado"></div>
       <input type="range" id="esc-pos" min="0" max="0" value="0"
              oninput="irAPedazo(+this.value)" aria-label="Posición">
@@ -1598,6 +1606,609 @@ async function abrirLibro(id){
 
 /* ══════════════════ AGREGAR UN LIBRO ══════════════════ */
 function pedirArchivo(){ $('archivo').click(); }
+/* ══════════════════════════════════════════════════════════════════════════
+   DOCUMENTOS DE TODO TIPO (v4.3, solo ADMIN) — pedido por Sensei el 17 nov 2026:
+   "que se pueda subir cualquier tipo de documento: Word, Excel, PDF..."
+   · Excel (.xlsx) y hoja de LibreOffice (.ods): cada hoja es un tema; cada fila
+     se lee "Columna: valor".
+   · PowerPoint (.pptx) y presentación de LibreOffice (.odp): cada diapositiva es
+     un tema con su título; también las notas del que presenta.
+   · Texto de LibreOffice (.odt), libro electrónico (.epub) y Markdown (.md):
+     se parten en temas igual que el Word, con lo que va en negrita.
+   · PDF: con el lector de PDF de Mozilla (pdf.js 6.2.108), que se baja una vez
+     de internet como la voz. Sin internet se usa el lector de antes.
+   · Word, Excel y PowerPoint VIEJOS (.doc .xls .ppt): se explica cómo guardarlos
+     en el formato nuevo.
+   TODO se abre DENTRO del teléfono: el documento nunca sale del aparato.
+   SEGURIDAD: nada del documento se mete como HTML en la pantalla (solo texto);
+   los XML con DOCTYPE/ENTITY se rechazan; ningún pedazo del zip puede inflarse
+   a más de 60 MB (ni 150 MB en total); el lector de PDF va sin "eval". */
+var DOC_TOPE_ENTRADA = 60 * 1024 * 1024, DOC_TOPE_TOTAL = 150 * 1024 * 1024;
+var PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/';
+var _pdfjs = null;
+
+function docAviso(titulo, html){ var e = new Error(titulo); e.docAviso = { titulo: titulo, html: html }; return e; }
+function docGrande(){
+  return docAviso('Archivo demasiado grande',
+    'Por dentro este archivo es demasiado grande para abrirlo en el teléfono, o viene dañado.<br><br>'
+    + 'Si es un documento de verdad, pártalo en varios más pequeños y súbalos uno por uno.');
+}
+function docDanado(que){
+  return docAviso('Ese archivo no se dejó leer',
+    'La app no pudo abrir ' + esc(que || 'este archivo') + ': parece dañado por dentro.<br><br>'
+    + 'Ábralo en la computadora, guárdelo de nuevo y vuelva a subirlo.');
+}
+
+/* ── el zip por dentro (Word, Excel, PowerPoint, LibreOffice y EPUB son zips) ── */
+async function inflarConTope(datos, tope){
+  if(typeof DecompressionStream === 'undefined') throw docAviso('Use Chrome', 'Este navegador no puede abrir este tipo de archivo. Use Chrome.');
+  var lector = new Blob([datos]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+  var trozos = [], total = 0;
+  for(;;){
+    var r = await lector.read();
+    if(r.done) break;
+    total += r.value.length;
+    if(total > tope){ try{ lector.cancel(); }catch(e){} throw docGrande(); }
+    trozos.push(r.value);
+  }
+  var out = new Uint8Array(total), k = 0;
+  for(var i = 0; i < trozos.length; i++){ out.set(trozos[i], k); k += trozos[i].length; }
+  return out;
+}
+function abrirZipDoc(buf){
+  var d = new DataView(buf), b = new Uint8Array(buf), i, fin = -1;
+  for(i = b.length - 22; i >= 0 && i > b.length - 66000; i--){
+    if(d.getUint32(i, true) === 0x06054b50){ fin = i; break; }
+  }
+  if(fin < 0) return null;
+  var cuantos = d.getUint16(fin + 10, true), donde = d.getUint32(fin + 16, true), mapa = {};
+  for(i = 0; i < cuantos; i++){
+    if(donde + 46 > b.length || d.getUint32(donde, true) !== 0x02014b50) break;
+    var nomTam = d.getUint16(donde + 28, true), extTam = d.getUint16(donde + 30, true), comTam = d.getUint16(donde + 32, true);
+    var nom = texto(b.slice(donde + 46, donde + 46 + nomTam));
+    mapa[nom] = { bandera: d.getUint16(donde + 8, true), metodo: d.getUint16(donde + 10, true),
+                  comp: d.getUint32(donde + 20, true), tam: d.getUint32(donde + 24, true), local: d.getUint32(donde + 42, true) };
+    donde += 46 + nomTam + extTam + comTam;
+  }
+  var gastado = 0;
+  return {
+    tiene: function(n){ return !!mapa[n]; },
+    bytes: async function(n){
+      var e = mapa[n]; if(!e) return null;
+      if(e.bandera & 1) throw docAviso('Este documento tiene clave',
+        'Está protegido con clave. Quítele la clave en la computadora y súbalo de nuevo.');
+      if(e.tam > DOC_TOPE_ENTRADA || gastado + e.tam > DOC_TOPE_TOTAL) throw docGrande();
+      if(e.local + 30 > b.length) throw docDanado();
+      var ini = e.local + 30 + d.getUint16(e.local + 26, true) + d.getUint16(e.local + 28, true);
+      var crudo = b.slice(ini, ini + e.comp), out;
+      if(e.metodo === 0) out = crudo;
+      else if(e.metodo === 8) out = await inflarConTope(crudo, Math.min(DOC_TOPE_ENTRADA, DOC_TOPE_TOTAL - gastado));
+      else throw docDanado();
+      gastado += out.length;
+      return out;
+    },
+    texto: async function(n){ var x = await this.bytes(n); return x ? new TextDecoder().decode(x) : null; }
+  };
+}
+
+/* ── XML con cuidado ── */
+function xmlDoc(s){
+  if(s == null) return null;
+  if(/<!DOCTYPE|<!ENTITY/i.test(s)) throw docAviso('Ese archivo no se dejó leer',
+    'Trae por dentro algo raro que la app no abre, para proteger el teléfono.');
+  var x = new DOMParser().parseFromString(s, 'application/xml');
+  if(x.getElementsByTagName('parsererror').length) throw docDanado();
+  return x;
+}
+function etq(n, local){ return n ? Array.prototype.slice.call(n.getElementsByTagNameNS('*', local)) : []; }
+function atr(el, local){
+  if(!el || !el.attributes) return null;
+  for(var i = 0; i < el.attributes.length; i++) if(el.attributes[i].localName === local) return el.attributes[i].value;
+  return null;
+}
+/* el r:id de una relacion (en PowerPoint el sldId trae "id" y "r:id": se quiere el r:id) */
+function atrRel(el){
+  if(!el || !el.attributes) return null;
+  for(var i = 0; i < el.attributes.length; i++){
+    var a = el.attributes[i];
+    if(a.localName === 'id' && a.namespaceURI && /relationships/.test(a.namespaceURI)) return a.value;
+  }
+  return null;
+}
+function rutaJunto(base, rel){
+  rel = rel || '';
+  try{ rel = decodeURIComponent(rel); }catch(e){}
+  rel = rel.split('#')[0];
+  var partes = (rel.charAt(0) === '/' ? rel.slice(1) : base + rel).split('/'), out = [];
+  partes.forEach(function(p){ if(p === '..') out.pop(); else if(p && p !== '.') out.push(p); });
+  return out.join('/');
+}
+function relsDe(x, base){
+  var m = {};
+  etq(x, 'Relationship').forEach(function(r){ m[atr(r, 'Id')] = { ruta: rutaJunto(base, atr(r, 'Target')), tipo: atr(r, 'Type') || '' }; });
+  return m;
+}
+function limpio(s){ return (s || '').replace(/\s+/g, ' ').trim(); }
+
+/* ── tablas (Excel y hojas de LibreOffice) ── */
+function letraCol(k){ var s = ''; k++; while(k > 0){ var r = (k - 1) % 26; s = String.fromCharCode(65 + r) + s; k = Math.floor((k - 1) / 26); } return s; }
+function colDe(ref){ var m = /^([A-Z]+)/.exec(ref || ''), n = 0; if(!m) return -1; for(var i = 0; i < m[1].length; i++) n = n * 26 + (m[1].charCodeAt(i) - 64); return n - 1; }
+function numeroBonito(v){ var n = parseFloat(v); if(!isFinite(n)) return limpio(v); return String(+n.toPrecision(12)); }
+function dosD(n){ return (n < 10 ? '0' : '') + n; }
+function fechaDe(f){
+  var t = dosD(f.getUTCDate()) + '/' + dosD(f.getUTCMonth() + 1) + '/' + f.getUTCFullYear();
+  if(f.getUTCHours() || f.getUTCMinutes()) t += ' ' + dosD(f.getUTCHours()) + ':' + dosD(f.getUTCMinutes());
+  return t;
+}
+function temasDeTabla(nombre, filas){
+  var llenas = filas.filter(function(f){ return f && f.some(function(v){ return v; }); });
+  if(!llenas.length) return [];
+  var ancho = 0; llenas.forEach(function(f){ ancho = Math.max(ancho, f.length); });
+  var cab = llenas[0];
+  var usaCab = llenas.length > 1 && cab.filter(Boolean).length >= 2
+    && cab.every(function(v){ return !v || isNaN(+String(v).replace(',', '.')); });
+  var cols = []; for(var k = 0; k < ancho; k++) cols[k] = usaCab && cab[k] ? cab[k] : 'Columna ' + letraCol(k);
+  var lineas = (usaCab ? llenas.slice(1) : llenas).map(function(f){
+    var partes = [];
+    for(var k = 0; k < ancho; k++) if(f[k]) partes.push(ancho === 1 ? f[k] : cols[k] + ': ' + f[k]);
+    var l = partes.join(', ');
+    return /[.!?:;]$/.test(l) ? l : l + '.';
+  });
+  var temas = [], CADA = 150;
+  for(var i = 0; i < lineas.length; i += CADA){
+    var t = nombre || 'Hoja';
+    if(lineas.length > CADA) t += ' (filas ' + (i + 1) + '–' + Math.min(lineas.length, i + CADA) + ')';
+    temas.push({ titulo: t, texto: lineas.slice(i, i + CADA) });
+  }
+  return temas;
+}
+function fechasDeEstilos(sx){
+  var fmt = {}, out = [];
+  if(!sx) return out;
+  etq(sx, 'numFmt').forEach(function(n){ fmt[atr(n, 'numFmtId')] = atr(n, 'formatCode') || ''; });
+  var xfs = etq(sx, 'cellXfs')[0];
+  etq(xfs, 'xf').forEach(function(xf){
+    var id = +atr(xf, 'numFmtId') || 0, cod = (fmt[id] || '').replace(/"[^"]*"|\[[^\]]*\]|\\./g, '');
+    out.push((id >= 14 && id <= 22) || (id >= 27 && id <= 36) || (id >= 45 && id <= 47) || (id >= 50 && id <= 58)
+             || (id >= 164 && /[dmyhs]/i.test(cod) && !/^[#0.,% ]*$/.test(cod)));
+  });
+  return out;
+}
+async function leerXlsx(z){
+  var wb = xmlDoc(await z.texto('xl/workbook.xml'));
+  if(!wb) throw docDanado('este Excel');
+  var rels = relsDe(xmlDoc(await z.texto('xl/_rels/workbook.xml.rels')), 'xl/');
+  var de1904 = etq(wb, 'workbookPr').some(function(p){ return /^(1|true)$/.test(atr(p, 'date1904') || ''); });
+  var comp = [], ss = await z.texto('xl/sharedStrings.xml');
+  if(ss) etq(xmlDoc(ss), 'si').forEach(function(si){
+    comp.push(etq(si, 't').filter(function(t){ return t.parentNode.localName !== 'rPh'; }).map(function(t){ return t.textContent; }).join(''));
+  });
+  var esFecha = fechasDeEstilos(xmlDoc(await z.texto('xl/styles.xml')));
+  var temas = [];
+  for(var h = 0, hojas = etq(wb, 'sheet'); h < hojas.length; h++){
+    var sh = hojas[h], st = atr(sh, 'state');
+    if(st === 'hidden' || st === 'veryHidden') continue;
+    var rel = rels[atrRel(sh)]; if(!rel) continue;
+    var x = xmlDoc(await z.texto(rel.ruta)); if(!x) continue;
+    var filas = etq(x, 'row').map(function(row){
+      var fila = [];
+      etq(row, 'c').forEach(function(c, k){
+        var col = colDe(atr(c, 'r')); if(col < 0) col = k;
+        if(col > 1000) return;
+        var t = atr(c, 't'), vEl = etq(c, 'v')[0], v = vEl ? vEl.textContent : null, val = '';
+        if(t === 's') val = comp[+v] || '';
+        else if(t === 'inlineStr') val = etq(c, 't').map(function(e){ return e.textContent; }).join('');
+        else if(t === 'b') val = v === '1' ? 'Sí' : 'No';
+        else if(t === 'e') val = '';
+        else if(t === 'str') val = v || '';
+        else if(v != null && v !== ''){
+          var n = parseFloat(v);
+          if(esFecha[+atr(c, 's') || 0] && isFinite(n))
+            val = fechaDe(new Date(Date.UTC(de1904 ? 1904 : 1899, de1904 ? 0 : 11, de1904 ? 1 : 30) + Math.round(n * 86400000)));
+          else val = numeroBonito(v);
+        }
+        fila[col] = limpio(val);
+      });
+      return fila;
+    });
+    temas = temas.concat(temasDeTabla(limpio(atr(sh, 'name')), filas));
+  }
+  return temas;
+}
+
+/* ── LibreOffice por dentro (content.xml) ── */
+function textoOdf(n, fuera){
+  var s = '';
+  (function rec(e){
+    for(var c = e.firstChild; c; c = c.nextSibling){
+      if(c.nodeType === 3){ s += c.nodeValue; continue; }
+      if(c.nodeType !== 1) continue;
+      var l = c.localName;
+      if(l === 's'){ s += new Array((+atr(c, 'c') || 1) + 1).join(' '); continue; }
+      if(l === 'tab' || l === 'line-break'){ s += ' '; continue; }
+      if(l === 'note' || l === 'annotation' || (fuera && fuera(c))) continue;
+      rec(c);
+    }
+  })(n);
+  return s;
+}
+function estilosOdf(x){
+  var m = {};
+  etq(x, 'style').forEach(function(st){
+    var nom = atr(st, 'name'); if(!nom) return;
+    var tp = etq(st, 'text-properties')[0], marca = false;
+    if(tp){
+      var fw = atr(tp, 'font-weight'), us = atr(tp, 'text-underline-style'), bg = atr(tp, 'background-color');
+      marca = fw === 'bold' || (+fw >= 600) || (us && us !== 'none') || (bg && bg !== 'transparent');
+    }
+    m[nom] = { padre: atr(st, 'parent-style-name') || '', marca: marca };
+  });
+  return m;
+}
+function esTituloOdf(nom, est){
+  for(var i = 0; i < 6 && nom; i++){
+    if(/^(Title|Heading|Titulo|Título)/i.test(nom.replace(/_20_/g, ' '))) return true;
+    nom = est[nom] ? est[nom].padre : '';
+  }
+  return false;
+}
+function marcaOdf(nom, est){
+  for(var i = 0; i < 6 && nom; i++){ if(est[nom] && est[nom].marca) return true; nom = est[nom] ? est[nom].padre : ''; }
+  return false;
+}
+async function leerOdt(z){
+  var x = xmlDoc(await z.texto('content.xml'));
+  if(!x) throw docDanado('este documento de LibreOffice');
+  var est = estilosOdf(x), sx = await z.texto('styles.xml');
+  if(sx){ var e2 = estilosOdf(xmlDoc(sx)); for(var k in e2) if(!est[k]) est[k] = e2[k]; }
+  var cuerpo = etq(x, 'text')[0], parrafos = [];
+  // office:text es el cuerpo (text:text no existe; el primero con ese nombre es office:text)
+  etq(x, 'body').forEach(function(b){ var t = etq(b, 'text')[0]; if(t) cuerpo = t; });
+  (function rec(e){
+    for(var c = e.firstChild; c; c = c.nextSibling){
+      if(c.nodeType !== 1) continue;
+      var l = c.localName;
+      if(l === 'table-of-content' || l === 'alphabetical-index' || l === 'tracked-changes' || l === 'sequence-decls') continue;
+      if(l === 'h' || l === 'p'){
+        var txt = limpio(textoOdf(c)), nomE = atr(c, 'style-name');
+        var tit = l === 'h' || esTituloOdf(nomE, est);
+        var nivel = l === 'h' ? (+atr(c, 'outline-level') || 1) : (esTituloOdf(nomE, est) && /title|t[ií]tulo/i.test(nomE || '') ? 0 : 0);
+        var marcados = [], neg = 0, tot = 0, todoMarcado = marcaOdf(nomE, est);
+        (function spans(n, marcado){
+          for(var s = n.firstChild; s; s = s.nextSibling){
+            if(s.nodeType === 3){ var len = s.nodeValue.replace(/\s/g, '').length; tot += len; if(marcado) neg += len; continue; }
+            if(s.nodeType !== 1 || s.localName === 'note' || s.localName === 'annotation') continue;
+            var m = marcado || (s.localName === 'span' && marcaOdf(atr(s, 'style-name'), est));
+            if(s.localName === 'span' && m && !marcado){ var tt = limpio(textoOdf(s)); if(tt.length > 3) marcados.push(tt); }
+            spans(s, m);
+          }
+        })(c, todoMarcado);
+        if(todoMarcado && txt.length > 3) marcados.push(txt);
+        if(txt || tit) parrafos.push({ txt: txt, titulo: tit, nivel: nivel, marcados: marcados, todaNegrita: tot > 0 && neg / tot > 0.92 });
+        continue;
+      }
+      rec(c);
+    }
+  })(cuerpo);
+  return parrafos;
+}
+async function leerOds(z){
+  var x = xmlDoc(await z.texto('content.xml'));
+  if(!x) throw docDanado('esta hoja de LibreOffice');
+  var temas = [];
+  etq(x, 'table').forEach(function(tb){
+    if(tb.parentNode && tb.parentNode.localName === 'table-cell') return;
+    var filas = [];
+    etq(tb, 'table-row').forEach(function(row){
+      var fila = [], col = 0, vacia = true;
+      for(var c = row.firstChild; c; c = c.nextSibling){
+        if(c.nodeType !== 1 || (c.localName !== 'table-cell' && c.localName !== 'covered-table-cell')) continue;
+        var rep = Math.min(+atr(c, 'number-columns-repeated') || 1, 1000), tipo = atr(c, 'value-type'), val = '';
+        if(tipo === 'float') val = numeroBonito(atr(c, 'value'));
+        else if(tipo === 'date'){
+          var dv = /^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d):(\d\d))?/.exec(atr(c, 'date-value') || '');
+          val = dv ? fechaDe(new Date(Date.UTC(+dv[1], +dv[2] - 1, +dv[3], +(dv[4] || 0), +(dv[5] || 0)))) : '';
+        }
+        else if(tipo === 'boolean') val = atr(c, 'boolean-value') === 'true' ? 'Sí' : 'No';
+        else val = etq(c, 'p').map(function(p){ return textoOdf(p); }).join(' ');
+        val = limpio(val);
+        if(val){ vacia = false; for(var r = 0; r < rep && col < 1000; r++) fila[col++] = val; }
+        else col += rep;
+        if(col >= 1000) break;
+      }
+      if(!vacia){
+        var rr = Math.min(+atr(row, 'number-rows-repeated') || 1, 1000);
+        for(var i = 0; i < rr; i++) filas.push(fila.slice());
+      }
+    });
+    temas = temas.concat(temasDeTabla(limpio(atr(tb, 'name')), filas));
+  });
+  return temas;
+}
+async function leerOdp(z){
+  var x = xmlDoc(await z.texto('content.xml'));
+  if(!x) throw docDanado('esta presentación de LibreOffice');
+  var temas = [];
+  etq(x, 'page').forEach(function(pg, k){
+    if(pg.parentNode && pg.parentNode.localName !== 'presentation') return;
+    var titulo = '', cuerpo = [], notas = [];
+    etq(pg, 'p').forEach(function(p){
+      var t = limpio(textoOdf(p)); if(!t) return;
+      var en = p, clase = '', enNotas = false;
+      while(en && en !== pg){ if(en.localName === 'notes') enNotas = true; if(en.localName === 'frame' && !clase) clase = atr(en, 'class') || ''; en = en.parentNode; }
+      if(enNotas){ if(clase !== 'page-number' && clase !== 'date-time' && clase !== 'footer' && clase !== 'header') notas.push(t); return; }
+      if(clase === 'page-number' || clase === 'date-time' || clase === 'footer' || clase === 'header') return;
+      if(clase === 'title') titulo = titulo ? titulo + ' ' + t : t; else cuerpo.push(t);
+    });
+    if(notas.length) cuerpo.push('Notas: ' + notas.join(' '));
+    if(titulo || cuerpo.length) temas.push({ titulo: 'Diapositiva ' + (k + 1) + (titulo ? ': ' + titulo : ''), texto: cuerpo });
+  });
+  return temas;
+}
+
+/* ── PowerPoint ── */
+function textoParrafoA(p){
+  var s = '';
+  (function rec(e){
+    for(var c = e.firstChild; c; c = c.nextSibling){
+      if(c.nodeType !== 1) continue;
+      if(c.localName === 't') s += c.textContent;
+      else if(c.localName === 'br') s += ' ';
+      else rec(c);
+    }
+  })(p);
+  return limpio(s);
+}
+function tipoPh(el){
+  for(var n = el; n; n = n.parentNode){
+    if(n.localName === 'sp' || n.localName === 'graphicFrame'){
+      var ph = etq(n, 'ph')[0];
+      return ph ? (atr(ph, 'type') || 'body') : '';
+    }
+  }
+  return '';
+}
+async function leerPptx(z){
+  var pres = xmlDoc(await z.texto('ppt/presentation.xml'));
+  if(!pres) throw docDanado('este PowerPoint');
+  var rels = relsDe(xmlDoc(await z.texto('ppt/_rels/presentation.xml.rels')), 'ppt/');
+  var temas = [], ids = etq(pres, 'sldId');
+  for(var k = 0; k < ids.length; k++){
+    var rel = rels[atrRel(ids[k])]; if(!rel) continue;
+    var x = xmlDoc(await z.texto(rel.ruta)); if(!x) continue;
+    var titulo = '', cuerpo = [];
+    etq(x, 'p').forEach(function(p){
+      if(p.namespaceURI && !/drawingml/.test(p.namespaceURI)) return;
+      var t = textoParrafoA(p); if(!t) return;
+      var ph = tipoPh(p);
+      if(ph === 'sldNum' || ph === 'dt' || ph === 'ftr' || ph === 'hdr') return;
+      if(ph === 'title' || ph === 'ctrTitle') titulo = titulo ? titulo + ' ' + t : t; else cuerpo.push(t);
+    });
+    var partes = rel.ruta.split('/'), nomS = partes.pop();
+    var srels = await z.texto(partes.join('/') + '/_rels/' + nomS + '.rels');
+    if(srels){
+      var rs = relsDe(xmlDoc(srels), partes.join('/') + '/'), notas = [];
+      for(var id in rs) if(/notesSlide$/.test(rs[id].tipo)){
+        var nx = xmlDoc(await z.texto(rs[id].ruta));
+        etq(nx, 'p').forEach(function(p){
+          if(p.namespaceURI && !/drawingml/.test(p.namespaceURI)) return;
+          var ph = tipoPh(p), t = textoParrafoA(p);
+          if(t && ph !== 'sldNum' && ph !== 'sldImg' && ph !== 'dt' && ph !== 'ftr' && ph !== 'hdr') notas.push(t);
+        });
+      }
+      if(notas.length) cuerpo.push('Notas: ' + notas.join(' '));
+    }
+    if(titulo || cuerpo.length) temas.push({ titulo: 'Diapositiva ' + (k + 1) + (titulo ? ': ' + titulo : ''), texto: cuerpo });
+  }
+  return temas;
+}
+
+/* ── libro electrónico (EPUB) ── */
+async function leerEpub(z){
+  var cont = xmlDoc(await z.texto('META-INF/container.xml'));
+  var rf = etq(cont, 'rootfile')[0], opfRuta = rf && atr(rf, 'full-path');
+  if(!opfRuta) throw docDanado('este libro electrónico');
+  var opf = xmlDoc(await z.texto(opfRuta));
+  if(!opf) throw docDanado('este libro electrónico');
+  var base = opfRuta.indexOf('/') >= 0 ? opfRuta.slice(0, opfRuta.lastIndexOf('/') + 1) : '';
+  var items = {};
+  etq(opf, 'item').forEach(function(it){ items[atr(it, 'id')] = { href: atr(it, 'href'), tipo: atr(it, 'media-type') || '' }; });
+  var parrafos = [], SEL = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,dt,dd';
+  var orden = etq(opf, 'itemref');
+  for(var i = 0; i < orden.length; i++){
+    var it = items[atr(orden[i], 'idref')];
+    if(!it || !/html/.test(it.tipo)) continue;
+    var html = await z.texto(rutaJunto(base, it.href)); if(!html) continue;
+    // el lector de HTML de Chrome no corre los <script> ni carga nada de lo que encuentra aqui
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    Array.prototype.forEach.call(doc.querySelectorAll('script,style,nav'), function(e){ e.remove(); });
+    Array.prototype.forEach.call(doc.body ? doc.body.querySelectorAll(SEL) : [], function(el){
+      if(el.querySelector(SEL)) return;
+      var txt = limpio(el.textContent); if(!txt) return;
+      var h = /^H([1-6])$/.exec(el.tagName), marcados = [], neg = 0, tot = txt.replace(/\s/g, '').length;
+      Array.prototype.forEach.call(el.querySelectorAll('b,strong,u,mark'), function(m){
+        if(m.parentNode.closest && m.parentNode.closest('b,strong,u,mark') && el.contains(m.parentNode.closest('b,strong,u,mark'))) return;
+        var t = limpio(m.textContent); neg += t.replace(/\s/g, '').length;
+        if(t.length > 3) marcados.push(t);
+      });
+      parrafos.push({ txt: txt, titulo: !!h, nivel: h ? +h[1] : 0, marcados: marcados, todaNegrita: tot > 0 && neg / tot > 0.92 });
+    });
+  }
+  return parrafos;
+}
+
+/* ── Markdown y texto con títulos "#" ── */
+function leerMd(buf){
+  var parrafos = [];
+  texto(buf).split(/\r?\n/).forEach(function(l){
+    l = l.trim(); if(!l) return;
+    var h = /^(#{1,6})\s+(.*?)\s*#*$/.exec(l);
+    if(h){ parrafos.push({ txt: quitarMd(h[2]), titulo: true, nivel: h[1].length - 1, marcados: [] }); return; }
+    l = l.replace(/^([-*+]|\d+[.)])\s+/, '').replace(/^>\s*/, '');
+    var marcados = [], re = /(\*\*|__)(.+?)\1/g, m, neg = 0;
+    while((m = re.exec(l))){ var t = quitarMd(m[2]); neg += t.replace(/\s/g, '').length; if(t.length > 3) marcados.push(t); }
+    var txt = quitarMd(l), tot = txt.replace(/\s/g, '').length;
+    if(txt) parrafos.push({ txt: txt, titulo: false, nivel: 0, marcados: marcados, todaNegrita: tot > 0 && neg / tot > 0.92 });
+  });
+  return parrafos;
+}
+function quitarMd(s){
+  return limpio(s.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+                 .replace(/(\*\*|__)(.+?)\1/g, '$2').replace(/(\*|_)(\S.*?)\1/g, '$2').replace(/`([^`]*)`/g, '$1'));
+}
+
+/* ── PDF con el lector de Mozilla ── */
+async function cargarPdfjs(){
+  if(_pdfjs) return _pdfjs;
+  var m = await import(PDFJS + 'build/pdf.min.mjs');
+  m.GlobalWorkerOptions.workerSrc = PDFJS + 'build/pdf.worker.min.mjs';
+  _pdfjs = m;
+  return m;
+}
+function mediana(a){ if(!a.length) return 0; var s = a.slice().sort(function(x, y){ return x - y; }); return s[Math.floor(s.length / 2)]; }
+async function leerPdfMozilla(buf, avance){
+  var pdfjs = await cargarPdfjs();
+  var doc, tarea;
+  try{
+    tarea = pdfjs.getDocument({ data: new Uint8Array(buf.slice(0)), isEvalSupported: false, disableFontFace: true,
+      useSystemFonts: false, cMapUrl: PDFJS + 'cmaps/', cMapPacked: true, standardFontDataUrl: PDFJS + 'standard_fonts/',
+      wasmUrl: PDFJS + 'wasm/' });
+    doc = await tarea.promise;
+  }catch(e){
+    if(e && e.name === 'PasswordException') throw docAviso('Este PDF tiene clave',
+      'Está protegido con clave. Quítele la clave en la computadora y súbalo de nuevo.');
+    throw docDanado('este PDF');
+  }
+  var lineas = [];
+  for(var n = 1; n <= doc.numPages; n++){
+    if(avance) avance(n, doc.numPages);
+    var pag = await doc.getPage(n), tc = await pag.getTextContent(), act = null;
+    tc.items.forEach(function(it){
+      if(typeof it.str !== 'string') return;
+      var tam = Math.abs(it.transform[3]) || Math.hypot(it.transform[2], it.transform[3]) || it.height || 10;
+      var x = it.transform[4], y = it.transform[5];
+      if(act && Math.abs(y - act.y) > tam * 0.5){ lineas.push(act); act = null; }
+      if(!act) act = { txt: '', tam: 0, y: y, x: x, fin: x, pag: n, letras: 0 };
+      if(it.str){
+        if(act.txt && !/\s$/.test(act.txt) && !/^\s/.test(it.str) && x - act.fin > tam * 0.2) act.txt += ' ';
+        act.txt += it.str;
+        var len = it.str.replace(/\s/g, '').length;
+        if(len){ act.tam = Math.max(act.tam, tam); act.letras += len; }
+        act.fin = x + (it.width || 0);
+      }
+      if(it.hasEOL){ lineas.push(act); act = null; }
+    });
+    if(act) lineas.push(act);
+    pag.cleanup();
+  }
+  try{ await tarea.destroy(); }catch(e){}
+  return lineasAParrafos(lineas.filter(function(l){ l.txt = limpio(l.txt); return l.txt && l.letras; }));
+}
+function lineasAParrafos(lineas){
+  // fuera los numeros de pagina y lo que se repite arriba/abajo en casi todas las paginas
+  var pags = {}, cuenta = {};
+  lineas.forEach(function(l){ pags[l.pag] = 1; });
+  var nPags = Object.keys(pags).length;
+  lineas.forEach(function(l){ var k = l.txt.replace(/\d+/g, '#'); cuenta[k] = (cuenta[k] || 0) + 1; });
+  lineas = lineas.filter(function(l){
+    if(/^\d{1,4}$/.test(l.txt)) return false;
+    return !(nPags >= 3 && cuenta[l.txt.replace(/\d+/g, '#')] >= Math.max(3, nPags * 0.5) && l.txt.length < 80);
+  });
+  var cuerpo = mediana(lineas.filter(function(l){ return l.letras > 20; }).map(function(l){ return l.tam; })) || mediana(lineas.map(function(l){ return l.tam; }));
+  var saltos = [];
+  for(var i = 1; i < lineas.length; i++){
+    var a = lineas[i - 1], b = lineas[i];
+    if(a.pag === b.pag && Math.abs(a.tam - b.tam) < 0.5 && a.y > b.y) saltos.push(a.y - b.y);
+  }
+  // el paso de una linea a la siguiente DENTRO de un parrafo: el salto mas chico que sea de verdad una
+  // linea (no un acento o un indice), y nunca mas de 1.35 veces la letra (por si todos los parrafos son de 1 linea)
+  var reales = saltos.filter(function(g){ return g >= cuerpo * 0.9; });
+  var paso = Math.min(reales.length ? Math.min.apply(null, reales) : cuerpo * 1.2, cuerpo * 1.35);
+  var anchoTipico = mediana(lineas.map(function(l){ return l.fin - l.x; }));
+  var parrafos = [], p = null;
+  lineas.forEach(function(l, i){
+    var ant = lineas[i - 1], grande = l.tam > cuerpo * 1.15;
+    var nuevo = !p || !ant || grande || ant.tam > cuerpo * 1.15 || Math.abs(l.tam - ant.tam) > cuerpo * 0.15;
+    if(!nuevo){
+      if(l.pag === ant.pag){
+        var hueco = ant.y - l.y;
+        if(hueco > paso * 1.3 || hueco < 0) nuevo = true;
+        else if(/[.!?:»"”]$/.test(ant.txt) && (ant.fin - ant.x) < anchoTipico * 0.75) nuevo = true;
+      } else if(/[.!?:»"”]$/.test(ant.txt)) nuevo = true;
+    }
+    if(nuevo){
+      // la primera linea, en letra mucho mas grande que el texto, es el titulo del documento (como el "Titulo" de Word)
+      var esTit = !parrafos.length && l.tam >= cuerpo * 1.5;
+      p = { txt: l.txt, titulo: esTit, nivel: 0, marcados: [] }; parrafos.push(p);
+    }
+    else if(/[A-Za-zÁÉÍÓÚáéíóúñÑ]-$/.test(p.txt) && /^[a-záéíóúñ]/.test(l.txt)) p.txt = p.txt.slice(0, -1) + l.txt;
+    else p.txt += ' ' + l.txt;
+  });
+  return parrafos;
+}
+
+/* ── la puerta de entrada: devuelve {parrafos}, {temas} o {aviso}; null = lo de siempre ── */
+var VIEJOS = { doc: ['Word', 'Documento de Word', '.docx'], xls: ['Excel', 'Libro de Excel', '.xlsx'], ppt: ['PowerPoint', 'Presentación de PowerPoint', '.pptx'] };
+async function leerDocumento(f, buf, nombre){
+  var ext = (/\.([a-z0-9]+)$/.exec(nombre) || [])[1] || '';
+  var b = new Uint8Array(buf, 0, Math.min(8, buf.byteLength));
+  var esCfb = b.length === 8 && b[0] === 0xD0 && b[1] === 0xCF && b[2] === 0x11 && b[3] === 0xE0;
+  try{
+    if(VIEJOS[ext] || (esCfb && /^(docx|xlsx|pptx)$/.test(ext))){
+      if(esCfb && /^(docx|xlsx|pptx)$/.test(ext)) throw docAviso('Este documento tiene clave',
+        'Está protegido con clave. Quítele la clave en la computadora y súbalo de nuevo.');
+      var v = VIEJOS[ext];
+      throw docAviso('Ese es un ' + v[0] + ' viejo',
+        'La app lee el formato nuevo de ' + v[0] + '. Para pasarlo:<br><br>'
+        + '<span style="color:var(--lavanda);font-size:15px">'
+        + '1. Ábralo en ' + v[0] + ' en la computadora<br>'
+        + '2. Archivo → <b>Guardar como</b><br>'
+        + '3. En "Tipo", escoja <b>' + v[1] + ' (' + v[2] + ')</b><br>'
+        + '4. Guárdelo y súbalo así</span>');
+    }
+    if(ext === 'md' || ext === 'markdown') return { parrafos: leerMd(buf) };
+    if(ext === 'pdf') return await leerPdfConTodo(f, buf);
+    var zipExt = { xlsx: 1, xlsm: 1, pptx: 1, odt: 1, ods: 1, odp: 1, epub: 1 };
+    if(!zipExt[ext]) return null;
+    var z = abrirZipDoc(buf);
+    if(!z) throw docDanado();
+    if(ext === 'xlsx' || ext === 'xlsm') return { temas: await leerXlsx(z) };
+    if(ext === 'pptx') return { temas: await leerPptx(z) };
+    if(ext === 'ods') return { temas: await leerOds(z) };
+    if(ext === 'odp') return { temas: await leerOdp(z) };
+    if(ext === 'odt') return { parrafos: await leerOdt(z) };
+    if(ext === 'epub') return { parrafos: await leerEpub(z) };
+  }catch(e){
+    if(e && e.docAviso) return { aviso: e.docAviso };
+    return { aviso: { titulo: 'No se pudo leer', html: esc(e && e.message || 'Ese archivo no se pudo abrir.') } };
+  }
+  return null;
+}
+async function leerPdfConTodo(f, buf){
+  var avance = function(n, total){
+    var p = document.querySelector('#modal p');
+    if(p) p.textContent = 'Leyendo "' + f.name + '" · página ' + n + ' de ' + total;
+    var br = $('barra'); if(br) br.style.width = Math.max(5, Math.round(100 * n / total)) + '%';
+  };
+  var sinLector = false, parrafos = null;
+  try{ await cargarPdfjs(); }catch(e){ sinLector = true; }
+  if(!sinLector){
+    parrafos = await leerPdfMozilla(buf, avance);
+    if(parrafos.length && pareceTexto(parrafos.map(function(p){ return p.txt; }).join(' '))) return { parrafos: parrafos };
+  }
+  // el lector de antes (sin internet, o por si este PDF lo lee mejor)
+  try{
+    var viejo = await leerPdf(buf);
+    if(viejo.length && pareceTexto(viejo.map(function(p){ return p.txt; }).join(' '))) return { parrafos: viejo };
+  }catch(e){}
+  if(sinLector) throw docAviso('Hace falta internet una vez',
+    'Para leer este PDF la app usa el lector de PDF de Mozilla, que se baja de internet <b>la primera vez</b> '
+    + '(como la voz). Conéctese a internet y vuelva a subirlo. El PDF no se manda a ningún lado: se lee aquí.');
+  throw docAviso('Este PDF no se deja leer',
+    'Parece que son páginas <b>escaneadas</b> (fotos de páginas), o guarda el texto de una forma que no se puede sacar.<br><br>'
+    + 'Por ahora la app no lee fotos de páginas. Si tiene el documento en Word, súbalo en Word.');
+}
+
 async function leerArchivo(input){
   var f = input.files && input.files[0];
   input.value = '';
@@ -1605,8 +2216,13 @@ async function leerArchivo(input){
   trabajando('Leyendo "' + f.name + '"...');
   try{
     var buf = await f.arrayBuffer();
-    var nombre = f.name.toLowerCase(), parrafos;
-    if(nombre.endsWith('.docx')){
+    var nombre = f.name.toLowerCase(), parrafos, temasListos = null;
+    // v4.3: Excel, PowerPoint, LibreOffice, EPUB, Markdown, PDF con el lector de Mozilla, y los viejos
+    var doc = await leerDocumento(f, buf, nombre);
+    if(doc && doc.aviso){ cerrarModal(); return decir(doc.aviso.titulo, doc.aviso.html); }
+    if(doc && doc.temas) temasListos = doc.temas;
+    if(doc){ parrafos = doc.parrafos || []; }
+    else if(nombre.endsWith('.docx')){
       parrafos = await leerDocx(buf);
     } else if(nombre.endsWith('.pdf')){
       try{
@@ -1633,12 +2249,12 @@ async function leerArchivo(input){
         return { txt:l.trim(), titulo:false, nivel:0, marcados:[] };
       }).filter(function(p){ return p.txt; });
     }
-    if(!parrafos.length) throw new Error('Ese archivo no trae texto.');
+    if(temasListos ? !temasListos.length : !parrafos.length) throw new Error('Ese archivo no trae texto.');
 
     // NUNCA aceptar un libro que no sea texto legible de verdad.
     // Antes se colaba basura del PDF y salian capitulos con titulos raros.
     var muestra = parrafos.map(function(p){ return p.txt; }).join(' ');
-    if(!pareceTexto(muestra)){
+    if(!temasListos && !pareceTexto(muestra)){
       cerrarModal();
       return decir('Ese archivo no se dejó leer',
         'La app lo abrió pero lo que salió no es texto legible: son símbolos sueltos, '
@@ -1651,8 +2267,13 @@ async function leerArchivo(input){
         + 'Archivo → Abrir → escoge el PDF, y Word lo convierte solo.</span>');
     }
 
-    var temas = partirEnTemas(parrafos);
-    var titulo = f.name.replace(/\.(docx|pdf|txt)$/i,'').replace(/[_-]+/g,' ').trim() || 'Libro';
+    if(temasListos) ultimaLimpieza = {};
+    // Excel y PowerPoint ya vienen en temas (una hoja / una diapositiva por tema)
+    var temas = temasListos ? temasListos.map(function(t, n){
+      return { n: n + 1, titulo: t.titulo, texto: t.texto,
+               importante: detectarImportante(t.texto.map(function(x){ return { txt: x, marcados: [] }; })) };
+    }) : partirEnTemas(parrafos);
+    var titulo = f.name.replace(/\.(docx|pdf|txt|md|markdown|xlsx|xlsm|pptx|odt|ods|odp|epub)$/i,'').replace(/[_-]+/g,' ').trim() || 'Libro';
     var libro = {
       id: 'L' + Date.now().toString(36),
       titulo: titulo,
@@ -1701,7 +2322,13 @@ function pintarPreparar(){
   if(!libroActual) return ir('p-biblioteca');
   var l = libroActual;
   if(temaActual < 0 || temaActual >= l.temas.length) temaActual = 0;
-  if(!pedazos.length && l.temas.length) prepararEscuchar(true);
+  // v4.3: si el reproductor tiene OTRO libro (se abrio otro, o se acaba de subir uno), se carga este,
+  // en el tema donde se quedo la ultima vez
+  if(l.temas.length && _libroEnRepro !== l.id){
+    if(sonando){ detenerVoz(); sonando = false; }
+    temaActual = temaGuardadoDe(l);
+    prepararEscuchar(true);
+  } else if(!pedazos.length && l.temas.length) prepararEscuchar(true);
   $('prep-titulo').textContent = l.titulo;
   var marcas = l.temas.reduce(function(s,t){ return s + t.importante.length; }, 0);
   var min = Math.round(contarPalabras(l) / 150);
@@ -2070,6 +2697,9 @@ function marcarDesdeParrafo(j){
    viene danada de origen queda marcada "no funciona". (4) La prueba 🔧 trae un
    resumen de la ultima vez que se escucho, y el registro ya no se llena con lo
    que dice el motor por dentro.
+   v4.2 (17 nov 2026, pedido por Sensei): el cuadro ya no salta de frase en
+   frase: tiene el tema entero y corre solo, poco a poco, al ritmo de la voz;
+   mas alto (unas 9 lineas); lo que sigue se ve opaco hasta que la voz llega.
    v4.1 (12 nov 2026, pedido por Sensei): las frases largas quedaban TAPADAS en
    el cuadrito. "Que el escrito vaya subiendo de acuerdo a como se va leyendo".
    Ahora el cuadro es como un TELEPROMPTER: alto fijo (los botones no brincan),
@@ -2090,6 +2720,9 @@ var candado = null;      // Wake Lock: que no se apague la pantalla (solo voz de
 /* — partir en frases: la voz del telefono se corta sola pasados unos 15 seg,
      asi que se le va dando de a poco — */
 function partirEnPedazos(texto){
+  /* v4.3: el punto o la coma ENTRE numeros (35.5 · 3.16 · 1,500) no corta la frase:
+     se esconden un momento y se devuelven al final. Todo lo demas se parte igual que antes. */
+  texto = texto.replace(/(\d)\.(?=\d)/g, '$1\uE000').replace(/(\d),(?=\d)/g, '$1\uE001');
   var fuera = [];
   (texto.match(/[^.!?;]+[.!?;]?/g) || [texto]).forEach(function(f){
     f = f.trim(); if(!f) return;
@@ -2101,7 +2734,7 @@ function partirEnPedazos(texto){
     });
     if(buf) fuera.push(buf);
   });
-  return fuera;
+  return fuera.map(function(f){ return f.replace(/\uE000/g, '.').replace(/\uE001/g, ','); });
 }
 /* — busca, dentro de un parrafo, si algun termino de las aclaraciones
      aparece mencionado por primera vez (sin acentos y sin mayusculas,
@@ -2158,40 +2791,69 @@ function armarPedazos(){
   pintarTiempos();
   ponerFrase(0, 'Este tema esta vacio.');
 }
-/* ── v4.1 EL TELEPROMPTER: el cuadro de la frase ──────────────────────────
-   Alto fijo. Arriba, apagada, la frase anterior; en el medio la que suena;
-   abajo, apagada, la que sigue. Si la que suena no cabe, el texto sube poco
-   a poco al ritmo de la voz: la linea que se esta oyendo siempre queda a la
-   vista, y al terminar la frase se ve su ultima linea.
-   Con la pantalla apagada no hace nada (no gasta bateria). */
-var _fraseIdx = -1, _inicioFrase = 0, _letraFrase = -1, _teleP = 0, _teleY = -1, _teleTimer = null, _teleCuadro = 0;
+/* ── v4.2 EL TELEPROMPTER CONTINUO ───────────────────────────────────────────
+   Pedido por Sensei el 17 nov 2026: "que vaya subiendo poco a poco, sin ese
+   efecto de salto", "un poco mas alto" y "que se vea opaco lo que sigue".
+   El cuadro tiene TODO el tema: lo ya leido queda apagado arriba, lo que suena
+   va claro con la raya dorada y lo que sigue se ve opaco. El texto corre solo,
+   al ritmo de la voz: la linea que se esta oyendo va siempre a un tercio del
+   cuadro. Todo se pinta en el cuadro de la pantalla (requestAnimationFrame):
+   con la pantalla apagada no hace nada y nunca le quita tiempo al audio.
+   #esc-dice queda escondido con la frase que suena (lectores de pantalla). */
+var _fraseIdx = -1, _inicioFrase = 0, _letraFrase = -1, _teleP = 0;
+var _teleLista = null, _teleNodos = [], _telePintada = -1, _teleY = null, _teleYvisto = null, _teleCuadro = 0;
+var TELE_LECTURA = 0.30;            // a que alto del cuadro va la linea que se oye
 function ponerFrase(i, siVacio){
   var d = $('esc-dice'); if(!d) return;
   var t = pedazos[i]; if(t == null) t = siVacio || '';
   d.textContent = t;                 // siempre, como antes (la prueba de letras exactas lo vigila)
-  var a = $('esc-antes'), z = $('esc-despues');
-  if(a){ var ta = (i > 0 && pedazos[i - 1]) || ''; if(a.textContent !== ta) a.textContent = ta; }
-  if(z){ var tz = pedazos[i + 1] || ''; if(z.textContent !== tz) z.textContent = tz; }
   _fraseIdx = i; _inicioFrase = Date.now(); _letraFrase = -1; _teleP = 0;
-  // mover el cuadro va en el proximo cuadro de la pantalla, no aqui: esto corre
-  // justo cuando cambia el audio y no se le quita ni un instante. Con la
-  // pantalla apagada no corre nunca.
-  if(!_teleCuadro && window.requestAnimationFrame)
-    _teleCuadro = requestAnimationFrame(function(){ _teleCuadro = 0; moverTele(_teleP); });
-  arrancarTele();
+  pedirCuadroTele();
 }
-/* p = cuanto de la frase ya se dijo (0 al empezar, 1 al terminar) */
-function moverTele(p){
-  var c = $('esc-tele'), inn = $('esc-tele-in'), d = $('esc-dice');
-  if(!c || !inn || !d || document.hidden) return;
-  var H = c.clientHeight; if(!H) return;          // no se ve: nada que mover
-  var arriba = Math.round(H * 0.24), abajo = Math.round(H * 0.12);
-  var sobra = Math.max(0, d.offsetHeight - (H - arriba - abajo));
-  p = Math.max(0, Math.min(1, p || 0));
-  var y = Math.max(0, Math.round(d.offsetTop - arriba + p * sobra));
-  if(y !== _teleY){ _teleY = y; inn.style.transform = 'translateY(' + (-y) + 'px)'; }
+function pedirCuadroTele(){
+  if(_teleCuadro || !window.requestAnimationFrame) return;
+  _teleCuadro = requestAnimationFrame(cuadroTele);
 }
-/* cuanto de la frase que suena ya se dijo */
+/* el tema entero dentro del cuadro: cada frase con textContent (nunca HTML del libro) */
+function armarListaTele(inn){
+  inn.textContent = '';
+  _teleNodos = [];
+  var lista = pedazos.length ? pedazos : [$('esc-dice').textContent || ''];
+  for(var k = 0; k < lista.length; k++){
+    var e = document.createElement('div');
+    e.className = 'tp-f';
+    e.textContent = lista[k];
+    inn.appendChild(e); _teleNodos.push(e);
+  }
+  _teleLista = pedazos; _telePintada = -1; _teleYvisto = null;
+}
+function cuadroTele(){
+  _teleCuadro = 0;
+  if(document.hidden) return;                       // pantalla apagada: nada
+  var c = $('esc-tele'), inn = $('esc-tele-in');
+  if(!c || !inn) return;
+  var H = c.clientHeight; if(!H) return;            // el cuadro no se ve (otra pantalla)
+  if(_teleLista !== pedazos || !_teleNodos.length) armarListaTele(inn);
+  var i = Math.max(0, Math.min(_teleNodos.length - 1, _fraseIdx));
+  if(_telePintada !== i){                           // leido / sonando / lo que sigue
+    for(var k = 0; k < _teleNodos.length; k++){
+      var cl = k < i ? 'tp-f tp-ya' : (k === i ? 'tp-f tp-suena' : 'tp-f');   // (no 'ahora': ese nombre ya lo usa el titulo del tema)
+      if(_teleNodos[k].className !== cl) _teleNodos[k].className = cl;
+    }
+    _telePintada = i;
+  }
+  if(sonando){ var p = progresoFrase(); _teleP = Math.max(0, Math.min(1, isFinite(p) ? p : 0)); }
+  var e = _teleNodos[i], sig = _teleNodos[i + 1];
+  var t0 = e.offsetTop, t1 = sig ? sig.offsetTop : t0 + e.offsetHeight;
+  var y = Math.max(0, t0 + _teleP * (t1 - t0) - H * TELE_LECTURA);
+  if(_teleYvisto === null) _teleYvisto = y;
+  var falta = y - _teleYvisto;
+  _teleYvisto = Math.abs(falta) < 0.5 ? y : _teleYvisto + falta * 0.2;   // corre suave, sin brincos
+  var yy = Math.round(_teleYvisto * 10) / 10;
+  if(yy !== _teleY){ _teleY = yy; inn.style.transform = 'translateY(' + (-yy) + 'px)'; }
+  if(sonando || Math.abs(y - _teleYvisto) > 0.5) pedirCuadroTele();
+}
+/* cuanto de la frase que suena ya se dijo (0 al empezar, 1 al terminar) */
 function progresoFrase(){
   if(!sonando) return _teleP;
   if(usandoNueva()){
@@ -2209,16 +2871,9 @@ function progresoFrase(){
   var est = segundosDe(t) * 1000 * 0.85;          // la cuenta es aproximada: mejor un poco antes que tarde
   return est > 0 ? (Date.now() - _inicioFrase) / est : 0;
 }
-function arrancarTele(){
-  if(_teleTimer) return;
-  _teleTimer = setInterval(function(){
-    if(document.hidden) return;
-    var c = $('esc-tele'); if(!c || !c.clientHeight) return;
-    var p = progresoFrase();
-    _teleP = Math.max(0, Math.min(1, isFinite(p) ? p : 0));
-    moverTele(_teleP);
-  }, 150);
-}
+/* por si la voz arranca sin cambiar de frase (pausa y play): un toque cada medio segundo */
+setInterval(function(){ if(!document.hidden) pedirCuadroTele(); }, 500);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ _teleYvisto = null; pedirCuadroTele(); } });
 /* — cuanto dura mas o menos un pedazo, para poder saltar 10 segundos — */
 function segundosDe(t){ return t.split(/\s+/).length / (2.6 * velocidad); }
 function mmss(s){
@@ -3572,9 +4227,19 @@ if(voz) voz.onvoiceschanged = function(){};
 
 /* — el reproductor vive ARRIBA de la pantalla del libro, siempre a la vista,
      igual que en NBS Academia — */
+/* v4.3: que libro tiene cargado el reproductor, y en que tema se quedo cada libro */
+var _libroEnRepro = null;
+function temaGuardadoDe(l){
+  var m = {}; try{ m = JSON.parse(localStorage.getItem('efd_tema_de') || '{}') || {}; }catch(e){}
+  var n = +m[l.id];
+  return (n >= 0 && n < l.temas.length) ? n : 0;
+}
 function prepararEscuchar(soloRefrescar){
   if(!libroActual || !libroActual.temas[temaActual]) return;
   var t = libroActual.temas[temaActual];
+  _libroEnRepro = libroActual.id;
+  try{ var m = JSON.parse(localStorage.getItem('efd_tema_de') || '{}') || {}; m[libroActual.id] = temaActual;
+       localStorage.setItem('efd_tema_de', JSON.stringify(m)); }catch(e){}
   var c = $('esc-cual');
   if(c) c.textContent = (temaActual + 1) + '. ' + t.titulo;
   var vg = parseFloat(localStorage.getItem('efd_vel') || '1');
@@ -5301,6 +5966,16 @@ if('serviceWorker' in navigator){
     }).catch(function(){});
   });
 }
+</script>
+<script>
+/* v4.2: la version a la vista debajo de "Para Dios". Sale sola del app-version: nadie la escribe a mano. */
+(function(){
+  var v = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+  var m = v.match(/V\d+(?:\.\d+)*$/);
+  var t = m ? 'Versión ' + m[0] : '';
+  var l = document.querySelectorAll('.ver-app');
+  for(var i = 0; i < l.length; i++) l[i].textContent = t;
+})();
 </script>
 </body>
 </html>
