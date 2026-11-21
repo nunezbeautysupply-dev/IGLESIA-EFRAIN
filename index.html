@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<meta name="app-version" content="20261117b-EFD-ADMIN-V4.3">
+<meta name="app-version" content="20261119b-EFD-ADMIN-V4.5">
 <meta name="theme-color" content="#0B1026">
 <title>Iglesia Efraín para Dios</title>
 <style>
@@ -364,6 +364,51 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
 /* v4.2 la version a la vista, chiquita, debajo de "Para Dios" */
 .ver-app{font-size:11.5px;color:var(--lavanda);opacity:.75;margin-top:6px;letter-spacing:.06em}
 .ver-app:empty{display:none}
+/* ── ✨ Preparar con IA (v4.4): compacto ─────────────── */
+.ia-tipo{margin:0 0 12px;display:flex;gap:8px}
+.ia-lista{max-height:34vh;overflow:auto;margin:2px 0 8px;border-top:1px solid rgba(169,166,216,.14);border-bottom:1px solid rgba(169,166,216,.14)}
+.ia-t{display:flex;gap:9px;align-items:flex-start;padding:6px 2px;font-size:15px;color:var(--perg);cursor:pointer;line-height:1.4}
+.ia-t input{width:18px;height:18px;margin-top:2px;accent-color:var(--oro);flex:0 0 auto}
+.ia-res{background:#0E1533;border:1px solid rgba(169,166,216,.2);border-radius:12px;padding:10px 13px;margin-bottom:10px;max-height:52vh;overflow:auto}
+.ia-tit{font-family:var(--serif);font-size:19px;color:var(--oro-suave);margin:0 0 8px}
+.ia-sub{font-size:15.5px;color:var(--oro);margin:12px 0 4px}
+.ia-txt{font-family:var(--serif);font-size:16px;line-height:1.6;color:var(--perg);white-space:pre-wrap}
+.ia-res [contenteditable]{outline:none;border-radius:6px}
+.ia-res [contenteditable]:focus{background:rgba(212,175,55,.07);box-shadow:0 0 0 2px rgba(212,175,55,.25)}
+mark.ia-ojo{background:rgba(199,97,79,.22);color:#F2B7AB;border-radius:3px;padding:0 2px}
+mark.ia-ojo::after{content:' ⚠'}
+.progreso i.ia-anda{width:40%;animation:iaAnda 1.3s ease-in-out infinite}
+@keyframes iaAnda{0%{margin-left:-40%}100%{margin-left:100%}}
+@media print{#imp h3{font-family:Georgia,serif;font-size:12.5pt;margin:5mm 0 2mm}}
+/* ── Estudiar (v4.5): compacto ─────────────── */
+.est-chips{margin:0 0 12px;display:flex;flex-wrap:wrap;gap:8px}
+.est-fila{display:flex;gap:9px;align-items:flex-start;padding:6px 2px;font-size:15px;color:var(--perg);cursor:pointer;line-height:1.4}
+.est-fila input[type=checkbox],.est-fila input[type=radio]{width:18px;height:18px;margin-top:2px;accent-color:var(--oro);flex:0 0 auto}
+.cz-cab{display:flex;justify-content:space-between;font-size:13px;color:var(--lavanda);font-weight:700}
+.cz-q{font-family:var(--serif);font-size:18px;line-height:1.5;color:var(--perg);margin:0 0 6px}
+.cz-op{text-align:left;margin:0 0 7px;padding:11px 13px;font-size:15.5px}
+.cz-op:disabled{opacity:1}
+.cz-op.cz-si{border-color:#5E9E7E;background:rgba(94,158,126,.18);color:#BDE5CF}
+.cz-op.cz-no{border-color:rgba(199,97,79,.6);background:rgba(199,97,79,.15);color:#F2B7AB}
+.cz-nota{font-family:var(--serif);font-size:40px;color:var(--oro);text-align:center;margin:2px 0}
+.cz-antes{padding:10px 13px;border-left:3px solid var(--oro)}
+.cz-antes-t{font-weight:700;color:var(--oro-suave);font-size:14.5px;margin-bottom:4px}
+.cz-antes-q{font-size:15px;color:var(--perg);line-height:1.45;margin:2px 0}
+.ex-cs{display:flex;flex-wrap:wrap;gap:6px}
+.ex-c{font-size:14px;padding:5px 10px;border-radius:14px;border:1px solid rgba(169,166,216,.25)}
+.ex-si{color:#9BD3B6;border-color:rgba(94,158,126,.5)}
+.ex-no{color:var(--lavanda)}
+.plan{background:var(--indigo);border:1px solid rgba(169,166,216,.14);border-radius:14px;padding:8px 12px;margin:0 0 10px}
+.plan-cab{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--oro-suave);font-weight:700;gap:8px}
+.plan-cambiar{background:none;border:0;color:var(--lavanda);font-size:13px;text-decoration:underline;cursor:pointer;padding:2px}
+.plan-hoy{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px;color:var(--perg);margin-top:5px}
+.plan-oir{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--oro);background:rgba(212,175,55,.12);color:var(--oro);font-size:13px;cursor:pointer}
+.plan-hacer{margin:0 0 10px}
+.ep-p{padding:9px 12px;margin-bottom:8px}
+.ep-q{font-size:15px;color:var(--perg);font-weight:600}
+.ia-pq{border-bottom:1px solid rgba(169,166,216,.1)}
+.ia-pqq{font-size:15px;color:var(--perg)}
+.ia-pqw{font-size:13px;color:#F2B7AB;margin-top:3px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -481,6 +526,7 @@ input[type=range]{width:100%;accent-color:var(--oro);height:26px;background:tran
       <button class="volver" onclick="abrirMenu()">☰</button>
     </div>
     <div id="prep-resumen"></div>
+    <div id="plan-caja"></div>
     <div class="repro" id="repro">
       <div class="ahora" id="esc-cual">Toca un tema para empezar</div>
       <div class="dice tele" id="esc-tele"><div class="tp-in" id="esc-tele-in"></div></div>
@@ -751,6 +797,7 @@ async function traerLibro(id){
   });
 }
 async function quitarLibro(id){
+  iaBorrarDelLibro(id);   // v4.4: lo que la IA preparo de ese libro se borra con el
   var db = await abrirBD();
   return new Promise(function(ok){
     var t = db.transaction('libros','readwrite');
@@ -2516,11 +2563,13 @@ function verTema(i){
           }).join('')
         + '</div><p class="mini" style="margin-top:10px">Toca cualquier párrafo para marcarlo como importante.</p></div>';
 
+  html += cajaAntesDeEscuchar(i);   // v4.5
   html += '<button class="btn btn-oro" onclick="escuchar()">🔊 Escuchar este tema</button>'
         + '<div class="fila"><button class="btn btn-linea" onclick="leerEnVentana()">📖 Leer</button>'
         + '<button class="btn btn-linea" onclick="abrirNota()">✍️ Nota</button></div>'
         + '<div class="fila"><button class="btn btn-linea" onclick="abrirRepaso()">❓ Repaso</button>'
         + '<button class="btn btn-linea" onclick="imprimirTema()">🖨️ Imprimir</button></div>'
+        + botonesEstudioTema(i)
         + '<div class="fila"><button class="btn btn-linea" onclick="verResumen(' + i + ')">📄 Lo esencial</button>'
         + '<button class="btn btn-linea" onclick="verRelacionados(' + i + ')">🔗 Se parece a...</button></div>'
         + '<button class="btn btn-linea" onclick="alternarHecho(' + i + ');verTema(' + i + ')">'
@@ -2719,7 +2768,19 @@ var candado = null;      // Wake Lock: que no se apague la pantalla (solo voz de
 
 /* — partir en frases: la voz del telefono se corta sola pasados unos 15 seg,
      asi que se le va dando de a poco — */
+/* v4.5: "[[pausa:8]]" es un silencio para pensar (el repaso hablado). Nunca se lee en voz alta. */
+var _pausaTok = 0;
+function esPausa(t){ var m = /^\s*\[\[pausa:(\d{1,2})\]\]\s*$/.exec(String(t == null ? '' : t)); return m ? Math.min(30, Math.max(1, +m[1])) : 0; }
+function textoVisible(t){ var sg = esPausa(t); return sg ? '⏳ Piense la respuesta… (' + sg + ' s)' : t; }
 function partirEnPedazos(texto){
+  /* v4.5: la marca de pausa va sola, como su propia frase */
+  if(/\[\[pausa:\d{1,2}\]\]/.test(texto)){
+    var fuera0 = [];
+    texto.split(/(\[\[pausa:\d{1,2}\]\])/).forEach(function(tr){
+      if(esPausa(tr)) fuera0.push(tr.trim()); else if(tr.trim()) fuera0 = fuera0.concat(partirEnPedazos(tr));
+    });
+    return fuera0;
+  }
   /* v4.3: el punto o la coma ENTRE numeros (35.5 · 3.16 · 1,500) no corta la frase:
      se esconden un momento y se devuelven al final. Todo lo demas se parte igual que antes. */
   texto = texto.replace(/(\d)\.(?=\d)/g, '$1\uE000').replace(/(\d),(?=\d)/g, '$1\uE001');
@@ -2806,7 +2867,7 @@ var TELE_LECTURA = 0.30;            // a que alto del cuadro va la linea que se 
 function ponerFrase(i, siVacio){
   var d = $('esc-dice'); if(!d) return;
   var t = pedazos[i]; if(t == null) t = siVacio || '';
-  d.textContent = t;                 // siempre, como antes (la prueba de letras exactas lo vigila)
+  d.textContent = textoVisible(t);   // siempre, como antes (la prueba de letras exactas lo vigila). v4.5: la pausa se ve como 'Piense'
   _fraseIdx = i; _inicioFrase = Date.now(); _letraFrase = -1; _teleP = 0;
   pedirCuadroTele();
 }
@@ -2822,7 +2883,7 @@ function armarListaTele(inn){
   for(var k = 0; k < lista.length; k++){
     var e = document.createElement('div');
     e.className = 'tp-f';
-    e.textContent = lista[k];
+    e.textContent = textoVisible(lista[k]);
     inn.appendChild(e); _teleNodos.push(e);
   }
   _teleLista = pedazos; _telePintada = -1; _teleYvisto = null;
@@ -2875,7 +2936,7 @@ function progresoFrase(){
 setInterval(function(){ if(!document.hidden) pedirCuadroTele(); }, 500);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden){ _teleYvisto = null; pedirCuadroTele(); } });
 /* — cuanto dura mas o menos un pedazo, para poder saltar 10 segundos — */
-function segundosDe(t){ return t.split(/\s+/).length / (2.6 * velocidad); }
+function segundosDe(t){ var sg = esPausa(t); if(sg) return sg; return t.split(/\s+/).length / (2.6 * velocidad); }
 function mmss(s){
   s = Math.max(0, Math.round(s));
   return Math.floor(s/60) + ':' + String(s % 60).padStart(2,'0');
@@ -2908,6 +2969,17 @@ function escogerVoz(){
 }
 function hablarPedazo(){
   if(!voz || pedazoAhora >= pedazos.length){ terminoElTema(); return; }
+  var sgP = esPausa(pedazos[pedazoAhora]), tok = ++_pausaTok;
+  if(sgP){                                   // v4.5: silencio para pensar
+    ponerFrase(pedazoAhora);
+    setTimeout(function(){
+      if(tok !== _pausaTok || pareYo || !sonando) return;
+      pedazoAhora++;
+      pintarTiempos();
+      if(pedazoAhora < pedazos.length){ ponerFrase(pedazoAhora); hablarPedazo(); } else terminoElTema();
+    }, sgP * 1000);
+    return;
+  }
   var u = new SpeechSynthesisUtterance(pedazos[pedazoAhora]);
   var v = escogerVoz();
   if(v){ u.voice = v; u.lang = v.lang || 'es-US'; } else { u.lang = 'es-US'; }
@@ -3461,9 +3533,13 @@ async function correrCola(){
   } finally { _generando = false; }
 }
 /* prepara UNA frase del pedazo y la guarda aparte */
+var _fmtVoz = null;                                            // v4.5: el formato del ultimo audio (para los silencios)
+var FMT_VOZ_DEFECTO = { formato: 1, fmt: { canales: 1, hz: 22050, porSeg: 44100, bloque: 2, bits: 16 } };
+function primeraReal(h){ for(var i = 0; i < h.length; i++) if(h[i] && h[i].pcm) return h[i]; return null; }
 async function generarParte(e){
+  var tx = e.partes[e.hechas.length], sgP = esPausa(tx);
+  if(sgP){ e.hechas.push({ pausa: sgP }); return; }             // v4.5: la pausa para pensar no pasa por la voz
   var s = await prepararVozNueva(vozNuevaId());
-  var tx = e.partes[e.hechas.length];
   var t0 = Date.now(), atras = !!document.hidden, vig = vigiaEmpezar();
   var wav;
   try{ wav = await s.predict(tx); } finally { var ocupado = vigiaTerminar(vig); }
@@ -3471,7 +3547,9 @@ async function generarParte(e){
   if(!wav || !wav.size) throw new Error('la voz no devolvio audio');
   var w = await leerWav(wav);
   if(!w) throw new Error('la voz devolvio un audio que no se entiende');
-  if(e.hechas.length && w.fmt.porSeg !== e.hechas[0].fmt.porSeg) throw new Error('la voz cambio a medio pedazo');
+  var ref = primeraReal(e.hechas);
+  if(ref && w.fmt.porSeg !== ref.fmt.porSeg) throw new Error('la voz cambio a medio pedazo');
+  _fmtVoz = { fmt: w.fmt, formato: w.formato };
   e.hechas.push(w);
   e.ms = (e.ms || 0) + ms; e.atras = e.atras || atras;
   if(!atras) e.ocupado = Math.max(e.ocupado || 0, ocupado);
@@ -3483,9 +3561,13 @@ async function generarParte(e){
 function pausaTrasFrase(t){ return /[.!?…:;]["»”')]*\s*$/.test(t || '') ? PAUSA_FRASE : PAUSA_COMA; }
 /* junta las frases en un solo audio y anota en que segundo EXACTO empieza cada una */
 function armarBloque(e){
-  var w0 = e.hechas[0], f = w0.fmt, trozos = [], marcas = [], t = 0;
+  var w0 = primeraReal(e.hechas) || _fmtVoz || FMT_VOZ_DEFECTO, f = w0.fmt, trozos = [], marcas = [], t = 0;
   for(var i = 0; i < e.hechas.length; i++){
     marcas.push(t);
+    if(e.hechas[i].pausa){                                       // v4.5: silencio para pensar
+      trozos.push(e.hechas[i].pausa); t += bytesDeSilencio(f, e.hechas[i].pausa) / f.porSeg;
+      continue;
+    }
     trozos.push(e.hechas[i].pcm); t += e.hechas[i].pcm.length / f.porSeg;
     var pausa = pausaTrasFrase(e.partes[i]);
     trozos.push(pausa); t += bytesDeSilencio(f, pausa) / f.porSeg;
@@ -3761,7 +3843,7 @@ function detenerAudio(){
   avisarCambio();
 }
 function detenerVoz(){
-  pareYo = true;
+  pareYo = true; _pausaTok++;
   try{ if(voz) voz.cancel(); }catch(e){}
   detenerAudio();
 }
@@ -4611,15 +4693,12 @@ function estadoTarjeta(i, j){
   return repasos()[llaveTarjeta(i, j)] || { paso: -1, prox: '0000-00-00' };
 }
 function anotarRepaso(i, j, lasabe){
-  var r = repasos(), k = llaveTarjeta(i, j), e = r[k] || { paso: -1 };
-  /* Si la sabes de primera, salta directo al segundo escalon: no tiene sentido
-     que una tarjeta que ya dominas te vuelva mañana igual que una que fallaste. */
-  e.paso = lasabe ? Math.min(ESCALERA.length - 1, (e.paso < 0 ? 1 : e.paso + 1)) : 0;
-  var d = new Date();
-  d.setDate(d.getDate() + ESCALERA[e.paso]);
-  e.prox = d.toISOString().slice(0, 10);
-  e.visto = hoyISO();
-  r[k] = e;
+  /* v4.5: FSRS (el calculo nuevo de Anki): lo que sabe vuelve mas tarde, lo que falla vuelve manana.
+     Lo guardado con la escalera de antes (1, 3, 7, 16, 35, 75 dias) se convierte solo. */
+  var r = repasos(), k = llaveTarjeta(i, j);
+  var n = fsrsRepasar(r[k], lasabe ? 3 : 1, hoyISO());
+  n.visto = hoyISO();
+  r[k] = n;
   ponerG('efd_repaso', r);
 }
 /* Todas las tarjetas del libro, y cuales tocan hoy. */
@@ -5781,6 +5860,1420 @@ function imprimirManual(){
   setTimeout(function(){ window.print(); }, 120);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ✨ PREPARAR CON IA  (v4.4, 18 nov 2026) — SOLO en la app de ADMIN, en la laptop
+   Pedido de Sensei: "decirle a la app que me saque un resumen, o que me prepare
+   una exposicion de X tema del documento que yo le haya compartido".
+   Usa la inteligencia artificial que Chrome trae por dentro (Gemini Nano, por la
+   "Prompt API"). Corre AHI MISMO en la computadora: el documento no sale a internet.
+   Reglas que se cumplen aqui:
+   - a la IA se le pasan SOLO los temas que la app encontro y que usted dejo marcados;
+   - lo que la IA escribe se pone en pantalla como TEXTO, nunca como codigo;
+   - si cita un versiculo que NO esta en el documento, se marca con ⚠;
+   - es un BORRADOR: se corrige tocando el texto, y no llega a los hermanos.
+   En el telefono esta opcion no sale (Chrome de Android no trae esta IA).
+   ══════════════════════════════════════════════════════════════════════════ */
+var IA_OPC = { expectedInputs: [{ type: 'text', languages: ['es'] }],
+               expectedOutputs: [{ type: 'text', languages: ['es'] }] };
+var IA_SISTEMA = 'Eres un ayudante para preparar enseñanzas de una iglesia cristiana. '
+  + 'Escribes en español sencillo, claro y cálido. Usas SOLO el material que te da el usuario: '
+  + 'no inventes datos, historias, nombres ni citas. Si mencionas un versículo de la Biblia, '
+  + 'usa solo los que aparecen en el material, escritos igual. Respondes únicamente con el JSON pedido.';
+var IA_ESQUEMA = { type: 'object', properties: {
+    titulo: { type: 'string' },
+    secciones: { type: 'array', items: { type: 'object',
+      properties: { titulo: { type: 'string' }, texto: { type: 'string' } }, required: ['titulo', 'texto'] } }
+  }, required: ['titulo', 'secciones'] };
+var IA_PALABRAS_MIN = 130;     // palabras por minuto, hablando con calma
+var IA_DURACIONES = [5, 10, 15, 20];
+var _iaBase = null, _iaCtl = null, _iaRes = null, _iaHabla = false, _iaVigia = null, _iaPed = null;
+
+function esTelefonoIA(){ return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || ''); }
+function hayIA(){ return typeof self !== 'undefined' && ('LanguageModel' in self); }
+function iaEnMenu(){ return hayIA() || !esTelefonoIA(); }
+function iaNombre(tipo){ return tipo === 'resumen' ? 'el resumen' : tipo === 'preguntas' ? 'las preguntas' : tipo === 'guia' ? 'la guía para el grupo' : 'la exposición'; }
+var IA_POR_TEMA = [3, 5, 8];
+
+/* ── 1. EL PEDIDO ── */
+function abrirIA(){
+  cerrarMenu();
+  if(!libroActual) return decir('Primero abra un documento', 'Abra el documento o libro del que quiere preparar algo, y vuelva a tocar ✨ Preparar con IA.');
+  if(!_iaPed || _iaPed.libro !== libroActual.id) _iaPed = { libro: libroActual.id, tipo: 'exposicion', tema: '', min: 15, marcados: null, todos: false };
+  iaPintarPedido();
+}
+function iaPintarPedido(){
+  iaCallar();
+  var p = _iaPed, g = iaGuardadas();
+  var ultima = _iaRes && _iaRes.libro === libroActual.id && !_iaRes.guardada;
+  var html = '<h2>✨ Preparar con IA</h2>'
+    + ((g.length || ultima) ? '<div style="margin:-4px 0 8px">'
+        + (ultima ? '<button class="btn btn-linea btn-chico" id="ia-ultima">↩ Ver la última que preparó</button>' : '')
+        + (g.length ? '<button class="btn btn-linea btn-chico" id="ia-ver-g">💾 Guardadas (' + g.length + ')</button>' : '')
+        + '</div>' : '')
+    + '<label class="etq">¿Qué quiere?</label>'
+    + '<div class="ia-tipo">'
+    + '<button class="chip' + (p.tipo === 'exposicion' ? ' on' : '') + '" id="ia-t-exp">Exposición</button> '
+    + '<button class="chip' + (p.tipo === 'resumen' ? ' on' : '') + '" id="ia-t-res">Resumen</button> '
+    + '<button class="chip' + (p.tipo === 'preguntas' ? ' on' : '') + '" id="ia-t-pre">Preguntas</button> '
+    + '<button class="chip' + (p.tipo === 'guia' ? ' on' : '') + '" id="ia-t-gui">Guía para el grupo</button></div>'
+    + '<label class="etq" for="ia-tema">¿De qué tema?</label>'
+    + '<input class="campo" id="ia-tema" maxlength="160" placeholder="Ej.: la fe en tiempos difíciles" value="' + esc(p.tema) + '">'
+    + (p.tipo === 'guia' ? '<select class="campo" id="ia-min" hidden><option value="15">15</option></select>'
+       : p.tipo === 'preguntas'
+       ? '<label class="etq" for="ia-min" style="margin-top:10px">Preguntas por tema</label>'
+         + '<select class="campo" id="ia-min">' + IA_POR_TEMA.map(function(m){
+             return '<option value="' + m + '"' + (m === (p.porTema || 5) ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select>'
+       : '<label class="etq" for="ia-min" style="margin-top:10px">Duración</label>'
+         + '<select class="campo" id="ia-min">' + IA_DURACIONES.map(function(m){
+             return '<option value="' + m + '"' + (m === p.min ? ' selected' : '') + '>' + m + ' min</option>'; }).join('') + '</select>')
+    + '<div id="ia-temas" style="margin-top:10px"></div>'
+    + '<div id="ia-err"></div>'
+    + '<button class="btn btn-oro" id="ia-ir">' + (p.tipo === 'preguntas' ? '✨ Hacerlas' : '✨ Prepararl' + (p.tipo === 'resumen' ? 'o' : 'a')) + '</button>'
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
+  modal(html);
+  var espera = null;
+  $('ia-tema').oninput = function(){
+    p.tema = this.value; p.marcados = null;
+    clearTimeout(espera); espera = setTimeout(iaPintarTemas, 250);
+  };
+  $('ia-tema').onkeydown = function(e){ if(e.key === 'Enter') $('ia-ir').click(); };
+  $('ia-min').onchange = function(){ if(p.tipo === 'preguntas') p.porTema = +this.value || 5; else if(p.tipo !== 'guia') p.min = +this.value || 15; };
+  $('ia-t-exp').onclick = function(){ p.tipo = 'exposicion'; iaPintarPedido(); };
+  $('ia-t-res').onclick = function(){ p.tipo = 'resumen'; iaPintarPedido(); };
+  $('ia-t-pre').onclick = function(){ p.tipo = 'preguntas'; iaPintarPedido(); };
+  $('ia-t-gui').onclick = function(){ p.tipo = 'guia'; iaPintarPedido(); };
+  $('ia-ir').onclick = iaEmpezar;
+  if($('ia-ver-g')) $('ia-ver-g').onclick = iaVerGuardadas;
+  if($('ia-ultima')) $('ia-ultima').onclick = iaPintarResultado;
+  iaPintarTemas();
+}
+
+/* Que temas del documento hablan de lo que pidio: se usa el mismo buscador de la
+   app (palabra completa y su plural, sin acentos). El titulo pesa mas. */
+function iaCandidatos(tema){
+  var q = String(tema || '').trim();
+  if(!q) return [];
+  var grupos = analizarBusqueda(q).grupos;
+  if(!grupos.length) return [];
+  var fuera = [];
+  libroActual.temas.forEach(function(t, i){
+    var tit = normal(t.titulo || '');
+    var cuerpo = normal((t.texto || []).join(' ') + ' ' + (t.importante || []).map(function(f){ return f.t; }).join(' '));
+    var pts = 0;
+    grupos.forEach(function(g){
+      g.re.lastIndex = 0; if(g.re.test(tit)) pts += 3;
+      g.re.lastIndex = 0; var m = cuerpo.match(g.re); if(m) pts += Math.min(m.length, 10);
+    });
+    if(pts > 0) fuera.push({ i: i, pts: pts });
+  });
+  return fuera.sort(function(a, b){ return b.pts - a.pts || a.i - b.i; }).slice(0, 12);
+}
+function iaPintarTemas(){
+  var p = _iaPed, caja = $('ia-temas');
+  if(!caja) return;
+  var cand = iaCandidatos(p.tema);
+  if(p.marcados === null){
+    p.marcados = {};
+    cand.slice(0, 3).forEach(function(c){ p.marcados[c.i] = true; });
+    if(!p.tema.trim() && libroActual.temas.length === 1) p.marcados[0] = true;
+  }
+  var lista, nota;
+  if(p.todos){
+    lista = libroActual.temas.map(function(t, i){ return i; });
+    nota = 'Todos los temas del documento. Marque los que quiere usar.';
+  } else if(cand.length){
+    lista = cand.map(function(c){ return c.i; });
+    nota = 'La app buscó estos temas del documento (puede marcar o quitar):';
+  } else {
+    lista = Object.keys(p.marcados).filter(function(k){ return p.marcados[k]; }).map(Number);
+    nota = p.tema.trim()
+      ? 'No encontré esas palabras en el documento. Pruebe con otra palabra, o marque usted los temas.'
+      : 'Escriba el tema y le busco las partes del documento que hablan de eso.';
+  }
+  var html = '<p class="mini" style="margin:0 0 4px">' + esc(nota) + '</p>';
+  if(lista.length){
+    html += '<div class="ia-lista">' + lista.map(function(i){
+      var t = libroActual.temas[i];
+      return '<label class="ia-t"><input type="checkbox" data-i="' + i + '"' + (p.marcados[i] ? ' checked' : '') + '>'
+           + '<span>' + (i + 1) + '. ' + esc(t.titulo) + '</span></label>';
+    }).join('') + '</div>';
+  }
+  if(!p.todos && libroActual.temas.length > lista.length)
+    html += '<button class="btn btn-linea btn-chico" id="ia-todos">Ver todos los temas (' + libroActual.temas.length + ')</button>';
+  caja.innerHTML = html;
+  caja.querySelectorAll('input[type=checkbox]').forEach(function(c){
+    c.onchange = function(){ p.marcados[+this.getAttribute('data-i')] = this.checked; };
+  });
+  if($('ia-todos')) $('ia-todos').onclick = function(){ p.todos = true; iaPintarTemas(); };
+}
+function iaMarcados(){
+  var m = _iaPed.marcados || {};
+  return Object.keys(m).filter(function(k){ return m[k]; }).map(Number)
+    .filter(function(i){ return i >= 0 && i < libroActual.temas.length; }).sort(function(a, b){ return a - b; });
+}
+
+/* ── 2. ¿HAY IA EN ESTE CHROME? ── */
+async function iaEmpezar(){
+  var p = _iaPed;
+  p.tema = ($('ia-tema').value || '').trim();
+  if(p.tipo === 'preguntas') p.porTema = +$('ia-min').value || 5;
+  else if(p.tipo !== 'guia') p.min = +$('ia-min').value || 15;
+  var idx = iaMarcados();
+  if(!p.tema) return errorEn('ia-err', 'Escriba de qué tema quiere ' + iaNombre(p.tipo) + '.');
+  if(!idx.length) return errorEn('ia-err', 'Marque al menos un tema del documento.');
+  p.ultimos = idx;
+  if(!hayIA()) return iaSinIA('falta');
+  var disp;
+  try{ disp = await LanguageModel.availability(IA_OPC); }catch(e){ disp = 'unavailable'; }
+  if(disp === 'unavailable') return iaSinIA('no');
+  if(disp === 'downloadable' || disp === 'downloading') return iaPedirDescarga(disp);
+  iaSeguir(idx);
+}
+function iaSeguir(idx){ if(_iaPed.tipo === 'preguntas') iaGenerarPreguntas(idx); else iaGenerar(idx); }
+function iaSinIA(motivo){
+  var lista = '<ul style="margin:6px 0 0;padding-left:20px;line-height:1.6">'
+    + '<li>Una computadora con Windows 10 u 11 (o Mac)</li>'
+    + '<li>Chrome al día: versión 149 o más nueva</li>'
+    + '<li>22 GB libres en el disco</li>'
+    + '<li>16 GB de memoria (o una tarjeta de video de más de 4 GB)</li></ul>';
+  if(motivo === 'falta')
+    return decir('Este Chrome no tiene la IA',
+      'Chrome trae la IA por dentro solo en computadoras y en versiones nuevas. Aquí no aparece.<br><br>'
+      + '<b>Qué hacer:</b> en Chrome toque <b>⋮</b> (arriba a la derecha) → <b>Ayuda</b> → '
+      + '<b>Información de Google Chrome</b>. Deje que se actualice y toque <b>Volver a abrir</b>.<br><br>'
+      + 'Lo que pide Chrome:' + lista, iaVolverAlPedido);
+  decir('Chrome dice que aquí no se puede',
+    'Chrome respondió que en esta computadora la IA no está disponible.<br><br>'
+    + 'Lo que pide Chrome:' + lista
+    + '<br>Lo más común es que falte espacio libre o que Chrome no esté al día.', iaVolverAlPedido);
+}
+function iaVolverAlPedido(){ setTimeout(iaPintarPedido, 60); }
+function iaPedirDescarga(estado){
+  modal('<h2>Bajar la IA (una sola vez)</h2>'
+    + '<p style="font-size:16px;line-height:1.6;margin:0 0 10px">Chrome tiene que bajar la IA a esta computadora. '
+    + 'Pasa <b>una sola vez</b>; después funciona aunque no haya internet.<br><br>'
+    + 'Use un internet sin límite de datos (el Wi-Fi de la casa). Puede tardar varios minutos.</p>'
+    + '<div class="progreso"><i id="ia-bar" style="width:0"></i></div>'
+    + '<p class="mini" id="ia-pct" style="margin:0 0 12px">' + (estado === 'downloading' ? 'Chrome ya la está bajando.' : '') + '</p>'
+    + '<div id="ia-err"></div>'
+    + '<button class="btn btn-oro" id="ia-baja">⬇ Bajar la IA ahora</button>'
+    + '<button class="btn btn-linea" id="ia-baja-no">Ahora no</button>');
+  $('ia-baja-no').onclick = iaPintarPedido;
+  $('ia-baja').onclick = function(){
+    var b = this; b.disabled = true; b.textContent = 'Bajando...';
+    // create() se llama AQUI, en el mismo toque: Chrome solo deja bajar la IA si la persona toco un boton
+    LanguageModel.create(Object.assign({}, IA_OPC, {
+      initialPrompts: [{ role: 'system', content: IA_SISTEMA }],
+      monitor: function(m){
+        m.addEventListener('downloadprogress', function(e){
+          var pct = Math.max(0, Math.min(100, Math.round((+e.loaded || 0) * 100)));
+          if($('ia-bar')) $('ia-bar').style.width = pct + '%';
+          if($('ia-pct')) $('ia-pct').textContent = pct < 100 ? ('Bajando: ' + pct + '%') : 'Ya bajó. Preparando la IA...';
+        });
+      }
+    })).then(function(s){
+      _iaBase = s;
+      iaSeguir(_iaPed.ultimos || iaMarcados());
+    }).catch(function(e){
+      b.disabled = false; b.textContent = '⬇ Bajar la IA ahora';
+      iaError(e);
+    });
+  };
+}
+
+/* ── 3. ESCRIBIR ── */
+async function iaSesion(){
+  if(_iaBase && typeof _iaBase.clone === 'function'){
+    try{ return await _iaBase.clone(); }catch(e){ _iaBase = null; }
+  }
+  if(!_iaBase){
+    _iaBase = await LanguageModel.create(Object.assign({}, IA_OPC, { initialPrompts: [{ role: 'system', content: IA_SISTEMA }] }));
+    if(typeof _iaBase.clone === 'function'){ try{ return await _iaBase.clone(); }catch(e){} }
+  }
+  // sin clone(): una sesion nueva para cada pedido (asi un pedido no se mezcla con otro)
+  return await LanguageModel.create(Object.assign({}, IA_OPC, { initialPrompts: [{ role: 'system', content: IA_SISTEMA }] }));
+}
+function iaVentana(s){ return +(s.contextWindow || s.inputQuota || 0); }
+function iaUsado(s){ return +(s.contextUsage || s.inputUsage || 0); }
+async function iaMedir(s, txt, esq){
+  esq = esq || IA_ESQUEMA;
+  try{
+    if(typeof s.measureContextUsage === 'function') return +(await s.measureContextUsage(txt, { responseConstraint: esq }));
+    if(typeof s.measureInputUsage === 'function') return +(await s.measureInputUsage(txt, { responseConstraint: esq }));
+  }catch(e){}
+  return Math.ceil(String(txt).length / 3);
+}
+function iaPrompt(p, material){
+  var palabras = p.min * IA_PALABRAS_MIN, puntos = p.min <= 5 ? 2 : (p.min <= 15 ? 3 : 4);
+  var pedido = p.tipo === 'guia'
+    ? 'Prepara una GUÍA PARA UN GRUPO PEQUEÑO de estudio bíblico sobre: «' + p.tema + '».\n'
+      + 'Secciones, en este orden: "Para empezar" (una pregunta sencilla para romper el hielo); "Leer juntos" (qué partes del material leer); '
+      + '"Observar" (3 preguntas sobre lo que dice el material); "Entender" (3 preguntas sobre lo que significa); '
+      + '"Aplicar" (3 preguntas para la vida de cada uno); "Para orar" (una idea para cerrar en oración). Pon cada pregunta en su propio renglón.\n'
+    : p.tipo === 'resumen'
+    ? 'Haz un RESUMEN de unas ' + palabras + ' palabras (unos ' + p.min + ' minutos leído en voz alta) sobre: «' + p.tema + '».\n'
+      + 'Organízalo en secciones cortas, cada una con su subtítulo, siguiendo el orden del material.\n'
+    : 'Prepara una EXPOSICIÓN para predicar, de unas ' + palabras + ' palabras (unos ' + p.min + ' minutos hablando), sobre: «' + p.tema + '».\n'
+      + 'Secciones, en este orden: "Introducción"; ' + puntos + ' puntos principales, cada uno con su propio subtítulo y su explicación; '
+      + '"Aplicación para la vida"; "Cierre".\n';
+  return pedido + 'Usa SOLO este material del documento «' + libroActual.titulo + '»:\n\n' + material
+    + '\n\nResponde solo con JSON: {"titulo": "...", "secciones": [{"titulo": "...", "texto": "..."}]}';
+}
+/* Arma el material con los temas marcados. Si no cabe todo, se usa una parte de
+   cada tema (siempre con su titulo y lo importante) y se avisa. */
+async function iaArmar(s, p, idx, hacer, esq){
+  hacer = hacer || function(m){ return iaPrompt(p, m); };
+  var temas = idx.map(function(i){ return { i: i, t: libroActual.temas[i] }; });
+  function material(fr){
+    return temas.map(function(x){
+      var pars = x.t.texto || [];
+      var cuantos = fr >= 1 ? pars.length : Math.floor(pars.length * fr);
+      var imp = (x.t.importante || []).map(function(f){ return '★ ' + f.t; });
+      return '### Tema ' + (x.i + 1) + ': ' + x.t.titulo + '\n'
+        + (imp.length ? imp.join('\n') + '\n' : '')
+        + pars.slice(0, cuantos).join('\n');
+    }).join('\n\n');
+  }
+  var ventana = iaVentana(s);
+  var libre = ventana ? Math.floor((ventana - iaUsado(s)) * 0.6) : 0;   // el 40% se deja para lo que la IA escribe
+  var todo = hacer(material(1));
+  if(!libre || await iaMedir(s, todo, esq) <= libre) return { prompt: todo, recortado: false };
+  var bajo = 0, alto = 1, mejor = null;
+  for(var k = 0; k < 7; k++){
+    var mitad = (bajo + alto) / 2, pr = hacer(material(mitad));
+    if(await iaMedir(s, pr, esq) <= libre){ mejor = pr; bajo = mitad; } else alto = mitad;
+  }
+  if(!mejor){
+    var minimo = hacer(material(0));
+    if(await iaMedir(s, minimo, esq) > libre){ var e = new Error('cupo'); e.name = 'QuotaExceededError'; throw e; }
+    mejor = minimo;
+  }
+  return { prompt: mejor, recortado: true };
+}
+function iaLeerRespuesta(crudo){
+  var txt = String(crudo || '').trim(), o = null;
+  try{ o = JSON.parse(txt); }catch(e){
+    var a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if(a >= 0 && b > a){ try{ o = JSON.parse(txt.slice(a, b + 1)); }catch(e2){ o = null; } }
+  }
+  if(!o || typeof o !== 'object' || !Array.isArray(o.secciones)) return null;
+  var secc = o.secciones.filter(function(x){ return x && typeof x.texto === 'string' && x.texto.trim(); })
+    .slice(0, 12).map(function(x){
+      return { titulo: String(x.titulo || '').trim().slice(0, 200), texto: String(x.texto).trim().slice(0, 20000) };
+    });
+  if(!secc.length) return null;
+  return { titulo: String(o.titulo || '').trim().slice(0, 200) || _iaPed.tema, secciones: secc };
+}
+async function iaGenerar(idx){
+  var p = _iaPed;
+  modal('<h2>✨ La IA está escribiendo</h2>'
+    + '<p style="font-size:16px;line-height:1.6;margin:0 0 6px">Está preparando ' + iaNombre(p.tipo) + ' sobre <b>' + esc(p.tema) + '</b>, '
+    + 'con ' + idx.length + ' tema' + (idx.length === 1 ? '' : 's') + ' del documento.</p>'
+    + '<p class="mini" style="margin:0">Puede tardar uno o dos minutos. No cierre esta ventana.</p>'
+    + '<div class="progreso"><i class="ia-anda"></i></div>'
+    + '<button class="btn btn-linea" id="ia-cancel">Cancelar</button>');
+  var ctl = _iaCtl = new AbortController(), s = null;
+  $('ia-cancel').onclick = function(){ ctl.abort(); };
+  try{
+    s = await iaSesion();
+    if(ctl.signal.aborted) throw new DOMException('cancelado', 'AbortError');
+    var arm = await iaArmar(s, p, idx);
+    if(ctl.signal.aborted) throw new DOMException('cancelado', 'AbortError');
+    var crudo = await s.prompt(arm.prompt, { responseConstraint: IA_ESQUEMA, signal: ctl.signal });
+    if(ctl.signal.aborted) throw new DOMException('cancelado', 'AbortError');
+    var r = iaLeerRespuesta(crudo);
+    if(!r){ var e = new Error('formato'); e.name = 'Formato'; throw e; }
+    _iaRes = { id: 'IA' + Date.now().toString(36), libro: libroActual.id, tipo: p.tipo, tema: p.tema, min: p.min,
+               fecha: hoyISO(), titulo: r.titulo, secciones: r.secciones, temas: idx.map(function(i){ return i + 1; }),
+               recortado: arm.recortado, guardada: false };
+    iaPintarResultado();
+  }catch(e){
+    if(ctl.signal.aborted || (e && e.name === 'AbortError')) return iaPintarPedido();
+    iaError(e);
+  }finally{
+    if(s && s !== _iaBase && typeof s.destroy === 'function'){ try{ s.destroy(); }catch(e){} }
+  }
+}
+function iaError(e){
+  var n = e && e.name, msg;
+  if(n === 'QuotaExceededError')
+    msg = 'Es demasiado texto para la IA de una sola vez. Quite algunos temas marcados y pruebe otra vez.';
+  else if(n === 'NotSupportedError')
+    msg = 'La IA de este Chrome todavía no escribe en español. Actualice Chrome: <b>⋮</b> → <b>Ayuda</b> → '
+        + '<b>Información de Google Chrome</b> (hace falta la versión 149 o más nueva).';
+  else if(n === 'Formato')
+    msg = 'La IA respondió algo que la app no pudo leer bien. Toque <b>Intentar otra vez</b>.';
+  else if(n === 'NotAllowedError')
+    msg = 'Chrome no dejó usar la IA. Toque <b>Intentar otra vez</b>; si sigue igual, cierre Chrome y vuelva a abrirlo.';
+  else
+    msg = 'La IA no pudo terminar. Toque <b>Intentar otra vez</b>.<br><span class="mini">(' + esc((e && (e.name + ': ' + e.message)) || 'sin detalle') + ')</span>';
+  modal('<h2>No salió</h2><p style="font-size:16px;line-height:1.6;margin:0 0 16px">' + msg + '</p>'
+    + '<button class="btn btn-oro" id="ia-otra">Intentar otra vez</button>'
+    + '<button class="btn btn-linea" id="ia-volver">Volver</button>');
+  $('ia-otra').onclick = function(){ iaPintarPedido(); setTimeout(function(){ if($('ia-ir')) $('ia-ir').click(); }, 30); };
+  $('ia-volver').onclick = iaPintarPedido;
+}
+
+/* ── 4. LAS CITAS: ¿la IA puso un versiculo que no esta en el documento? ── */
+var IA_LIBROS = [
+  ['genesis', 'genesis', 'gen', 'gn'], ['exodo', 'exodo', 'exo', 'ex'], ['levitico', 'levitico', 'lev', 'lv'],
+  ['numeros', 'numeros', 'num', 'nm'], ['deuteronomio', 'deuteronomio', 'deut', 'dt'], ['josue', 'josue', 'jos'],
+  ['jueces', 'jueces', 'jc'], ['rut', 'rut', 'rt'], ['samuel', 'samuel', 'sam'], ['reyes', 'reyes', 'rey', 're'],
+  ['cronicas', 'cronicas', 'cron', 'cr'], ['esdras', 'esdras', 'esd'], ['nehemias', 'nehemias', 'neh'], ['ester', 'ester', 'est'],
+  ['job', 'job'], ['salmos', 'salmos', 'salmo', 'sl'], ['proverbios', 'proverbios', 'prov', 'pr'],
+  ['eclesiastes', 'eclesiastes', 'ecl', 'ec'], ['cantares', 'cantar de los cantares', 'cantares', 'cant', 'cnt'],
+  ['isaias', 'isaias', 'isa', 'is'], ['jeremias', 'jeremias', 'jer'], ['lamentaciones', 'lamentaciones', 'lam', 'lm'],
+  ['ezequiel', 'ezequiel', 'eze', 'ez'], ['daniel', 'daniel', 'dn'], ['oseas', 'oseas', 'os'], ['joel', 'joel', 'jl'],
+  ['amos', 'amos', 'am'], ['abdias', 'abdias', 'abd'], ['jonas', 'jonas', 'jon'], ['miqueas', 'miqueas', 'miq'],
+  ['nahum', 'nahum', 'nah'], ['habacuc', 'habacuc', 'hab'], ['sofonias', 'sofonias', 'sof'], ['hageo', 'hageo', 'hag'],
+  ['zacarias', 'zacarias', 'zac'], ['malaquias', 'malaquias', 'mal'], ['mateo', 'mateo', 'mat', 'mt'],
+  ['marcos', 'marcos', 'mar', 'mr', 'mc'], ['lucas', 'lucas', 'luc', 'lc'], ['juan', 'juan', 'jn'],
+  ['hechos', 'hechos', 'hech', 'hch'], ['romanos', 'romanos', 'rom', 'ro'], ['corintios', 'corintios', 'cor', 'co'],
+  ['galatas', 'galatas', 'gal', 'ga'], ['efesios', 'efesios', 'ef'], ['filipenses', 'filipenses', 'flp', 'fil'],
+  ['colosenses', 'colosenses', 'col'], ['tesalonicenses', 'tesalonicenses', 'tes', 'ts'], ['timoteo', 'timoteo', 'tim', 'ti'],
+  ['tito', 'tito', 'tit'], ['filemon', 'filemon', 'flm'], ['hebreos', 'hebreos', 'heb'], ['santiago', 'santiago', 'stg', 'sant'],
+  ['pedro', 'pedro', 'ped', 'pe'], ['judas', 'judas', 'jud'], ['apocalipsis', 'apocalipsis', 'apoc', 'ap']
+];
+/* Palabras de todos los dias que tambien son abreviatura: con ellas se exigen los dos puntos (Mal 3:10), nunca el punto. */
+var IA_COMUNES = { mal: 1, dan: 1, sal: 1, mi: 1, col: 1, am: 1, os: 1, re: 1, es: 1, est: 1, job: 1, ti: 1, pe: 1, co: 1, ro: 1, ga: 1 };
+var _iaReCita = null, _iaNombreDe = null;
+function iaReCita(){
+  if(_iaReCita) return _iaReCita;
+  _iaNombreDe = {};
+  var formas = [];
+  IA_LIBROS.forEach(function(l){ for(var k = 1; k < l.length; k++){ _iaNombreDe[l[k]] = l[0]; formas.push(l[k]); } });
+  formas.sort(function(a, b){ return b.length - a.length; });
+  var pref = '(?:(1|2|3|iii|ii|i|primera|primero|primer|segunda|segundo|tercera|tercero|tercer)(?:ra|da|era|ro|do|a|o|º|ª)?\\.?\\s*(?:de\\s+)?)?';
+  _iaReCita = new RegExp('(^|[^a-z0-9])' + pref + '(' + formas.map(function(f){ return f.replace(/ /g, '\\s+'); }).join('|') + ')'
+    + '(\\.?)\\s*(\\d{1,3})(?:\\s*([:.])\\s*(\\d{1,3})(?:\\s*[-–]\\s*(\\d{1,3}))?)?(?![0-9])', 'g');
+  return _iaReCita;
+}
+var IA_NUM = { '1': 1, '2': 2, '3': 3, i: 1, ii: 2, iii: 3, primera: 1, primero: 1, primer: 1, segunda: 2, segundo: 2, tercera: 3, tercero: 3, tercer: 3 };
+/* Todas las citas de un texto: [{ini, fin, clave:'1 juan 4', v1, v2}] (v1 = null si es el capitulo entero) */
+function iaCitas(txt){
+  var orig = String(txt || '').normalize('NFC'), n = normal(orig), re = iaReCita(), m, fuera = [];
+  re.lastIndex = 0;
+  while((m = re.exec(n))){
+    var forma = m[3].replace(/\s+/g, ' '), sep = m[6], v1 = m[7] ? +m[7] : null;
+    var esNombre = IA_LIBROS.some(function(l){ return l[1] === forma || l[0] === forma; });
+    if(sep === '.' && !esNombre){ if(re.lastIndex <= m.index) re.lastIndex = m.index + 1; continue; }
+    if(IA_COMUNES[forma] && sep !== ':'){ if(re.lastIndex <= m.index) re.lastIndex = m.index + 1; continue; }
+    if(v1 === null && !esNombre){ if(re.lastIndex <= m.index) re.lastIndex = m.index + 1; continue; }
+    var num = m[2] ? IA_NUM[m[2]] : 0;
+    var clave = (num ? num + ' ' : '') + _iaNombreDe[forma] + ' ' + (+m[5]);
+    var ini = m.index + m[1].length;
+    fuera.push({ ini: ini, fin: m.index + m[0].length, clave: clave, v1: v1, v2: m[8] ? +m[8] : v1,
+                 texto: n.length === orig.length ? orig.slice(ini, m.index + m[0].length) : n.slice(ini, m.index + m[0].length) });
+  }
+  return fuera;
+}
+function iaCitaEsta(c, mapa){
+  var r = mapa[c.clave];
+  if(!r) return false;
+  if(c.v1 === null) return true;
+  return r.some(function(x){ return c.v1 >= x[0] && c.v1 <= x[1]; });
+}
+/* Las citas que trae el documento: se miran TODOS los temas del libro (la IA solo vio los
+   marcados, pero si el versiculo esta en otra parte del mismo documento tampoco es invento) */
+function iaMapaDoc(){
+  var mapa = {};
+  libroActual.temas.forEach(function(t){
+    var todo = t.titulo + '\n' + (t.texto || []).join('\n') + '\n' + (t.importante || []).map(function(f){ return f.t; }).join('\n');
+    iaCitas(todo).forEach(function(c){
+      (mapa[c.clave] || (mapa[c.clave] = [])).push(c.v1 === null ? [1, 999] : [c.v1, Math.max(c.v1, c.v2 || c.v1)]);
+    });
+  });
+  return mapa;
+}
+
+/* ── 5. EL RESULTADO ── */
+function iaPintarResultado(){
+  iaCallar();
+  var r = _iaRes;
+  modal('<div class="aviso av-oro" style="margin-bottom:10px">⚠ <b>BORRADOR DE LA IA</b> — revíselo antes de usarlo.</div>'
+    + '<div id="ia-res" class="ia-res"></div>'
+    + '<div id="ia-citas"></div>'
+    + '<p class="mini" id="ia-largo" style="margin:0 0 4px"></p>'
+    + '<p class="mini" style="margin:0 0 10px">✎ Toque cualquier parte para corregirla.</p>'
+    + '<div class="fila"><button class="btn btn-linea" id="ia-oir">🔊 Escuchar</button>'
+    + '<button class="btn btn-linea" id="ia-imp">🖨️ Imprimir</button></div>'
+    + '<div class="fila"><button class="btn btn-oro" id="ia-guardar">💾 Guardar</button>'
+    + '<button class="btn btn-linea" id="ia-word">📄 Bajar en Word</button></div>'
+    + '<button class="btn btn-linea" id="ia-cerrar">Cerrar</button>');
+  var caja = $('ia-res'), mapa = iaMapaDoc();
+  var h = document.createElement('h3');
+  h.className = 'ia-tit'; h.setAttribute('contenteditable', 'plaintext-only'); h.setAttribute('data-ia', 'titulo');
+  h.textContent = r.titulo;
+  caja.appendChild(h);
+  r.secciones.forEach(function(s, n){
+    var h4 = document.createElement('h4'); h4.className = 'ia-sub';
+    var num = document.createElement('span'); num.textContent = (n + 1) + '. ';
+    var tit = document.createElement('span'); tit.setAttribute('contenteditable', 'plaintext-only'); tit.setAttribute('data-ia', 'sub');
+    tit.textContent = s.titulo;
+    h4.appendChild(num); h4.appendChild(tit);
+    var d = document.createElement('div'); d.className = 'ia-txt'; d.setAttribute('contenteditable', 'plaintext-only'); d.setAttribute('data-ia', 'txt');
+    iaLlenarTexto(d, s.texto, mapa);
+    d.addEventListener('blur', function(){ iaLlenarTexto(d, d.innerText, iaMapaDoc()); iaRevisar(); });
+    caja.appendChild(h4); caja.appendChild(d);
+  });
+  caja.addEventListener('input', function(){ _iaRes.cambiada = true; });
+  $('ia-oir').onclick = iaOir;
+  $('ia-imp').onclick = iaImprimir;
+  $('ia-guardar').onclick = iaGuardar;
+  $('ia-word').onclick = iaWord;
+  $('ia-cerrar').onclick = function(){
+    iaCallar();
+    iaLeerDom();
+    if(_iaRes.guardada && !_iaRes.cambiada) return cerrarModal();
+    modal('<h2>¿Cerrar sin guardar?</h2><p style="font-size:16px;line-height:1.6;margin:0 0 16px">'
+      + (_iaRes.guardada ? 'Los últimos cambios no están guardados.' : 'Lo que preparó la IA no está guardado.')
+      + ' Si cierra, todavía lo puede ver con <b>↩ Ver la última que preparó</b> mientras no cierre la app.</p>'
+      + '<button class="btn btn-oro" id="ia-c-volver">Volver a la exposición</button>'
+      + '<button class="btn btn-linea" id="ia-c-si">Cerrar sin guardar</button>');
+    $('ia-c-volver').onclick = iaPintarResultado;
+    $('ia-c-si').onclick = cerrarModal;
+  };
+  iaRevisar();
+}
+/* Pone el texto de una seccion, marcando (con ⚠ por CSS, sin tocar el texto) las citas que no estan en el documento */
+function iaLlenarTexto(d, texto, mapa){
+  texto = String(texto || '').normalize('NFC');
+  d.textContent = '';
+  var citas = iaCitas(texto), pos = 0;
+  var alineado = normal(texto).length === texto.length;
+  citas.forEach(function(c){
+    if(!alineado || c.v1 === null || iaCitaEsta(c, mapa) || c.ini < pos) return;
+    d.appendChild(document.createTextNode(texto.slice(pos, c.ini)));
+    var mk = document.createElement('mark'); mk.className = 'ia-ojo'; mk.textContent = texto.slice(c.ini, c.fin);
+    d.appendChild(mk);
+    pos = c.fin;
+  });
+  d.appendChild(document.createTextNode(texto.slice(pos)));
+}
+function iaLeerDom(){
+  var caja = $('ia-res'), r = _iaRes;
+  if(!caja) return r;
+  var t = caja.querySelector('[data-ia=titulo]');
+  var subs = caja.querySelectorAll('[data-ia=sub]'), txts = caja.querySelectorAll('[data-ia=txt]');
+  var secc = [];
+  for(var i = 0; i < txts.length; i++)
+    secc.push({ titulo: (subs[i] ? subs[i].innerText : '').replace(/\s+/g, ' ').trim(), texto: txts[i].innerText.replace(/\n{3,}/g, '\n\n').trim() });
+  r.titulo = (t ? t.innerText : r.titulo).replace(/\s+/g, ' ').trim() || r.tema;
+  r.secciones = secc;
+  return r;
+}
+function iaRevisar(){
+  var r = iaLeerDom(), mapa = iaMapaDoc(), faltan = [], visto = {};
+  r.secciones.forEach(function(s){
+    iaCitas(s.texto).forEach(function(c){
+      if(c.v1 === null || iaCitaEsta(c, mapa)) return;
+      var k = c.texto.replace(/\s+/g, ' ').trim();
+      if(!visto[k]){ visto[k] = 1; faltan.push(k); }
+    });
+  });
+  var cc = $('ia-citas');
+  if(cc) cc.innerHTML = faltan.length
+    ? '<div class="aviso av-rojo" style="margin-bottom:10px">⚠ Estas citas <b>no están en su documento</b>: la IA las agregó. Verifíquelas: '
+      + faltan.map(esc).join(' · ') + '</div>' : '';
+  var palabras = r.secciones.reduce(function(n, s){ return n + (s.titulo + ' ' + s.texto).split(/\s+/).filter(Boolean).length; }, 0);
+  var el = $('ia-largo');
+  var mins = Math.max(1, Math.round(palabras / IA_PALABRAS_MIN));
+  if(el) el.textContent = palabras + ' palabras · ' + (mins === 1 ? '1 min' : 'unos ' + mins + ' min') + ' en voz alta'
+    + ' · usó los temas ' + r.temas.join(', ')
+    + (r.recortado ? ' · ⚠ eran muchos para la IA: leyó solo una parte de cada uno' : '');
+  return faltan;
+}
+
+/* ── 6. GUARDAR (en esta computadora, dentro del libro) ── */
+function iaTodas(){ try{ return JSON.parse(localStorage.getItem('efd_ia') || '{}') || {}; }catch(e){ return {}; } }
+function iaGuardadas(){ var t = iaTodas(); return (libroActual && Array.isArray(t[libroActual.id])) ? t[libroActual.id] : []; }
+function iaPonerTodas(t){
+  try{ localStorage.setItem('efd_ia', JSON.stringify(t)); return true; }catch(e){ return false; }
+}
+function iaGuardar(){
+  var r = iaLeerDom(), t = iaTodas(), lista = Array.isArray(t[libroActual.id]) ? t[libroActual.id] : [];
+  var item = { id: r.id, tipo: r.tipo, tema: r.tema, min: r.min, fecha: r.fecha, titulo: r.titulo,
+               secciones: r.secciones, temas: r.temas, recortado: !!r.recortado };
+  var k = lista.map(function(x){ return x.id; }).indexOf(r.id);
+  if(k >= 0) lista[k] = item; else lista.unshift(item);
+  t[libroActual.id] = lista;
+  if(!iaPonerTodas(t)) return decir('No se pudo guardar', 'La memoria de Chrome en esta computadora está llena. Borre algunas guardadas y pruebe otra vez.', iaPintarResultado);
+  r.guardada = true; r.cambiada = false;
+  var b = $('ia-guardar'); if(b){ b.textContent = '✓ Guardada'; setTimeout(function(){ if($('ia-guardar')) $('ia-guardar').textContent = '💾 Guardar'; }, 1800); }
+}
+function iaVerGuardadas(){
+  var g = iaGuardadas();
+  if(!g.length) return iaPintarPedido();
+  modal('<h2>💾 Guardadas</h2><p class="mini" style="margin:-4px 0 10px">De este documento, en esta computadora.</p>'
+    + g.map(function(x, n){
+        return '<div class="tarj" style="padding:10px 12px;margin-bottom:8px"><div style="font-weight:700;color:var(--perg)">' + esc(x.titulo) + '</div>'
+          + '<div class="mini">' + (x.tipo === 'resumen' ? 'Resumen' : 'Exposición') + ' · ' + esc(x.fecha) + ' · ' + esc(x.tema) + '</div>'
+          + '<div style="margin-top:8px"><button class="btn btn-linea btn-chico" data-abrir="' + n + '">Abrir</button>'
+          + '<button class="btn btn-rojo btn-chico" data-borrar="' + n + '">Borrar</button></div></div>';
+      }).join('')
+    + '<button class="btn btn-linea" id="ia-g-volver">Volver</button>');
+  $('modal').querySelectorAll('[data-abrir]').forEach(function(b){
+    b.onclick = function(){
+      var x = iaGuardadas()[+this.getAttribute('data-abrir')];
+      if(!x) return;
+      _iaRes = JSON.parse(JSON.stringify(x)); _iaRes.libro = libroActual.id; _iaRes.guardada = true; _iaRes.cambiada = false;
+      iaPintarResultado();
+    };
+  });
+  $('modal').querySelectorAll('[data-borrar]').forEach(function(b){
+    b.onclick = function(){
+      var n = +this.getAttribute('data-borrar'), x = iaGuardadas()[n];
+      if(!x) return;
+      preguntar('Borrar la guardada', 'Se borra <b>' + esc(x.titulo) + '</b> de esta computadora.', function(){
+        var t = iaTodas(), lista = (t[libroActual.id] || []).filter(function(y){ return y.id !== x.id; });
+        if(lista.length) t[libroActual.id] = lista; else delete t[libroActual.id];
+        iaPonerTodas(t);
+        if(_iaRes && _iaRes.id === x.id) _iaRes.guardada = false;
+        setTimeout(iaVerGuardadas, 60);
+      });
+    };
+  });
+  $('ia-g-volver').onclick = iaPintarPedido;
+}
+/* Si se borra el libro, se borra tambien lo que la IA preparo de ese libro */
+function iaBorrarDelLibro(id){
+  var t = iaTodas();
+  if(t[id]){ delete t[id]; iaPonerTodas(t); }
+  if(_iaRes && _iaRes.libro === id) _iaRes = null;
+}
+
+/* ── 7. IMPRIMIR ── */
+function iaImprimir(){
+  iaCallar();
+  var r = iaLeerDom();
+  var html = cabeceraImp() + '<h2>' + esc(r.titulo) + '</h2>';
+  r.secciones.forEach(function(s, n){
+    html += '<h3>' + (n + 1) + '. ' + esc(s.titulo) + '</h3>'
+      + s.texto.split(/\n+/).filter(function(x){ return x.trim(); }).map(function(x){ return '<p>' + esc(x) + '</p>'; }).join('');
+  });
+  html += '<p class="pie">Iglesia Efraín para Dios · uso interno</p>';
+  $('imp').innerHTML = html;
+  setTimeout(function(){ window.print(); }, 120);
+}
+
+/* ── 8. BAJAR EN WORD (.docx hecho aqui mismo, sin nada de internet) ──
+   Cada seccion va como "Titulo 1" de Word: al subir ese Word en el telefono con
+   "+ Agregar un libro o documento", cada seccion sale como un tema para escuchar. */
+var _iaCrc = null;
+function iaCrc32(b){
+  if(!_iaCrc){
+    _iaCrc = new Uint32Array(256);
+    for(var n = 0; n < 256; n++){ var c = n; for(var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); _iaCrc[n] = c >>> 0; }
+  }
+  var x = 0xFFFFFFFF;
+  for(var i = 0; i < b.length; i++) x = _iaCrc[(x ^ b[i]) & 0xFF] ^ (x >>> 8);
+  return (x ^ 0xFFFFFFFF) >>> 0;
+}
+function iaZip(archivos){
+  var enc = new TextEncoder(), partes = [], central = [], pos = 0;
+  var f = new Date(), hora = (f.getHours() << 11) | (f.getMinutes() << 5) | (f.getSeconds() >> 1);
+  var dia = ((f.getFullYear() - 1980) << 9) | ((f.getMonth() + 1) << 5) | f.getDate();
+  archivos.forEach(function(a){
+    var nom = enc.encode(a.nombre), dat = typeof a.datos === 'string' ? enc.encode(a.datos) : a.datos, crc = iaCrc32(dat);
+    var h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+    h.setUint16(10, hora, true); h.setUint16(12, dia, true); h.setUint32(14, crc, true);
+    h.setUint32(18, dat.length, true); h.setUint32(22, dat.length, true); h.setUint16(26, nom.length, true); h.setUint16(28, 0, true);
+    var c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+    c.setUint16(10, 0, true); c.setUint16(12, hora, true); c.setUint16(14, dia, true); c.setUint32(16, crc, true);
+    c.setUint32(20, dat.length, true); c.setUint32(24, dat.length, true); c.setUint16(28, nom.length, true);
+    c.setUint16(30, 0, true); c.setUint16(32, 0, true); c.setUint16(34, 0, true); c.setUint16(36, 0, true);
+    c.setUint32(38, 0, true); c.setUint32(42, pos, true);
+    partes.push(new Uint8Array(h.buffer), nom, dat);
+    central.push(new Uint8Array(c.buffer), nom);
+    pos += 30 + nom.length + dat.length;
+  });
+  var tamC = central.reduce(function(n, x){ return n + x.length; }, 0);
+  var e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, archivos.length, true); e.setUint16(10, archivos.length, true);
+  e.setUint32(12, tamC, true); e.setUint32(16, pos, true);
+  return new Blob(partes.concat(central, [new Uint8Array(e.buffer)]),
+                  { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+function iaXml(s){
+  return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function iaPw(txt, estilo){
+  return '<w:p>' + (estilo ? '<w:pPr><w:pStyle w:val="' + estilo + '"/></w:pPr>' : '')
+    + '<w:r><w:t xml:space="preserve">' + iaXml(txt) + '</w:t></w:r></w:p>';
+}
+function iaDocx(r){
+  var W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  var cuerpo = iaPw(r.titulo, 'Title');
+  r.secciones.forEach(function(s){
+    cuerpo += iaPw(s.titulo, 'Heading1');
+    s.texto.split(/\n+/).forEach(function(x){ if(x.trim()) cuerpo += iaPw(x.trim()); });
+  });
+  var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + W + '>'
+    + '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:pPr><w:spacing w:after="160" w:line="300" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="24"/></w:rPr></w:style>'
+    + '<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="240"/></w:pPr><w:rPr><w:b/><w:sz w:val="40"/></w:rPr></w:style>'
+    + '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="320" w:after="120"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="30"/></w:rPr></w:style>'
+    + '</w:styles>';
+  return iaZip([
+    { nombre: '[Content_Types].xml', datos: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
+      + '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+      + '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>' },
+    { nombre: '_rels/.rels', datos: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>' },
+    { nombre: 'word/_rels/document.xml.rels', datos: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+    { nombre: 'word/document.xml', datos: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + '><w:body>' + cuerpo
+      + '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>' },
+    { nombre: 'word/styles.xml', datos: estilos }
+  ]);
+}
+function iaNombreArchivo(r){
+  var base = (r.tipo === 'resumen' ? 'Resumen' : r.tipo === 'guia' ? 'Guia para el grupo' : 'Exposicion') + ' - ' + String(r.titulo || r.tema || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9ñÑ ,.-]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  return base.replace(/[ .-]+$/, '') + '.docx';
+}
+function iaWord(){
+  iaCallar();
+  var r = iaLeerDom(), blob = iaDocx(r), url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = iaNombreArchivo(r);
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  var b = $('ia-word'); if(b){ b.textContent = '✓ Bajado'; setTimeout(function(){ if($('ia-word')) $('ia-word').textContent = '📄 Bajar en Word'; }, 1800); }
+}
+
+/* ── 9. ESCUCHAR (con la voz de la computadora; la voz nueva se usa subiendo el Word) ── */
+function iaOir(){
+  if(_iaHabla) return iaCallar();
+  if(!voz) return;
+  if(typeof sonando !== 'undefined' && sonando){
+    detenerVoz(); sonando = false;
+    var bp = $('esc-play'); if(bp) bp.textContent = '▶';
+    if(typeof estadoSesion === 'function') estadoSesion('paused');
+  }
+  var r = iaLeerDom(), frases = [r.titulo];
+  r.secciones.forEach(function(s){
+    if(s.titulo) frases.push(s.titulo);
+    frases = frases.concat(partirEnPedazos(s.texto.replace(/\s*\n+\s*/g, ' ')));
+  });
+  frases = frases.filter(function(x){ return x && x.trim(); });
+  _iaHabla = true;
+  var b = $('ia-oir'); if(b) b.textContent = '⏹ Parar';
+  var i = 0;
+  function sig(){
+    if(!_iaHabla) return;
+    if(!$('ia-res') || !$('velo').classList.contains('abierto') || i >= frases.length) return iaCallar();
+    var u = new SpeechSynthesisUtterance(frases[i++]), v = escogerVoz();
+    if(v){ u.voice = v; u.lang = v.lang || 'es-US'; } else u.lang = 'es-US';
+    u.rate = velocidad;
+    u.onend = sig;
+    u.onerror = function(){ iaCallar(); };
+    voz.speak(u);
+  }
+  clearInterval(_iaVigia);
+  _iaVigia = setInterval(function(){ if(_iaHabla && (!$('ia-res') || !$('velo').classList.contains('abierto'))) iaCallar(); }, 400);
+  sig();
+}
+function iaCallar(){
+  clearInterval(_iaVigia); _iaVigia = null;
+  if(_iaHabla){ _iaHabla = false; try{ if(voz) voz.cancel(); }catch(e){} }
+  var b = $('ia-oir'); if(b) b.textContent = '🔊 Escuchar';
+}
+
+/* ══ v4.5: PREGUNTAS HECHAS CON LA IA, para el cuestionario y el repaso hablado ══
+   La IA hace las preguntas tema por tema, usted las revisa (marca las buenas), y
+   se guardan DENTRO del libro: al sellarlo, les llegan a los hermanos revisadas. */
+var IA_ESQ_PREG = { type: 'object', properties: { preguntas: { type: 'array', items: { type: 'object', properties: {
+    tipo: { type: 'string' }, pregunta: { type: 'string' }, opciones: { type: 'array', items: { type: 'string' } },
+    correcta: { type: 'integer' }, explicacion: { type: 'string' } }, required: ['tipo', 'pregunta', 'correcta', 'explicacion'] } } },
+  required: ['preguntas'] };
+function iaPromptPreguntas(n, material){
+  return 'Haz ' + n + ' preguntas para repasar este tema de un libro cristiano. Usa SOLO el material.\n'
+    + 'Mezcla: la mayoría de opción múltiple (4 opciones, una sola correcta) y una o dos de verdadero o falso.\n'
+    + 'Opción múltiple: "tipo": "opcion", "opciones": las 4 opciones, "correcta": el número de la correcta empezando en 0.\n'
+    + 'Verdadero o falso: "tipo": "vf", "opciones": [], "correcta": 1 si la afirmación es verdadera, 0 si es falsa.\n'
+    + '"explicacion": una frase corta del material que muestre la respuesta. No inventes citas bíblicas.\n\n'
+    + 'MATERIAL:\n' + material
+    + '\n\nResponde solo con JSON: {"preguntas": [{"tipo": "opcion", "pregunta": "...", "opciones": ["...","...","...","..."], "correcta": 0, "explicacion": "..."}]}';
+}
+function iaLeerPreguntas(crudo){
+  var txt = String(crudo || '').trim(), o = null;
+  try{ o = JSON.parse(txt); }catch(e){
+    var a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if(a >= 0 && b > a){ try{ o = JSON.parse(txt.slice(a, b + 1)); }catch(e2){ o = null; } }
+  }
+  var lista = o && Array.isArray(o.preguntas) ? o.preguntas : (Array.isArray(o) ? o : null);
+  if(!lista) return null;
+  var fuera = [];
+  lista.slice(0, 12).forEach(function(x){
+    if(!x || typeof x.pregunta !== 'string' || !x.pregunta.trim()) return;
+    var q = x.pregunta.trim().slice(0, 400), ex = String(x.explicacion || '').trim().slice(0, 600);
+    var ops = Array.isArray(x.opciones) ? x.opciones.map(function(v){ return String(v == null ? '' : v).trim().slice(0, 200); }).filter(Boolean) : [];
+    var vistas = {}; ops = ops.filter(function(v){ var k = v.toLowerCase(); if(vistas[k]) return false; vistas[k] = 1; return true; });
+    var c = +x.correcta;
+    if(String(x.tipo || '').toLowerCase().indexOf('v') === 0 && ops.length < 2 || (!ops.length && (c === 0 || c === 1))){
+      fuera.push({ tipo: 'vf', q: q, correcta: c === 1 || x.correcta === true, explica: ex });
+    } else if(ops.length >= 2 && ops.length <= 6 && c >= 0 && c < ops.length && Math.floor(c) === c){
+      fuera.push({ tipo: 'opcion', q: q, opciones: ops, correcta: c, explica: ex });
+    }
+  });
+  return fuera.length ? fuera : null;
+}
+async function iaGenerarPreguntas(idx){
+  var p = _iaPed, n = p.porTema || 5, hechas = [], ctl = _iaCtl = new AbortController(), s = null;
+  function pintar(k){
+    modal('<h2>✨ La IA está haciendo las preguntas</h2>'
+      + '<p style="font-size:16px;line-height:1.6;margin:0 0 6px">Tema ' + (k + 1) + ' de ' + idx.length + ': <b id="ia-pt"></b></p>'
+      + '<p class="mini" style="margin:0">Tarda un poco por cada tema. No cierre esta ventana.</p>'
+      + '<div class="progreso"><i class="ia-anda"></i></div>'
+      + '<button class="btn btn-linea" id="ia-cancel">Cancelar</button>');
+    $('ia-pt').textContent = libroActual.temas[idx[k]].titulo;
+    $('ia-cancel').onclick = function(){ ctl.abort(); };
+  }
+  try{
+    for(var k = 0; k < idx.length; k++){
+      pintar(k);
+      s = await iaSesion();
+      if(ctl.signal.aborted) throw new DOMException('cancelado', 'AbortError');
+      var arm = await iaArmar(s, p, [idx[k]], function(m){ return iaPromptPreguntas(n, m); }, IA_ESQ_PREG);
+      var crudo = await s.prompt(arm.prompt, { responseConstraint: IA_ESQ_PREG, signal: ctl.signal });
+      if(s !== _iaBase && typeof s.destroy === 'function'){ try{ s.destroy(); }catch(e){} }
+      s = null;
+      var lista = iaLeerPreguntas(crudo);
+      (lista || []).forEach(function(q){ q.tema = idx[k]; hechas.push(q); });
+    }
+    if(!hechas.length){ var e = new Error('formato'); e.name = 'Formato'; throw e; }
+    iaRevisarPreguntas(hechas);
+  }catch(e){
+    if(ctl.signal.aborted || (e && e.name === 'AbortError')) return iaPintarPedido();
+    iaError(e);
+  }finally{
+    if(s && s !== _iaBase && typeof s.destroy === 'function'){ try{ s.destroy(); }catch(e){} }
+  }
+}
+function iaRevisarPreguntas(lista){
+  var mapa = iaMapaDoc();
+  modal('<div class="aviso av-oro" style="margin-bottom:10px">⚠ <b>BORRADOR DE LA IA</b> — marque solo las preguntas buenas.</div>'
+    + '<h2 style="margin-bottom:6px">Revise las preguntas</h2><div id="ia-pl" class="ia-res"></div>'
+    + '<p class="mini" style="margin:0 0 10px">Después las puede cambiar en cada tema con ✏️ Preguntas de este tema.</p>'
+    + '<button class="btn btn-oro" id="ia-pg">Guardar las marcadas en el libro</button>'
+    + '<button class="btn btn-linea" id="ia-pno">Cerrar sin guardar</button>');
+  var caja = $('ia-pl'), temaVisto = -1;
+  lista.forEach(function(q, k){
+    if(q.tema !== temaVisto){ temaVisto = q.tema; var h = document.createElement('h4'); h.className = 'ia-sub'; h.textContent = 'Tema ' + (q.tema + 1) + ': ' + libroActual.temas[q.tema].titulo; caja.appendChild(h); }
+    var l = document.createElement('label'); l.className = 'est-fila ia-pq';
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('data-k', k);
+    var d = document.createElement('div');
+    var t1 = document.createElement('div'); t1.className = 'ia-pqq'; t1.textContent = (q.tipo === 'vf' ? '(V/F) ' : '') + q.q;
+    var t2 = document.createElement('div'); t2.className = 'mini';
+    t2.textContent = (q.tipo === 'vf' ? 'Respuesta: ' + (q.correcta ? 'Verdadero' : 'Falso') : 'Opciones: ' + q.opciones.map(function(o, j){ return (j === q.correcta ? '✓ ' : '') + o; }).join(' · '))
+      + (q.explica ? ' — ' + q.explica : '');
+    d.appendChild(t1); d.appendChild(t2);
+    var malas = iaCitas(q.q + ' ' + (q.explica || '') + ' ' + (q.opciones || []).join(' ')).filter(function(c){ return c.v1 !== null && !iaCitaEsta(c, mapa); });
+    if(malas.length){ var w = document.createElement('div'); w.className = 'ia-pqw'; w.textContent = '⚠ Esta cita no está en su documento: ' + malas.map(function(c){ return c.texto; }).join(' · '); d.appendChild(w); cb.checked = false; }
+    l.appendChild(cb); l.appendChild(d); caja.appendChild(l);
+  });
+  $('ia-pno').onclick = cerrarModal;
+  $('ia-pg').onclick = async function(){
+    var marcadas = [].filter.call(caja.querySelectorAll('input[type=checkbox]'), function(c){ return c.checked; }).map(function(c){ return lista[+c.getAttribute('data-k')]; });
+    if(!marcadas.length) return decir('Ninguna marcada', 'No marcó ninguna pregunta. No se guardó nada.', function(){ iaRevisarPreguntas(lista); });
+    marcadas.forEach(function(q){
+      var t = libroActual.temas[q.tema];
+      if(!Array.isArray(t.preguntas)) t.preguntas = [];
+      var nueva = q.tipo === 'vf' ? { tipo: 'vf', q: q.q, correcta: !!q.correcta, explica: q.explica }
+                                  : { tipo: 'opcion', q: q.q, opciones: q.opciones.slice(), correcta: q.correcta, explica: q.explica };
+      nueva.id = 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      nueva.revisada = true; nueva.origen = 'ia';
+      t.preguntas.push(nueva);
+    });
+    libroActual.sellado = null;
+    await guardarLibro(libroActual);
+    decir('Preguntas guardadas', 'Se guardaron <b>' + marcadas.length + '</b> preguntas en el libro. Ya salen en ❓ Preguntas y en el repaso hablado. '
+      + 'A los hermanos les llegan cuando vuelva a sellar el libro y se lo mande.');
+  };
+}
+/* desde ✏️ Preguntas de este tema: abre la IA con ese tema ya marcado */
+function iaPreguntasDeTema(i){
+  _iaPed = { libro: libroActual.id, tipo: 'preguntas', tema: libroActual.temas[i].titulo, min: 15, porTema: 5, marcados: {}, todos: false };
+  _iaPed.marcados[i] = true;
+  iaPintarPedido();
+}
+
+var EFD_ADMIN = true;
+/* ══════════════════════════════════════════════════════════════════════════
+   ESTUDIAR  (ADMIN V4.5 · USUARIOS V1.9 · 19 nov 2026)
+   Pedido de Sensei: "darle con todo" a la app para que sea la mejor herramienta
+   de estudio para él y para los hermanos. Lo que dice la ciencia que más ayuda:
+     - RECORDAR (preguntas) en vez de releer,
+     - REPASAR ESPACIADO (FSRS, el cálculo nuevo de Anki),
+     - EXPLICAR con sus palabras, PREGUNTAS ANTES de estudiar,
+     - MEZCLAR temas, y un PLAN diario.
+   Todo esto corre DENTRO del teléfono: sin IA y sin internet. Las preguntas que
+   hace la IA las prepara el pastor en la laptop, las revisa, y llegan dentro del
+   libro sellado. Lo que viene del libro se pone siempre como TEXTO (nunca código).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. FSRS-4.5: cuándo volver a repasar algo ──────────────────────────────
+   Cada cosa que se repasa tiene su "estabilidad" (cuántos días aguanta en la
+   memoria) y su "dificultad". Si la sabe, vuelve más tarde; si la falla, vuelve
+   mañana. Parámetros por defecto de FSRS-4.5 (open-spaced-repetition). */
+var FSRS_W = [0.4072, 1.1829, 3.1262, 15.4722, 7.2102, 0.5316, 1.0651, 0.0234, 1.616, 0.1544,
+              1.0824, 1.9813, 0.0953, 0.2975, 2.2042, 0.2407, 2.9466];
+var FSRS_DECAY = -0.5, FSRS_FACTOR = 19 / 81, FSRS_MAX = 365;
+function fsrsDias(a, b){ return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000); }
+function fsrsMas(fecha, n){ var d = new Date(fecha + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function fsrsR(t, s){ return Math.pow(1 + FSRS_FACTOR * t / s, FSRS_DECAY); }
+function fsrsD0(g){ return Math.min(10, Math.max(1, FSRS_W[4] - (g - 3) * FSRS_W[5])); }
+function fsrsIntervalo(s){ return Math.min(FSRS_MAX, Math.max(1, Math.round(s))); }   // con 90% de recuerdo, intervalo = estabilidad
+/* lo que estaba guardado con la escalera de antes (1, 3, 7, 16, 35, 75 días) se convierte, sin perder nada */
+function fsrsDeAntes(e){
+  if(!e) return null;
+  if(e.s > 0 && e.d > 0) return e;
+  if(typeof e.paso === 'number' && e.paso >= 0){
+    var esc = [1, 3, 7, 16, 35, 75];
+    return { s: esc[Math.min(e.paso, esc.length - 1)], d: 5, ult: e.visto || hoyISO(), reps: e.paso + 1, fallas: 0 };
+  }
+  return null;
+}
+/* g: 1 = no la sabía · 3 = sí la sabía */
+function fsrsRepasar(e, g, hoy){
+  e = fsrsDeAntes(e);
+  var n = {};
+  if(!e){
+    n.s = FSRS_W[g - 1]; n.d = fsrsD0(g); n.reps = 1; n.fallas = g === 1 ? 1 : 0;
+  } else {
+    var t = Math.max(0, fsrsDias(e.ult || hoy, hoy)), r = fsrsR(t, e.s);
+    var d = e.d - FSRS_W[6] * (g - 3);
+    n.d = Math.min(10, Math.max(1, FSRS_W[7] * fsrsD0(3) + (1 - FSRS_W[7]) * d));
+    if(g === 1)
+      n.s = Math.min(e.s, FSRS_W[11] * Math.pow(e.d, -FSRS_W[12]) * (Math.pow(e.s + 1, FSRS_W[13]) - 1) * Math.exp(FSRS_W[14] * (1 - r)));
+    else
+      n.s = e.s * (Math.exp(FSRS_W[8]) * (11 - e.d) * Math.pow(e.s, -FSRS_W[9]) * (Math.exp(FSRS_W[10] * (1 - r)) - 1)
+            * (g === 2 ? FSRS_W[15] : 1) * (g === 4 ? FSRS_W[16] : 1) + 1);
+    n.reps = (e.reps || 0) + 1; n.fallas = (e.fallas || 0) + (g === 1 ? 1 : 0);
+  }
+  n.s = Math.max(0.1, n.s);
+  n.ult = hoy;
+  n.prox = fsrsMas(hoy, g === 1 ? 1 : fsrsIntervalo(n.s));
+  return n;
+}
+
+/* ── 2. LAS PREGUNTAS ───────────────────────────────────────────────────────
+   Del libro:  t.preguntas = [{ id, tipo:'opcion'|'vf', q, opciones:[...], correcta, explica, revisada }]
+               (las hace el pastor a mano o con la IA en la laptop, y las revisa).
+   Automáticas: "complete la frase" con opciones, sacadas de lo marcado como importante. */
+var EST_MAX = 10;
+function estLetras(p){ return String(p || '').replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, ''); }
+function estHash(s){ var h = 2166136261; s = String(s); for(var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+function estAzar(semilla){ var x = parseInt(estHash(semilla), 36) || 1; return function(){ x = (Math.imul(x ^ (x >>> 15), 2246822507) + 0x9E3779B9) >>> 0; return (x % 100000) / 100000; }; }
+function estBarajar(a, semilla){ var r = estAzar(semilla), b = a.slice(); for(var i = b.length - 1; i > 0; i--){ var j = Math.floor(r() * (i + 1)); var t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+function pregValida(p){
+  if(!p || typeof p.q !== 'string' || !p.q.trim()) return false;
+  if(p.tipo === 'vf') return typeof p.correcta === 'boolean';
+  return Array.isArray(p.opciones) && p.opciones.length >= 2 && p.opciones.length <= 6
+    && p.opciones.every(function(o){ return typeof o === 'string' && o.trim(); })
+    && p.correcta >= 0 && p.correcta < p.opciones.length;
+}
+function preguntasDelLibro(t){ return (t && Array.isArray(t.preguntas) ? t.preguntas : []).filter(function(p){ return p.revisada !== false && pregValida(p); }); }
+/* palabras de lo importante de TODO el libro, para inventar las opciones que no son */
+function bancoPalabras(){
+  var visto = {}, fuera = [];
+  libroActual.temas.forEach(function(t){
+    (t.importante || []).forEach(function(f){
+      String(f.t || '').split(/\s+/).forEach(function(w){
+        var l = estLetras(w), n = normal(l);
+        if(l.length >= 5 && !esVacia[n] && !visto[n]){ visto[n] = 1; fuera.push(l.toLowerCase()); }
+      });
+    });
+  });
+  return fuera;
+}
+function preguntasAuto(i, banco){
+  var t = libroActual.temas[i], fuera = [];
+  banco = banco || bancoPalabras();
+  (t.importante || []).forEach(function(f){
+    var frase = String(f.t || ''), pal = frase.split(/\s+/).filter(function(p){ return estLetras(p).length >= 5 && !esVacia[normal(estLetras(p))]; });
+    if(pal.length < 2) return;
+    var elegida = pal[Math.floor(pal.length / 2)], limpia = estLetras(elegida);
+    var otras = estBarajar(banco.filter(function(w){ return normal(w) !== normal(limpia); }), frase).slice(0, 3);
+    if(otras.length < 2) return;
+    fuera.push({ id: 'A' + estHash(frase), tipo: 'completar', auto: true,
+                 q: frase.replace(elegida, elegida.replace(limpia, '______')),
+                 opciones: [limpia.toLowerCase()].concat(otras), correcta: 0,
+                 explica: 'La frase completa: «' + frase + '»' });
+  });
+  return fuera;
+}
+function preguntasDeTema(i, banco){
+  return preguntasDelLibro(libroActual.temas[i]).map(function(p){ return Object.assign({}, p); }).concat(preguntasAuto(i, banco));
+}
+function cuantasPreguntas(i){ return preguntasDeTema(i).length; }
+/* el estado de cada pregunta (FSRS y si la última vez la falló) */
+function estPregTodo(){ return leerG('efd_preg', {}); }
+function estPreg(qid){ var t = estPregTodo(); return ((t[libroActual.id] || {})[qid]) || null; }
+function anotarPregunta(qid, bien){
+  var t = estPregTodo(), l = t[libroActual.id] || (t[libroActual.id] = {});
+  var n = fsrsRepasar(l[qid], bien ? 3 : 1, hoyISO());
+  n.ultima = bien ? 'bien' : 'mal';
+  l[qid] = n;
+  ponerG('efd_preg', t);
+}
+/* qué preguntas tocan, según lo que pidió */
+function listaPreguntas(alcance, i){
+  var banco = bancoPalabras(), todas = [];
+  libroActual.temas.forEach(function(t, k){
+    if(alcance === 'tema' && k !== i) return;
+    preguntasDeTema(k, banco).forEach(function(p){ p.tema = k; todas.push(p); });
+  });
+  var hoy = hoyISO();
+  if(alcance === 'falladas') todas = todas.filter(function(p){ var e = estPreg(p.id); return e && e.ultima === 'mal'; });
+  if(alcance === 'hoy') todas = todas.filter(function(p){ var e = estPreg(p.id); return !e || e.prox <= hoy; });
+  return todas;
+}
+function preguntasParaSesion(alcance, i){
+  var todas = listaPreguntas(alcance, i), hoy = hoyISO(), sem = hoy + alcance + (i || 0) + Date.now();
+  if(alcance === 'tema') return estBarajar(todas, sem).slice(0, EST_MAX);
+  /* mezcladas: primero las que tocan hoy (o nunca vistas), luego las demás; de varios temas a la vez */
+  var tocan = todas.filter(function(p){ var e = estPreg(p.id); return !e || e.prox <= hoy; });
+  var resto = todas.filter(function(p){ return tocan.indexOf(p) < 0; });
+  return estBarajar(tocan, sem).concat(estBarajar(resto, sem + 'r')).slice(0, EST_MAX);
+}
+
+/* ── 3. EL CUESTIONARIO ── */
+var _cz = null;
+function sinPreguntas(){
+  decir('Todavía no hay preguntas',
+    (EFD_ADMIN
+      ? 'Este libro todavía no tiene preguntas.<br><br>Puede escribirlas en cada tema con <b>✏️ Preguntas de este tema</b>, '
+        + 'o hacerlas con <b>✨ Preparar con IA</b> en la laptop. Las que salen solas aparecen cuando hay frases marcadas como ★ importantes.'
+      : 'Este libro todavía no trae preguntas. Cuando el pastor las agregue, le llegan en el libro.'));
+}
+function abrirCuestionario(alcance, i){
+  cerrarMenu();
+  if(!libroActual) return;
+  var lista = preguntasParaSesion(alcance || 'libro', i);
+  if(!lista.length){
+    if(alcance === 'falladas') return decir('¡Nada que repasar!', 'No tiene preguntas falladas en este libro.');
+    if(alcance === 'hoy') return decir('Al día', 'Hoy no le toca repasar ninguna pregunta. Vuelva mañana.');
+    return sinPreguntas();
+  }
+  _cz = { lista: lista, n: 0, bien: 0, mal: [], alcance: alcance || 'libro', tema: i, resp: null,
+          orden: lista.map(function(p, k){ return estBarajar(p.tipo === 'vf' ? [] : p.opciones.map(function(o, j){ return j; }), p.id + k + Date.now()); }) };
+  pintarPregunta();
+}
+function pintarPregunta(){
+  estCallar();
+  var c = _cz, p = c.lista[c.n], t = libroActual.temas[p.tema];
+  var html = '<div class="cz-cab"><span>Pregunta ' + (c.n + 1) + ' de ' + c.lista.length + '</span>'
+    + '<span>Tema ' + (p.tema + 1) + '</span></div>'
+    + '<div class="progreso" style="margin:6px 0 12px"><i style="width:' + Math.round(c.n * 100 / c.lista.length) + '%"></i></div>'
+    + '<div class="cz-q" id="cz-q"></div>'
+    + '<button class="btn btn-linea btn-chico" id="cz-oir" style="margin:2px 0 10px">🔊 Oír la pregunta</button>'
+    + '<div id="cz-ops"></div><div id="cz-fb"></div>'
+    + '<div class="fila" id="cz-pie"><button class="btn btn-linea" id="cz-salir">Salir</button></div>';
+  modal(html);
+  $('cz-q').textContent = (p.tipo === 'vf' ? 'Verdadero o falso: ' : '') + p.q;
+  var ops = $('cz-ops');
+  if(p.tipo === 'vf'){
+    [['Verdadero', true], ['Falso', false]].forEach(function(o){
+      var b = document.createElement('button'); b.className = 'btn btn-linea cz-op'; b.textContent = o[0];
+      b.onclick = function(){ responderPregunta(o[1]); }; ops.appendChild(b);
+    });
+  } else {
+    c.orden[c.n].forEach(function(j, k){
+      var b = document.createElement('button'); b.className = 'btn btn-linea cz-op'; b.setAttribute('data-j', j);
+      b.textContent = String.fromCharCode(65 + k) + ') ' + p.opciones[j];
+      b.onclick = function(){ responderPregunta(j); }; ops.appendChild(b);
+    });
+  }
+  $('cz-oir').onclick = function(){
+    var txt = $('cz-q').textContent + (p.tipo === 'vf' ? '' : '. ' + c.orden[c.n].map(function(j, k){ return String.fromCharCode(65 + k) + ': ' + p.opciones[j]; }).join('. '));
+    estDecir([txt]);
+  };
+  $('cz-salir').onclick = function(){ estCallar(); terminarCuestionario(true); };
+}
+function responderPregunta(r){
+  var c = _cz, p = c.lista[c.n];
+  if(c.resp !== null) return;
+  var bien = p.tipo === 'vf' ? (r === p.correcta) : (r === p.correcta);
+  c.resp = r;
+  if(bien) c.bien++; else c.mal.push(p);
+  anotarPregunta(p.id, bien);
+  [].forEach.call(document.querySelectorAll('#cz-ops .cz-op'), function(b, k){
+    b.disabled = true;
+    var val = p.tipo === 'vf' ? (k === 0) : +b.getAttribute('data-j');
+    if(val === p.correcta) b.classList.add('cz-si');
+    else if(val === r) b.classList.add('cz-no');
+  });
+  var correcta = p.tipo === 'vf' ? (p.correcta ? 'Verdadero' : 'Falso') : p.opciones[p.correcta];
+  var fb = $('cz-fb');
+  fb.innerHTML = '<div class="aviso ' + (bien ? 'av-verde' : 'av-rojo') + '" style="margin:10px 0"><b id="cz-ok"></b><div id="cz-exp" style="margin-top:6px"></div></div>';
+  $('cz-ok').textContent = bien ? '✓ ¡Correcto!' : '✗ La respuesta es: ' + correcta;
+  $('cz-exp').textContent = p.explica || '';
+  var ult = c.n + 1 >= c.lista.length;
+  $('cz-pie').innerHTML = '<button class="btn btn-linea" id="cz-ver">📖 Ver en el tema</button>'
+    + '<button class="btn btn-oro" id="cz-sig">' + (ult ? 'Terminar' : 'Siguiente →') + '</button>';
+  $('cz-ver').onclick = function(){ estCallar(); cerrarModal(); verTema(p.tema); };
+  $('cz-sig').onclick = function(){ c.n++; c.resp = null; if(c.n >= c.lista.length) terminarCuestionario(); else pintarPregunta(); };
+}
+function terminarCuestionario(salio){
+  var c = _cz;
+  if(!c) return cerrarModal();
+  var hechas = salio ? c.n + (c.resp !== null ? 1 : 0) : c.lista.length;
+  if(!hechas) return cerrarModal();
+  var pct = Math.round(c.bien * 100 / hechas);
+  var html = '<h2>' + (pct >= 80 ? '¡Muy bien!' : pct >= 50 ? 'Buen trabajo' : 'Siga practicando') + '</h2>'
+    + '<div class="cz-nota">' + c.bien + ' de ' + hechas + '</div>'
+    + '<p class="mini" style="text-align:center;margin:0 0 12px">Las que falló vuelven mañana; las que sabe, más adelante.</p>';
+  if(c.mal.length){
+    html += '<p class="etq">Para repasar</p><div id="cz-mal"></div>'
+      + '<button class="btn btn-oro" id="cz-rep">🔁 Repasar las falladas</button>'
+      + '<button class="btn btn-linea" id="cz-hab">🗣 Escucharlas (repaso hablado)</button>';
+  }
+  html += '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>';
+  modal(html);
+  var caja = $('cz-mal');
+  if(caja) c.mal.forEach(function(p){ var d = document.createElement('div'); d.className = 'rubrica'; d.textContent = p.q; caja.appendChild(d); });
+  if($('cz-rep')) $('cz-rep').onclick = function(){ abrirCuestionario('falladas'); };
+  if($('cz-hab')) $('cz-hab').onclick = function(){ armarRepasoHablado('falladas', 8); };
+  _cz = null;
+}
+
+/* ── 4. EL REPASO HABLADO: la app pregunta, deja pensar, y dice la respuesta.
+   Se arma como un libro aparte ("🗣 Repaso — ..."), así suena con la voz nueva
+   con la pantalla apagada, con los botones de la pantalla bloqueada y el texto
+   que corre. El silencio para pensar es la marca [[pausa:N]]. */
+function enunciadoHablado(p){
+  if(p.tipo === 'vf') return 'Verdadero o falso: ' + p.q;
+  if(p.tipo === 'completar') return 'Complete la frase: ' + p.q.replace(/_{3,}/g, '…') + ' ¿Qué palabra falta?';
+  return p.q + ' Opciones: ' + p.opciones.join('. ') + '.';
+}
+function respuestaHablada(p){
+  var r = p.tipo === 'vf' ? ('Es ' + (p.correcta ? 'verdadero' : 'falso') + '.') : ('Respuesta: ' + p.opciones[p.correcta] + '.');
+  return r + (p.explica ? ' ' + p.explica : '');
+}
+function abrirRepasoHablado(){
+  cerrarMenu();
+  if(!libroActual) return;
+  if(libroActual.derivado) return decir('Este ya es un repaso', 'Toque ▶ para escucharlo. Para armar otro, abra el libro original.');
+  if(!listaPreguntas('libro').length) return sinPreguntas();
+  var segs = [5, 8, 12];
+  modal('<h2>🗣 Repaso hablado</h2>'
+    + '<p style="font-size:15.5px;line-height:1.55;margin:0 0 12px">La app le hace las preguntas en voz alta, le deja unos segundos para pensar '
+    + 'la respuesta, y después se la dice. Sirve con la pantalla apagada, manejando o caminando.</p>'
+    + '<label class="etq">¿Cuáles?</label><div class="est-chips">'
+    + '<button class="chip on" data-al="libro">Todas</button> <button class="chip" data-al="hoy">Las de hoy</button> <button class="chip" data-al="falladas">Las que fallé</button></div>'
+    + '<label class="etq">Tiempo para pensar</label><div class="est-chips" id="rh-seg">'
+    + segs.map(function(s){ return '<button class="chip' + (s === 8 ? ' on' : '') + '" data-s="' + s + '">' + s + ' s</button>'; }).join(' ') + '</div>'
+    + '<div id="rh-err"></div>'
+    + '<button class="btn btn-oro" id="rh-ir">🗣 Armar y escuchar</button>'
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>');
+  var al = 'libro', sg = 8;
+  [].forEach.call(document.querySelectorAll('[data-al]'), function(b){
+    b.onclick = function(){ al = this.getAttribute('data-al'); [].forEach.call(document.querySelectorAll('[data-al]'), function(x){ x.classList.toggle('on', x === b); }); };
+  });
+  [].forEach.call(document.querySelectorAll('[data-s]'), function(b){
+    b.onclick = function(){ sg = +this.getAttribute('data-s'); [].forEach.call(document.querySelectorAll('[data-s]'), function(x){ x.classList.toggle('on', x === b); }); };
+  });
+  $('rh-ir').onclick = function(){ armarRepasoHablado(al, sg); };
+}
+async function armarRepasoHablado(alcance, sg){
+  var lista = listaPreguntas(alcance);
+  if(!lista.length){
+    if($('rh-err')) return errorEn('rh-err', alcance === 'falladas' ? 'No tiene preguntas falladas.' : 'Hoy no le toca ninguna.');
+    return decir('Nada que repasar', 'No hay preguntas para ese repaso.');
+  }
+  lista = alcance === 'libro' ? lista : estBarajar(lista, hoyISO());
+  var orig = libroActual, temas = [], POR = 8;
+  for(var k = 0; k < lista.length; k += POR){
+    var parte = lista.slice(k, k + POR), texto = [];
+    parte.forEach(function(p, j){
+      texto.push('Pregunta ' + (k + j + 1) + '. ' + enunciadoHablado(p));
+      texto.push('[[pausa:' + sg + ']]');
+      texto.push(respuestaHablada(p));
+    });
+    var de = parte[0].tema + 1, a = parte[parte.length - 1].tema + 1;
+    temas.push({ n: temas.length + 1, titulo: 'Repaso ' + (temas.length + 1) + ' · ' + (de === a ? 'tema ' + de : 'temas ' + Math.min(de, a) + '–' + Math.max(de, a)),
+                 texto: texto, importante: [] });
+  }
+  var nombre = alcance === 'falladas' ? 'las que falló' : alcance === 'hoy' ? 'las de hoy' : 'todas';
+  var lib = { id: 'RH-' + orig.id, titulo: '🗣 Repaso — ' + orig.titulo + ' (' + nombre + ')', creado: hoyISO(),
+              sellado: null, derivado: orig.id, temas: temas };
+  await guardarLibro(lib);
+  cerrarModal();
+  await abrirLibro(lib.id);
+  try{ temaActual = 0; prepararEscuchar(true); if(!sonando) setTimeout(playPausa, 200); }catch(e){}
+}
+
+/* ── 5. ANTES DE ESCUCHAR: 2 preguntas para pensar (sin la respuesta) ── */
+function cajaAntesDeEscuchar(i){
+  if(!libroActual || libroActual.derivado || esHecho(i)) return '';
+  var ps = preguntasDeTema(i).filter(function(p){ return p.tipo !== 'completar'; }).slice(0, 2);
+  if(!ps.length) ps = preguntasDeTema(i).slice(0, 1);
+  if(!ps.length) return '';
+  return '<div class="tarj cz-antes"><div class="cz-antes-t">❔ Antes de escuchar, piense:</div>'
+    + ps.map(function(p){ return '<div class="cz-antes-q">• ' + esc((p.tipo === 'vf' ? '¿Verdadero o falso? ' : '') + p.q.replace(/_{3,}/g, '…')) + '</div>'; }).join('')
+    + '<div class="mini" style="margin-top:4px">La respuesta está en el tema. Al final, toque ❓ Preguntas.</div></div>';
+}
+
+/* ── 6. EXPLÍQUELO CON SUS PALABRAS ── */
+function conceptosDelTema(i){
+  var t = libroActual.temas[i], cuenta = {}, forma = {};
+  var fuente = (t.importante || []).map(function(f){ return f.t; }).join(' ') + ' ' + resumirTexto(t.texto || [], 5).join(' ') + ' ' + t.titulo;
+  String(fuente).split(/\s+/).forEach(function(w){
+    var l = estLetras(w), n = normal(l);
+    if(l.length < 5 || esVacia[n]) return;
+    var raiz = n.slice(0, 5);
+    cuenta[raiz] = (cuenta[raiz] || 0) + 1;
+    if(!forma[raiz] || l.length < forma[raiz].length) forma[raiz] = l.toLowerCase();
+  });
+  return Object.keys(cuenta).sort(function(a, b){ return cuenta[b] - cuenta[a] || (a < b ? -1 : 1); }).slice(0, 6)
+    .map(function(r){ return { raiz: r, palabra: forma[r] }; });
+}
+function estExplicaciones(){ return leerG('efd_explica', {}); }
+function abrirExplicar(i){
+  if(i === undefined) i = temaActual;
+  var t = libroActual.temas[i], previa = (estExplicaciones()[llaveTema(i)] || {}).txt || '';
+  modal('<h2>✍️ Explíquelo con sus palabras</h2>'
+    + '<p style="font-size:15.5px;line-height:1.55;margin:0 0 10px">Sin mirar el tema, escriba (o dicte con el micrófono del teclado) '
+    + 'lo principal de <b id="ex-tit"></b>. Explicarlo uno mismo es de lo que más ayuda a recordar.</p>'
+    + '<textarea class="campo" id="ex-txt" rows="6" style="resize:vertical"></textarea>'
+    + '<div id="ex-err"></div>'
+    + '<button class="btn btn-oro" id="ex-ok">Comparar con el tema</button>'
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>');
+  $('ex-tit').textContent = t.titulo;
+  $('ex-txt').value = previa;
+  $('ex-ok').onclick = function(){
+    var txt = ($('ex-txt').value || '').trim();
+    if(txt.split(/\s+/).length < 5) return errorEn('ex-err', 'Escriba por lo menos una o dos frases.');
+    var g = estExplicaciones(); g[llaveTema(i)] = { txt: txt.slice(0, 5000), fecha: hoyISO() }; ponerG('efd_explica', g);
+    compararExplicacion(i, txt);
+  };
+}
+function compararExplicacion(i, txt){
+  var mio = normal(txt).replace(/[^a-z0-9ñ\s]/g, ' ').split(/\s+/);
+  var cs = conceptosDelTema(i).map(function(c){
+    return { palabra: c.palabra, si: mio.some(function(w){ return w.length >= 4 && w.slice(0, 5) === c.raiz.slice(0, Math.min(5, w.length)) && w.slice(0, 4) === c.raiz.slice(0, 4); }) };
+  });
+  var cuantas = cs.filter(function(c){ return c.si; }).length;
+  modal('<h2>Su explicación</h2>'
+    + '<p class="mini" style="margin:-6px 0 8px">Palabras clave del tema: mencionó ' + cuantas + ' de ' + cs.length + '.</p>'
+    + '<div id="ex-cs" class="ex-cs"></div>'
+    + '<p class="etq" style="margin-top:12px">Lo esencial del tema</p><div id="ex-res"></div>'
+    + '<button class="btn btn-linea" id="ex-otra">Escribirla otra vez</button>'
+    + '<button class="btn btn-oro" onclick="cerrarModal()">Listo</button>');
+  var caja = $('ex-cs');
+  cs.forEach(function(c){ var s = document.createElement('span'); s.className = 'ex-c ' + (c.si ? 'ex-si' : 'ex-no'); s.textContent = (c.si ? '✓ ' : '○ ') + c.palabra; caja.appendChild(s); });
+  var res = $('ex-res'), lineas = resumirTexto(libroActual.temas[i].texto || [], 4);
+  (lineas.length ? lineas : (libroActual.temas[i].importante || []).map(function(f){ return f.t; })).forEach(function(l){
+    var d = document.createElement('div'); d.className = 'rubrica'; d.textContent = l; res.appendChild(d);
+  });
+  $('ex-otra').onclick = function(){ abrirExplicar(i); };
+}
+
+/* ── 7. EL PLAN DE ESTUDIO: cuántos temas por día. Si un día falla, el plan
+   no castiga: "hoy" siempre es lo siguiente que no ha escuchado. ── */
+function estPlanes(){ return leerG('efd_plan', {}); }
+function planDe(l){ return l ? estPlanes()[l.id] || null : null; }
+function pintarPlan(){
+  var caja = $('plan-caja');
+  if(!caja) return;
+  var l = libroActual;
+  if(!l || l.derivado || !l.temas || l.temas.length < 3){ caja.innerHTML = ''; return; }
+  var pl = planDe(l);
+  if(!pl){ caja.innerHTML = '<button class="btn btn-linea btn-chico plan-hacer" onclick="abrirPlan()">📅 Hacer un plan de estudio</button>'; return; }
+  var total = l.temas.length, hechos = 0, pend = [];
+  l.temas.forEach(function(t, i){ if(esHecho(i)) hechos++; else pend.push(i); });
+  var porDia = pl.porDia || 1, dias = Math.ceil(total / porDia);
+  var hoyToca = pend.slice(0, porDia), pct = Math.round(hechos * 100 / total);
+  /* al día = ya hizo lo de los días pasados (lo de hoy todavía lo puede hacer hoy) */
+  var pasados = Math.max(0, fsrsDias(pl.inicio, hoyISO()));
+  var minimo = Math.min(total, pasados * porDia), maximo = Math.min(total, (pasados + 1) * porDia);
+  var atras = Math.ceil((minimo - hechos) / porDia), alante = Math.ceil((hechos - maximo) / porDia);
+  var ritmo = !pend.length ? '' : hechos < minimo ? ' · el plan se corrió ' + atras + ' día' + (atras === 1 ? '' : 's') + ', sin problema'
+            : hechos > maximo ? ' · va ' + alante + ' día' + (alante === 1 ? '' : 's') + ' adelantado' : ' · al día';
+  var rc = 0; try{ rc = racha(); }catch(e){}
+  var html = '<div class="plan"><div class="plan-cab"><span>📅 Plan: ' + porDia + ' tema' + (porDia === 1 ? '' : 's') + ' por día · día '
+    + Math.min(dias, Math.floor(hechos / porDia) + 1) + ' de ' + dias + '</span><button class="plan-cambiar" onclick="abrirPlan()">Cambiar</button></div>';
+  if(!pend.length) html += '<div class="plan-hoy">🎉 ¡Terminó el plan! Escuchó los ' + total + ' temas.</div>';
+  else html += hoyToca.map(function(i){ return '<div class="plan-hoy"><span>Hoy: ' + (i + 1) + '. ' + esc(l.temas[i].titulo) + '</span>'
+      + '<button class="plan-oir" onclick="planEscuchar(' + i + ')">▶</button></div>'; }).join('');
+  html += '<div class="progreso" style="margin:6px 0 2px"><i style="width:' + pct + '%"></i></div>'
+    + '<div class="mini">' + pct + '% hecho' + ritmo + (rc > 1 ? ' · 🔥 ' + rc + ' días seguidos' : '') + '</div></div>';
+  caja.innerHTML = html;
+}
+function planEscuchar(i){
+  cargarEnReproductor(i);
+  if(!sonando) setTimeout(playPausa, 150);
+}
+function abrirPlan(){
+  cerrarMenu();
+  if(!libroActual) return;
+  if(libroActual.derivado) return decir('Es un repaso', 'Los planes son para los libros, no para los repasos.');
+  var pl = planDe(libroActual), total = libroActual.temas.length;
+  modal('<h2>📅 Plan de estudio</h2>'
+    + '<p style="font-size:15.5px;line-height:1.55;margin:0 0 12px">Un poquito cada día rinde más que mucho de una vez. '
+    + 'Escoja cuántos temas por día. Si un día no puede, el plan se corre solo, sin castigo.</p>'
+    + '<div class="est-chips">' + [1, 2, 3].map(function(n){
+        return '<button class="chip' + ((pl ? pl.porDia : 1) === n ? ' on' : '') + '" data-pd="' + n + '">' + n + ' por día · ' + Math.ceil(total / n) + ' días</button>';
+      }).join(' ') + '</div>'
+    + '<button class="btn btn-oro" id="pl-ok">' + (pl ? 'Guardar el cambio' : 'Empezar hoy') + '</button>'
+    + (pl ? '<button class="btn btn-linea" id="pl-quitar">Quitar el plan</button>' : '')
+    + '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>');
+  var pd = pl ? pl.porDia : 1;
+  [].forEach.call(document.querySelectorAll('[data-pd]'), function(b){
+    b.onclick = function(){ pd = +this.getAttribute('data-pd'); [].forEach.call(document.querySelectorAll('[data-pd]'), function(x){ x.classList.toggle('on', x === b); }); };
+  });
+  $('pl-ok').onclick = function(){
+    var g = estPlanes(); g[libroActual.id] = { porDia: pd, inicio: pl ? pl.inicio : hoyISO() }; ponerG('efd_plan', g);
+    cerrarModal(); pintarPlan();
+  };
+  if($('pl-quitar')) $('pl-quitar').onclick = function(){ var g = estPlanes(); delete g[libroActual.id]; ponerG('efd_plan', g); cerrarModal(); pintarPlan(); };
+}
+
+/* ── 8. VOZ PARA LEER UNA PREGUNTA (la de la computadora/teléfono) ── */
+var _estHabla = false;
+function estDecir(frases){
+  estCallar();
+  if(!voz) return;
+  if(typeof sonando !== 'undefined' && sonando){ detenerVoz(); sonando = false; var bp = $('esc-play'); if(bp) bp.textContent = '▶'; }
+  _estHabla = true;
+  var i = 0;
+  (function sig(){
+    if(!_estHabla || i >= frases.length){ _estHabla = false; return; }
+    var u = new SpeechSynthesisUtterance(frases[i++]), v = escogerVoz();
+    if(v){ u.voice = v; u.lang = v.lang || 'es-US'; } else u.lang = 'es-US';
+    u.rate = velocidad; u.onend = sig; u.onerror = function(){ _estHabla = false; };
+    voz.speak(u);
+  })();
+}
+function estCallar(){ if(_estHabla){ _estHabla = false; try{ if(voz) voz.cancel(); }catch(e){} } }
+
+/* ── 9. LOS BOTONES Y EL MENÚ ── */
+function botonesEstudioTema(i){
+  if(libroActual && libroActual.derivado) return '';
+  var n = cuantasPreguntas(i);
+  var h = '<div class="fila"><button class="btn btn-linea" onclick="abrirCuestionario(\'tema\',' + i + ')">❓ Preguntas' + (n ? ' (' + n + ')' : '') + '</button>'
+        + '<button class="btn btn-linea" onclick="abrirExplicar(' + i + ')">✍️ Explíquelo</button></div>';
+  if(!EFD_ADMIN) h += '<div class="fila"><button class="btn btn-linea" onclick="verResumen(' + i + ')">📄 Lo esencial</button>'
+        + '<button class="btn btn-linea" onclick="verRelacionados(' + i + ')">🔗 Se parece a...</button></div>';
+  if(EFD_ADMIN) h += '<button class="btn btn-linea" onclick="editarPreguntas(' + i + ')">✏️ Preguntas de este tema (' + preguntasDelLibro(libroActual.temas[i]).length + ')</button>';
+  return h;
+}
+function menuEstudiar(){
+  if(!libroActual || libroActual.derivado) return '';
+  var c = '<div class="menu-sec">Estudiar</div>';
+  if(!EFD_ADMIN){
+    var pendHoy = 0; try{ pendHoy = tarjetasDelLibro(true).length; }catch(e){}
+    c += '<div class="menu-it" onclick="abrirBuscar()"><span class="mi">🔍</span>Buscar en el libro</div>'
+      + '<div class="menu-it" onclick="verMapa()"><span class="mi">🗺️</span>Mapa del libro</div>'
+      + '<div class="menu-it" onclick="verConceptos()"><span class="mi">🗂️</span>Índice de conceptos</div>'
+      + '<div class="menu-it" onclick="abrirTarjetas()"><span class="mi">🃏</span>Tarjetas de repaso'
+      + (pendHoy ? '<span class="mx" style="color:var(--oro)">' + pendHoy + ' hoy</span>' : '') + '</div>';
+  }
+  var hoyP = 0; try{ hoyP = listaPreguntas('hoy').length; }catch(e){}
+  c += '<div class="menu-it" onclick="abrirCuestionario(\'libro\')"><span class="mi">❓</span>Cuestionario (temas mezclados)'
+    + (hoyP ? '<span class="mx" style="color:var(--oro)">' + hoyP + ' hoy</span>' : '') + '</div>'
+    + '<div class="menu-it" onclick="abrirCuestionario(\'falladas\')"><span class="mi">🔁</span>Las preguntas que fallé</div>'
+    + '<div class="menu-it" onclick="abrirRepasoHablado()"><span class="mi">🗣</span>Repaso hablado</div>'
+    + '<div class="menu-it" onclick="abrirPlan()"><span class="mi">📅</span>Plan de estudio</div>';
+  return c;
+}
+/* la caja del plan se pinta cada vez que se pinta la pantalla del libro */
+var _pintarPrepararAntes = pintarPreparar;
+pintarPreparar = function(){ var r = _pintarPrepararAntes.apply(this, arguments); try{ pintarPlan(); }catch(e){} return r; };
+
+/* ── 10. SOLO EL PASTOR (ADMIN): escribir, corregir o borrar las preguntas de un tema ── */
+function editarPreguntas(i){
+  if(!EFD_ADMIN) return;
+  var t = libroActual.temas[i], ps = Array.isArray(t.preguntas) ? t.preguntas : [];
+  var html = '<h2>✏️ Preguntas del tema ' + (i + 1) + '</h2><p class="mini" style="margin:-6px 0 10px" id="ep-tit"></p>'
+    + '<div id="ep-lista"></div>'
+    + '<button class="btn btn-oro" id="ep-nueva">+ Escribir una pregunta</button>'
+    + (typeof iaEnMenu === 'function' && iaEnMenu() ? '<button class="btn btn-linea" id="ep-ia">✨ Hacerlas con IA</button>' : '')
+    + '<button class="btn btn-linea" onclick="cerrarModal();verTema(' + i + ')">Cerrar</button>';
+  modal(html);
+  $('ep-tit').textContent = t.titulo + ' · Las preguntas viajan dentro del libro sellado.';
+  var caja = $('ep-lista');
+  if(!ps.length){ caja.innerHTML = '<p class="mini">Este tema todavía no tiene preguntas escritas.</p>'; }
+  ps.forEach(function(p, k){
+    var d = document.createElement('div'); d.className = 'tarj ep-p';
+    var q = document.createElement('div'); q.className = 'ep-q'; q.textContent = (k + 1) + '. ' + (p.tipo === 'vf' ? '(V/F) ' : '') + p.q;
+    var r = document.createElement('div'); r.className = 'mini';
+    r.textContent = 'Respuesta: ' + (p.tipo === 'vf' ? (p.correcta ? 'Verdadero' : 'Falso') : (p.opciones || [])[p.correcta]) + (p.origen === 'ia' ? ' · ✨ hecha con IA y revisada' : '');
+    var b = document.createElement('div'); b.style.marginTop = '6px';
+    b.innerHTML = '<button class="btn btn-linea btn-chico">✏️ Cambiar</button><button class="btn btn-rojo btn-chico">Borrar</button>';
+    b.children[0].onclick = function(){ formPregunta(i, k); };
+    b.children[1].onclick = function(){
+      preguntar('Borrar la pregunta', 'Se borra esta pregunta del tema.', async function(){
+        t.preguntas.splice(k, 1); libroActual.sellado = null; await guardarLibro(libroActual); editarPreguntas(i);
+      });
+    };
+    d.appendChild(q); d.appendChild(r); d.appendChild(b); caja.appendChild(d);
+  });
+  $('ep-nueva').onclick = function(){ formPregunta(i, -1); };
+  if($('ep-ia')) $('ep-ia').onclick = function(){ iaPreguntasDeTema(i); };
+}
+function formPregunta(i, k){
+  var t = libroActual.temas[i], p = k >= 0 ? t.preguntas[k] : { tipo: 'opcion', q: '', opciones: ['', '', '', ''], correcta: 0, explica: '' };
+  var tipo = p.tipo === 'vf' ? 'vf' : 'opcion';
+  modal('<h2>' + (k >= 0 ? 'Cambiar la pregunta' : 'Pregunta nueva') + '</h2>'
+    + '<div class="est-chips"><button class="chip' + (tipo === 'opcion' ? ' on' : '') + '" id="fp-op">Opción múltiple</button> '
+    + '<button class="chip' + (tipo === 'vf' ? ' on' : '') + '" id="fp-vf">Verdadero o falso</button></div>'
+    + '<label class="etq" for="fp-q" id="fp-ql"></label><textarea class="campo" id="fp-q" rows="2" maxlength="400"></textarea>'
+    + '<div id="fp-opciones"></div>'
+    + '<label class="etq" for="fp-ex" style="margin-top:10px">Explicación (se ve al responder)</label><textarea class="campo" id="fp-ex" rows="2" maxlength="600"></textarea>'
+    + '<div id="fp-err"></div>'
+    + '<button class="btn btn-oro" id="fp-ok">Guardar</button><button class="btn btn-linea" id="fp-no">Cancelar</button>');
+  $('fp-q').value = p.q || ''; $('fp-ex').value = p.explica || '';
+  function pintarOps(){
+    $('fp-ql').textContent = tipo === 'vf' ? 'La afirmación' : 'La pregunta';
+    var c = $('fp-opciones');
+    if(tipo === 'vf'){
+      c.innerHTML = '<label class="etq" style="margin-top:10px">¿Es verdadera?</label><div class="est-chips"><button class="chip" id="fp-v">Verdadero</button> <button class="chip" id="fp-f">Falso</button></div>';
+      var v = p.tipo === 'vf' ? p.correcta : true;
+      $('fp-v').classList.toggle('on', v); $('fp-f').classList.toggle('on', !v);
+      $('fp-v').onclick = function(){ p._v = true; $('fp-v').classList.add('on'); $('fp-f').classList.remove('on'); };
+      $('fp-f').onclick = function(){ p._v = false; $('fp-f').classList.add('on'); $('fp-v').classList.remove('on'); };
+      if(p._v === undefined) p._v = v;
+    } else {
+      var ops = (p.tipo !== 'vf' && p.opciones) ? p.opciones.slice() : ['', '', '', ''];
+      while(ops.length < 4) ops.push('');
+      c.innerHTML = '<label class="etq" style="margin-top:10px">Opciones (marque la correcta)</label>';
+      ops.slice(0, 5).forEach(function(o, j){
+        var f = document.createElement('label'); f.className = 'est-fila';
+        f.innerHTML = '<input type="radio" name="fp-c" value="' + j + '"' + ((p.tipo !== 'vf' ? p.correcta : 0) === j ? ' checked' : '') + '><input class="campo fp-o" style="padding:9px 10px" maxlength="200">';
+        f.querySelector('.fp-o').value = o; c.appendChild(f);
+      });
+    }
+  }
+  pintarOps();
+  $('fp-op').onclick = function(){ tipo = 'opcion'; $('fp-op').classList.add('on'); $('fp-vf').classList.remove('on'); pintarOps(); };
+  $('fp-vf').onclick = function(){ tipo = 'vf'; $('fp-vf').classList.add('on'); $('fp-op').classList.remove('on'); pintarOps(); };
+  $('fp-no').onclick = function(){ editarPreguntas(i); };
+  $('fp-ok').onclick = async function(){
+    var q = ($('fp-q').value || '').trim(), ex = ($('fp-ex').value || '').trim(), nueva;
+    if(!q) return errorEn('fp-err', 'Escriba la pregunta.');
+    if(tipo === 'vf') nueva = { tipo: 'vf', q: q, correcta: p._v !== false, explica: ex };
+    else {
+      var ops = [], cor = -1, marc = +((document.querySelector('input[name=fp-c]:checked') || {}).value || 0);
+      [].forEach.call(document.querySelectorAll('.fp-o'), function(inp, j){ var v = (inp.value || '').trim(); if(v){ if(j === marc) cor = ops.length; ops.push(v); } });
+      if(ops.length < 2) return errorEn('fp-err', 'Escriba por lo menos 2 opciones.');
+      if(cor < 0) return errorEn('fp-err', 'La opción marcada como correcta está vacía.');
+      nueva = { tipo: 'opcion', q: q, opciones: ops, correcta: cor, explica: ex };
+    }
+    nueva.id = (k >= 0 && t.preguntas[k].id) || ('P' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+    nueva.revisada = true; nueva.origen = k >= 0 ? (t.preguntas[k].origen || 'pastor') : 'pastor';
+    if(!Array.isArray(t.preguntas)) t.preguntas = [];
+    if(k >= 0) t.preguntas[k] = nueva; else t.preguntas.push(nueva);
+    libroActual.sellado = null;
+    await guardarLibro(libroActual);
+    editarPreguntas(i);
+  };
+}
+
 /* ── el menú lateral ── */
 function abrirMenu(){
   var hayLibro = !!libroActual;
@@ -5793,6 +7286,7 @@ function abrirMenu(){
       + '<div class="menu-it" onclick="verConceptos()"><span class="mi">🗂️</span>Índice de conceptos</div>'
       + '<div class="menu-it" onclick="abrirTarjetas()"><span class="mi">🃏</span>Tarjetas de repaso'
       + (pendHoy ? '<span class="mx" style="color:var(--oro)">' + pendHoy + ' hoy</span>' : '') + '</div>'
+      + menuEstudiar()   // v4.5
       + '<div class="menu-sec">Escuchar</div>'
       + '<div class="menu-it" onclick="temaDelDia()"><span class="mi">📅</span>Tema del día</div>'
       + '<div class="menu-it" onclick="cerrarMenu();escucharDesdeElPrincipio()"><span class="mi">🔊</span>Escuchar el libro</div>'
@@ -5800,6 +7294,7 @@ function abrirMenu(){
       + '<div class="menu-it" onclick="abrirTemporizador()"><span class="mi">⏱️</span>Temporizador'
       + (tempQuedan ? '<span class="mx">' + tempQuedan + '</span>' : '') + '</div>'
       + '<div class="menu-sec">Materiales</div>'
+      + (iaEnMenu() ? '<div class="menu-it" onclick="abrirIA()"><span class="mi">✨</span>Preparar con IA</div>' : '')
       + '<div class="menu-it" onclick="hojaDeBolsillo()"><span class="mi">📄</span>Hoja de bolsillo</div>'
       + '<div class="menu-it" onclick="imprimirLibro()"><span class="mi">🖨️</span>Imprimir el libro</div>';
   }
